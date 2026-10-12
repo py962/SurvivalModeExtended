@@ -1,0 +1,311 @@
+{
+  "owl.ambient": {
+    "subtitle": "subtitles.entity.owl.ambient",
+    "sounds": [
+      "terrainlab:entity/owl/ambient"
+    ]
+  },
+  "owl.hurt": {
+    "subtitle": "subtitles.entity.owl.hurt",
+    "sounds": [
+      "terrainlab:entity/owl/hurt"
+    ]
+  },
+  "owl.death": {
+    "subtitle": "subtitles.entity.owl.death",
+    "sounds": [
+      "terrainlab:entity/owl/death"
+    ]
+  },
+  "owl.ambient_distant": {
+    "subtitle": "subtitles.entity.owl.ambient",
+    "sounds": [
+      {
+        "name": "terrainlab:entity/owl/ambient_distant",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "goose.ambient": {
+    "subtitle": "subtitles.entity.goose.ambient",
+    "sounds": [
+      "terrainlab:entity/goose/ambient"
+    ]
+  },
+  "goose.hurt": {
+    "subtitle": "subtitles.entity.goose.hurt",
+    "sounds": [
+      "terrainlab:entity/goose/hurt"
+    ]
+  },
+  "goose.death": {
+    "subtitle": "subtitles.entity.goose.death",
+    "sounds": [
+      "terrainlab:entity/goose/death"
+    ]
+  },
+  "goose.ambient_distant": {
+    "subtitle": "subtitles.entity.goose.ambient",
+    "sounds": [
+      {
+        "name": "terrainlab:entity/goose/ambient_distant",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "vulture.ambient": {
+    "subtitle": "subtitles.entity.vulture.ambient",
+    "sounds": [
+      "terrainlab:entity/vulture/ambient"
+    ]
+  },
+  "vulture.hurt": {
+    "subtitle": "subtitles.entity.vulture.hurt",
+    "sounds": [
+      "terrainlab:entity/vulture/hurt"
+    ]
+  },
+  "vulture.death": {
+    "subtitle": "subtitles.entity.vulture.death",
+    "sounds": [
+      "terrainlab:entity/vulture/death"
+    ]
+  },
+  "vulture.ambient_distant": {
+    "subtitle": "subtitles.entity.vulture.ambient",
+    "sounds": [
+      {
+        "name": "terrainlab:entity/vulture/ambient_distant",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "elephant.ambient": {
+    "subtitle": "subtitles.entity.elephant.ambient",
+    "sounds": [
+      "terrainlab:entity/elephant/ambient"
+    ]
+  },
+  "elephant.hurt": {
+    "subtitle": "subtitles.entity.elephant.hurt",
+    "sounds": [
+      "terrainlab:entity/elephant/hurt"
+    ]
+  },
+  "elephant.death": {
+    "subtitle": "subtitles.entity.elephant.death",
+    "sounds": [
+      "terrainlab:entity/elephant/death"
+    ]
+  },
+  "caribou.ambient": {
+    "subtitle": "subtitles.entity.caribou.ambient",
+    "sounds": [
+      "terrainlab:entity/caribou/ambient"
+    ]
+  },
+  "caribou.hurt": {
+    "subtitle": "subtitles.entity.caribou.hurt",
+    "sounds": [
+      "terrainlab:entity/caribou/hurt"
+    ]
+  },
+  "caribou.death": {
+    "subtitle": "subtitles.entity.caribou.death",
+    "sounds": [
+      "terrainlab:entity/caribou/death"
+    ]
+  },
+  "caribou.herd_ambience": {
+    "subtitle": "subtitles.entity.caribou.herd_ambience",
+    "sounds": [
+      {
+        "name": "terrainlab:entity/caribou/herd_ambience",
+        "volume": 0.5,
+        "stream": true
+      }
+    ]
+  },
+  "biome_ambience.jungle_night": {
+    "subtitle": "subtitles.biome_ambience.jungle_night",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/jungle_night",
+        "stream": true
+      }
+    ]
+  },
+  "biome_ambience.swamp_night": {
+    "subtitle": "subtitles.biome_ambience.swamp_night",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/swamp_night",
+        "stream": true
+      }
+    ]
+  },
+  "biome_ambience.wolves_distant_night": {
+    "subtitle": "subtitles.biome_ambience.wolves_distant_night",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/wolves_distant_night",
+        "volume": 0.6
+      }
+    ]
+  },
+  "biome_ambience.ocean_waves_cold": {
+    "subtitle": "subtitles.biome_ambience.ocean_waves_cold",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/ocean_waves_cold",
+        "stream": true
+      }
+    ]
+  },
+  "biome_ambience.beach_waves_warm": {
+    "subtitle": "subtitles.biome_ambience.beach_waves_warm",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/beach_waves_warm",
+        "stream": true
+      }
+    ]
+  },
+  "biome_ambience.forest_temperate": {
+    "subtitle": "subtitles.biome_ambience.forest_temperate",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/forest_day_2",
+        "stream": true
+      }
+    ]
+  },
+  "biome_ambience.forest_floral": {
+    "subtitle": "subtitles.biome_ambience.forest_floral",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/forest_day_1",
+        "stream": true
+      }
+    ]
+  },
+  "elephant.ambient_distant": {
+    "subtitle": "subtitles.entity.elephant.ambient",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/savanna_wildlife_distant",
+        "stream": true
+      }
+    ]
+  },
+  "biome_ambience.mountain_wind": {
+    "subtitle": "subtitles.biome_ambience.mountain_wind",
+    "sounds": [
+      {
+        "name": "terrainlab:ambience/mountain_wind",
+        "stream": true
+      }
+    ]
+  },
+  "villager.song": {
+    "subtitle": "subtitles.terrainlab.villager.song",
+    "sounds": [
+      {
+        "name": "minecraft:mob/villager/idle2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "villager.mood.hungry": {
+    "subtitle": "subtitles.terrainlab.villager.mood.hungry",
+    "sounds": [
+      {
+        "name": "minecraft:mob/villager/idle1",
+        "pitch": 0.6,
+        "volume": 0.9
+      },
+      {
+        "name": "minecraft:mob/villager/idle2",
+        "pitch": 0.6,
+        "volume": 0.9
+      },
+      {
+        "name": "minecraft:mob/villager/idle3",
+        "pitch": 0.6,
+        "volume": 0.9
+      }
+    ]
+  },
+  "villager.mood.tired": {
+    "subtitle": "subtitles.terrainlab.villager.mood.tired",
+    "sounds": [
+      {
+        "name": "minecraft:mob/villager/haggle1",
+        "pitch": 0.7,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/villager/haggle2",
+        "pitch": 0.7,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/villager/haggle3",
+        "pitch": 0.7,
+        "volume": 0.7
+      }
+    ]
+  },
+  "villager.mood.trapped": {
+    "subtitle": "subtitles.terrainlab.villager.mood.trapped",
+    "sounds": [
+      {
+        "name": "minecraft:mob/villager/no1",
+        "pitch": 1.15,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:mob/villager/no2",
+        "pitch": 1.15,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:mob/villager/no3",
+        "pitch": 1.15,
+        "volume": 1.0
+      }
+    ]
+  },
+  "villager.mood.fearful": {
+    "subtitle": "subtitles.terrainlab.villager.mood.fearful",
+    "sounds": [
+      {
+        "name": "minecraft:mob/villager/idle1",
+        "pitch": 1.5,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/villager/idle2",
+        "pitch": 1.5,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/villager/idle3",
+        "pitch": 1.5,
+        "volume": 0.7
+      }
+    ]
+  },
+  "block.celestial_forge.ritual": {
+    "subtitle": "subtitles.terrainlab.block.celestial_forge.ritual",
+    "sounds": [
+      "terrainlab:block/celestial_forge/ritual"
+    ]
+  },
+  "block.celestial_forge.transform": {
+    "subtitle": "subtitles.terrainlab.block.celestial_forge.transform",
+    "sounds": [
+      "terrainlab:block/celestial_forge/transform"
+    ]
+  }
+}

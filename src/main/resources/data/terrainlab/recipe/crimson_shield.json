@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "wood_shield",
+  "pattern": [
+    "WIW",
+    "WWW",
+    " W "
+  ],
+  "key": {
+    "W": "minecraft:crimson_planks",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "terrainlab:crimson_shield",
+    "count": 1
+  }
+}

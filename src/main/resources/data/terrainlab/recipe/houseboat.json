@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " L ",
+    "DP ",
+    "BRB"
+  ],
+  "key": {
+    "L": "minecraft:lantern",
+    "R": "minecraft:resin_clump",
+    "B": "#minecraft:boats",
+    "P": "#minecraft:planks",
+    "D": "#minecraft:beds"
+  },
+  "result": {
+    "id": "terrainlab:houseboat",
+    "count": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "food": {
+    "nutrition": 0,
+    "saturation": 0.0,
+    "can_always_eat": false
+  }
+}

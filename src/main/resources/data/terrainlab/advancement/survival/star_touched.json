@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/under_the_aurora",
+  "criteria": {
+    "amulet": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "amulet"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:life_amulet",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.star_touched.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.star_touched.description"
+    }
+  },
+  "requirements": [
+    [
+      "amulet"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

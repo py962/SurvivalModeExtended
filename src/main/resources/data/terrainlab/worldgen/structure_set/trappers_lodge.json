@@ -1,0 +1,13 @@
+{
+  "structures": [{"structure": "terrainlab:trappers_lodge", "weight": 1}],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 381726451,
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 1
+    },
+    "spacing": 12,
+    "separation": 6
+  }
+}

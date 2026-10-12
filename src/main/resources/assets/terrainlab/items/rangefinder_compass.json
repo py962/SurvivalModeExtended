@@ -1,0 +1,1517 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "component": "minecraft:lodestone_tracker",
+    "on_true": {
+      "type": "minecraft:range_dispatch",
+      "property": "terrainlab:rangefinder_distance",
+      "scale": 1.0,
+      "entries": [
+        {
+          "threshold": 0.0,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.0909,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.1818,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.2727,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.3636,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.4545,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.5455,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.6364,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.7273,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.8182,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.9091,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "lodestone",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a07"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "on_false": {
+      "type": "minecraft:range_dispatch",
+      "property": "terrainlab:rangefinder_distance",
+      "scale": 1.0,
+      "entries": [
+        {
+          "threshold": 0.0,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b10_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.0909,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b09_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.1818,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b08_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.2727,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b07_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.3636,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b06_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.4545,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b05_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.5455,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b04_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.6364,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b03_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.7273,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b02_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.8182,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b01_a07"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "threshold": 0.9091,
+          "model": {
+            "type": "minecraft:range_dispatch",
+            "property": "minecraft:compass",
+            "target": "spawn",
+            "wobble": true,
+            "scale": 1.0,
+            "entries": [
+              {
+                "threshold": 0.0,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a00"
+                }
+              },
+              {
+                "threshold": 0.125,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a01"
+                }
+              },
+              {
+                "threshold": 0.25,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a02"
+                }
+              },
+              {
+                "threshold": 0.375,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a03"
+                }
+              },
+              {
+                "threshold": 0.5,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a04"
+                }
+              },
+              {
+                "threshold": 0.625,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a05"
+                }
+              },
+              {
+                "threshold": 0.75,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a06"
+                }
+              },
+              {
+                "threshold": 0.875,
+                "model": {
+                  "type": "minecraft:model",
+                  "model": "terrainlab:item/rangefinder_compass_b00_a07"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "property": "minecraft:has_component"
+  }
+}

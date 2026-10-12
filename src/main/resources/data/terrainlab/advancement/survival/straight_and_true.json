@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/bespoke_defence",
+  "criteria": {
+    "specialist_arrow": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "specialist_arrow"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:owl_tiered_arrow",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.straight_and_true.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.straight_and_true.description"
+    }
+  },
+  "requirements": [
+    [
+      "specialist_arrow"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

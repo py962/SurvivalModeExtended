@@ -1,0 +1,18 @@
+{
+  "type": "terrainlab:celestial_pair_shaped",
+  "category": "misc",
+  "group": "celestial_conduit",
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:moss_block",
+    "P": "terrainlab:life_pearl"
+  },
+  "result": {
+    "id": "terrainlab:life_conduit",
+    "count": 1
+  }
+}

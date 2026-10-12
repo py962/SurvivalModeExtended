@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "fur_cloak": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "fur_cloak"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:fur_cloak",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.wrapped_up_warm.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.wrapped_up_warm.description"
+    }
+  },
+  "requirements": [
+    [
+      "fur_cloak"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

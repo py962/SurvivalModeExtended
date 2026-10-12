@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "ingredient": "terrainlab:venison",
+  "result": { "id": "terrainlab:cooked_venison", "count": 1 },
+  "experience": 0.35,
+  "cookingtime": 200
+}

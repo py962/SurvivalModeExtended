@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "axis=x": { "model": "terrainlab:block/redstone_portal_ns" },
+    "axis=z": { "model": "terrainlab:block/redstone_portal_ew" }
+  }
+}

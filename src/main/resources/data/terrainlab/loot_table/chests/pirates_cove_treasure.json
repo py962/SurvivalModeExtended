@@ -1,0 +1,132 @@
+{
+"type": "minecraft:chest",
+"pools": [
+{
+"rolls": 1,
+"entries": [
+{
+"type": "minecraft:item",
+"name": "minecraft:enchanted_book",
+"weight": 1,
+"functions": [
+{
+"function": "minecraft:set_enchantments",
+"enchantments": {
+"minecraft:loyalty": {
+"type": "minecraft:uniform",
+"min": 1,
+"max": 3
+}
+}
+}
+]
+}
+]
+},
+{
+"rolls": { "type": "minecraft:uniform", "min": 5, "max": 7 },
+"entries": [
+{
+"type": "minecraft:item",
+"name": "minecraft:goat_horn",
+"weight": 8,
+"functions": [
+{
+"function": "minecraft:set_components",
+"components": {
+"minecraft:instrument": "minecraft:call_goat_horn"
+}
+}
+]
+},
+{
+"type": "minecraft:item",
+"name": "minecraft:emerald",
+"weight": 5,
+"functions": [
+{
+"function": "minecraft:set_count",
+"count": {
+"type": "minecraft:uniform",
+"min": 1,
+"max": 6
+}
+}
+]
+},
+{
+"type": "minecraft:item",
+"name": "minecraft:iron_nautilus_armor",
+"weight": 5
+},
+{
+"type": "minecraft:item",
+"name": "minecraft:potion",
+"weight": 3,
+"functions": [
+{
+"function": "minecraft:set_potion",
+"id": "terrainlab:warmth"
+}
+]
+}
+]
+},
+{
+"rolls": 1,
+"entries": [
+{
+"type": "minecraft:item",
+"name": "minecraft:turtle_helmet",
+"weight": 2,
+"functions": [
+{
+"function": "minecraft:set_enchantments",
+"enchantments": {
+"minecraft:respiration": 3
+}
+}
+]
+}
+]
+},
+{
+"rolls": { "type": "minecraft:uniform", "min": 4, "max": 6 },
+"entries": [
+{ "type": "minecraft:item", "name": "minecraft:crossbow", "weight": 5 },
+{
+"type": "minecraft:item",
+"name": "minecraft:nautilus_shell",
+"weight": 8,
+"functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 5 } }]
+},
+
+{
+"type": "minecraft:item",
+"name": "minecraft:prismarine_shard",
+"weight": 8,
+"functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 4, "max": 10 } }]
+},
+{
+"type": "minecraft:item",
+"name": "minecraft:sponge",
+"weight": 4,
+"functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+},
+  {
+    "type": "minecraft:item",
+    "name": "minecraft:gold_ingot",
+    "weight": 4,
+    "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 3 } }]
+  },
+{
+"type": "minecraft:item",
+"name": "minecraft:potion",
+"weight": 3,
+"functions": [{ "function": "minecraft:set_potion", "id": "terrainlab:warmth" }]
+}
+]
+}
+],
+"random_sequence": "terrainlab:chests/pirates_cove_treasure"
+}

@@ -1,0 +1,7 @@
+{
+  "type": "terrainlab:celestial_forge",
+  "variant": "shield",
+  "core": "minecraft:quartz",
+  "thrown": "minecraft:snowball",
+  "thrown_count": 2
+}

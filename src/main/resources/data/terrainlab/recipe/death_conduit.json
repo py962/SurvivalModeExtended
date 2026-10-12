@@ -1,0 +1,18 @@
+{
+  "type": "terrainlab:celestial_pair_shaped",
+  "category": "misc",
+  "group": "celestial_conduit",
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:crying_obsidian",
+    "P": "terrainlab:death_pearl"
+  },
+  "result": {
+    "id": "terrainlab:death_conduit",
+    "count": 1
+  }
+}

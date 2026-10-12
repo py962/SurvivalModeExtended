@@ -1,0 +1,48 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "terrainlab:shield_raised",
+    "on_false": {
+      "type": "minecraft:special",
+      "base": "terrainlab:item/shield",
+      "model": {
+        "type": "terrainlab:tinted_shield",
+        "texture": "terrainlab:entity/shield/dark_oak_wood",
+        "color": 4336404
+      }
+    },
+    "on_true": {
+      "type": "minecraft:special",
+      "base": "terrainlab:item/shield_blocking",
+      "model": {
+        "type": "terrainlab:tinted_shield",
+        "texture": "terrainlab:entity/shield/dark_oak_wood",
+        "color": 4336404
+      }
+    },
+    "transformation": {
+      "left_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "right_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        -1.0,
+        -1.0
+      ],
+      "translation": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

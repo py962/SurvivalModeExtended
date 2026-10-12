@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_special_shielddecoration",
+  "banner": "#minecraft:banners",
+  "target": "terrainlab:acacia_shield",
+  "result": {
+    "id": "terrainlab:acacia_shield"
+  }
+}

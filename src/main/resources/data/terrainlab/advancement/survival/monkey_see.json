@@ -1,0 +1,35 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "enderman_sequence": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "enderman_sequence"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:player_head",
+      "count": 1,
+      "components": {
+        "minecraft:profile": {
+          "texture": "terrainlab:entity/enderman_head"
+        }
+      }
+    },
+    "title": {
+      "translate": "advancements.terrainlab.monkey_see.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.monkey_see.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "enderman_sequence"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

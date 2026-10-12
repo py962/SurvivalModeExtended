@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:white_tulip"
+  ],
+  "result": {
+    "components": {
+      "minecraft:suspicious_stew_effects": [
+        {
+          "duration": 140,
+          "id": "minecraft:weakness"
+        }
+      ],
+      "minecraft:item_name": {
+        "translate": "item.terrainlab.suspicious_stew.weakness"
+      },
+      "terrainlab:stew_flower": "white_tulip"
+    },
+    "count": 1,
+    "id": "minecraft:suspicious_stew"
+  }
+}

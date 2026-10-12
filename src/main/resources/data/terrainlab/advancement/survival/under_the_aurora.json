@@ -1,0 +1,30 @@
+{
+  "parent": "terrainlab:survival/ancient_wisdom",
+  "criteria": {
+    "celestial_forge": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "celestial_forge"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:celestial_forge",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.under_the_aurora.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.under_the_aurora.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "celestial_forge"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

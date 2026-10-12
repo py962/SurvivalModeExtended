@@ -1,0 +1,27 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "terrainlab:season_angle",
+    "scale": 1.0,
+    "entries": [
+      { "threshold": 0.00000, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_00" } },
+      { "threshold": 0.05556, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_01" } },
+      { "threshold": 0.11111, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_02" } },
+      { "threshold": 0.16667, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_03" } },
+      { "threshold": 0.22222, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_04" } },
+      { "threshold": 0.27778, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_05" } },
+      { "threshold": 0.33333, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_06" } },
+      { "threshold": 0.38889, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_07" } },
+      { "threshold": 0.44444, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_08" } },
+      { "threshold": 0.50000, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_09" } },
+      { "threshold": 0.55556, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_10" } },
+      { "threshold": 0.61111, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_11" } },
+      { "threshold": 0.66667, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_12" } },
+      { "threshold": 0.72222, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_13" } },
+      { "threshold": 0.77778, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_14" } },
+      { "threshold": 0.83333, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_15" } },
+      { "threshold": 0.88889, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_16" } },
+      { "threshold": 0.94444, "model": { "type": "minecraft:model", "model": "terrainlab:item/calendar_17" } }
+    ]
+  }
+}

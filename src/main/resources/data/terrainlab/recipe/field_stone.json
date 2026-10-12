@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CMC",
+    "MEM",
+    "CMC"
+  ],
+  "key": {
+    "C": "minecraft:chiseled_stone_bricks",
+    "M": "terrainlab:magnetite_dust",
+    "E": "minecraft:ender_eye"
+  },
+  "result": {
+    "id": "terrainlab:field_stone",
+    "count": 1
+  }
+}

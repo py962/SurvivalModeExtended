@@ -1,0 +1,93 @@
+{
+  "parent": "terrainlab:survival/star_touched",
+  "criteria": {
+    "breath": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_breath"
+      }
+    },
+    "life": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_life"
+      }
+    },
+    "death": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_death"
+      }
+    },
+    "shield": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_shield"
+      }
+    },
+    "peace": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_peace"
+      }
+    },
+    "eye": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_eye"
+      }
+    },
+    "luck": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_luck"
+      }
+    },
+    "end": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "conduit_end"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:life_conduit",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.full_constellation.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.full_constellation.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "breath"
+    ],
+    [
+      "life"
+    ],
+    [
+      "death"
+    ],
+    [
+      "shield"
+    ],
+    [
+      "peace"
+    ],
+    [
+      "eye"
+    ],
+    [
+      "luck"
+    ],
+    [
+      "end"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

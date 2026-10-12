@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:mineshaft",
+  "biomes": [
+    "minecraft:badlands",
+    "minecraft:eroded_badlands",
+    "minecraft:stony_peaks",
+    "minecraft:frozen_peaks",
+    "minecraft:jagged_peaks"
+  ],
+  "mineshaft_type": "mesa",
+  "spawn_overrides": {},
+  "step": "underground_structures"
+}

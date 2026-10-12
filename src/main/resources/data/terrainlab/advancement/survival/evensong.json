@@ -1,0 +1,30 @@
+{
+  "parent": "terrainlab:survival/moving_up",
+  "criteria": {
+    "village_song": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_song"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:note_block",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.evensong.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.evensong.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "village_song"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

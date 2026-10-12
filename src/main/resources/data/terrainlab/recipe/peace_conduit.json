@@ -1,0 +1,18 @@
+{
+  "type": "terrainlab:celestial_pair_shaped",
+  "category": "misc",
+  "group": "celestial_conduit",
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:bone_block",
+    "P": "terrainlab:peace_pearl"
+  },
+  "result": {
+    "id": "terrainlab:peace_conduit",
+    "count": 1
+  }
+}

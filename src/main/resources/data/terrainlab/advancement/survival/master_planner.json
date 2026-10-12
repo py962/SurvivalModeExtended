@@ -1,0 +1,84 @@
+{
+  "parent": "terrainlab:survival/moving_up",
+  "criteria": {
+    "plains": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_tier4_plains"
+      }
+    },
+    "desert": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_tier4_desert"
+      }
+    },
+    "savanna": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_tier4_savanna"
+      }
+    },
+    "taiga": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_tier4_taiga"
+      }
+    },
+    "snow": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_tier4_snow"
+      }
+    },
+    "jungle": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_tier4_jungle"
+      }
+    },
+    "swamp": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_tier4_swamp"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald_block",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.master_planner.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.master_planner.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "plains"
+    ],
+    [
+      "desert"
+    ],
+    [
+      "savanna"
+    ],
+    [
+      "taiga"
+    ],
+    [
+      "snow"
+    ],
+    [
+      "jungle"
+    ],
+    [
+      "swamp"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "borrowing_dream": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "borrowing_dream"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:nightcap_mushroom",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.borrowed_eyes.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.borrowed_eyes.description"
+    }
+  },
+  "requirements": [
+    [
+      "borrowing_dream"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

@@ -1,0 +1,98 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "terrainlab:stew_flower",
+    "cases": [
+      {
+        "when": "allium",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_fire_resistance"
+        }
+      },
+      {
+        "when": [
+          "azure_bluet",
+          "open_eyeblossom"
+        ],
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_blindness"
+        }
+      },
+      {
+        "when": "blue_orchid",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_energy"
+        }
+      },
+      {
+        "when": "closed_eyeblossom",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_nausea"
+        }
+      },
+      {
+        "when": "cornflower",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_jump_boost"
+        }
+      },
+      {
+        "when": "dandelion",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_resistance"
+        }
+      },
+      {
+        "when": "lily_of_the_valley",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_poison"
+        }
+      },
+      {
+        "when": [
+          "orange_tulip",
+          "pink_tulip",
+          "red_tulip",
+          "white_tulip"
+        ],
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_weakness"
+        }
+      },
+      {
+        "when": "oxeye_daisy",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_healing"
+        }
+      },
+      {
+        "when": "poppy",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_night_vision"
+        }
+      },
+      {
+        "when": "wither_rose",
+        "model": {
+          "type": "minecraft:model",
+          "model": "terrainlab:item/suspicious_stew_wither"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/suspicious_stew"
+    }
+  }
+}

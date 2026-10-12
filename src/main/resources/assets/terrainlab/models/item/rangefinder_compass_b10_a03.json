@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "terrainlab:item/rangefinder_compass_b10_a03"
+  }
+}

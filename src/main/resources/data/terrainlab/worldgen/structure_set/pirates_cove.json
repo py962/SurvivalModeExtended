@@ -1,0 +1,13 @@
+{
+  "structures": [{"structure": "terrainlab:pirates_cove", "weight": 1}],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 913746281,
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 1
+    },
+    "spacing": 48,
+    "separation": 16
+  }
+}

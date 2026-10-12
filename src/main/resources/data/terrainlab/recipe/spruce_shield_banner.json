@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_special_shielddecoration",
+  "banner": "#minecraft:banners",
+  "target": "terrainlab:spruce_shield",
+  "result": {
+    "id": "terrainlab:spruce_shield"
+  }
+}

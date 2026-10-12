@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": "minecraft:bamboo_planks",
+    "M": "minecraft:bamboo_mosaic",
+    "W": "#minecraft:wool"
+  },
+  "pattern": [
+    "MBM",
+    "BWB",
+    "BBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "terrainlab:howdah"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "terrainlab:block/death_conduit"
+    },
+    "active=true": {
+      "model": "terrainlab:block/death_conduit"
+    }
+  }
+}

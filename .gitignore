@@ -1,0 +1,59 @@
+### Gradle ###
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/**/out/
+
+.run/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.eclipse/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/**/bin/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Minecraft Modding ###
+run/
+!**/src/**/run/
+**/src/generated/**/.cache/
+repo/
+!**/src/**/repo/
+
+### Survival Mode Extended: keep out of the repository ###
+# Original sound recordings: several licences forbid redistributing the raw files.
+/sounds/
+/sound_sources/
+# Local working files.
+/reports/
+/livingentity_bytecode.txt
+/verify_trapper_pillager.png
+# Files extracted from the NeoForge jar into the project root by mistake.
+/assets/
+/data/
+/net/
+/META-INF/
+/mcplogo.png
+/neoforged_logo.png
+/url.png
+/pack.mcmeta
+/neoforge.mixins.json

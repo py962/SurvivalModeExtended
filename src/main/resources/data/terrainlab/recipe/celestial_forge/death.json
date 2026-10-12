@@ -1,0 +1,7 @@
+{
+  "type": "terrainlab:celestial_forge",
+  "variant": "death",
+  "core": "minecraft:echo_shard",
+  "thrown": "minecraft:ghast_tear",
+  "thrown_count": 2
+}

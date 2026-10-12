@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_special_shielddecoration",
+  "banner": "#minecraft:banners",
+  "target": "terrainlab:enderwood_shield",
+  "result": {
+    "id": "terrainlab:enderwood_shield"
+  }
+}

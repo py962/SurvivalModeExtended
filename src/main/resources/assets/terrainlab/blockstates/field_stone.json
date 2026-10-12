@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "terrainlab:block/field_stone" },
+    "lit=true": { "model": "terrainlab:block/field_stone_lit" }
+  }
+}

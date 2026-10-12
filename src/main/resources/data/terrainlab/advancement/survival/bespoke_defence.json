@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "specialist_shield": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "specialist_shield"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:oak_shield",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.bespoke_defence.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.bespoke_defence.description"
+    }
+  },
+  "requirements": [
+    [
+      "specialist_shield"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

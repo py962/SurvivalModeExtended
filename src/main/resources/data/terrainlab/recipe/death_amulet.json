@@ -1,0 +1,18 @@
+{
+  "type": "terrainlab:celestial_pair_shaped",
+  "category": "equipment",
+  "group": "celestial_amulet",
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:gold_ingot",
+    "P": "terrainlab:death_pearl"
+  },
+  "result": {
+    "id": "terrainlab:death_amulet",
+    "count": 1
+  }
+}

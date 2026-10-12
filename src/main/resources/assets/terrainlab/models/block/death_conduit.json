@@ -1,0 +1,6 @@
+{
+  "parent": "terrainlab:block/celestial_conduit_base",
+  "textures": {
+    "core": "terrainlab:block/death_conduit"
+  }
+}

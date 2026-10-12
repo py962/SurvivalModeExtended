@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": "#minecraft:has_structure/bastion_remnant",
+  "max_distance_from_center": 80,
+  "size": 20,
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": [
+        { "type": "minecraft:piglin", "weight": 1, "minCount": 20, "maxCount": 30 }
+      ]
+    }
+  },
+  "start_height": { "absolute": 40 },
+  "start_pool": "terrainlab:bastion_starts_housing",
+  "step": "surface_structures",
+  "use_expansion_hack": false
+}

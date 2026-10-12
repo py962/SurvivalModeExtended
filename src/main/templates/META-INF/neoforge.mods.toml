@@ -1,0 +1,43 @@
+# Mod metadata for NeoForge. Values are filled in from gradle.properties at build time.
+
+license="${mod_license}"
+
+issueTrackerURL="https://github.com/py962/survival-mode-extended/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+displayURL="https://github.com/py962/survival-mode-extended"
+authors="TerrainLab"
+credits="Aurora rendering adapted from Auroral by Saereth (MIT). Sounds from Freesound contributors; see CREDITS.md."
+description='''
+A survival overhaul that makes the world something to prepare for and live in, without changing the feel of vanilla.
+
+Body temperature, energy and a reworked hunger system; seasons with changing day length, weather, snow and sandstorms; reworked villages with happiness, reputation and paired trading; four travelling guides with quest chains; Celestial conduits and amulets; new creatures, biomes, structures, enchantments and potion effects; and layered biome ambience.
+'''
+
+[[dependencies.${mod_id}]]
+modId="neoforge"
+type="required"
+versionRange="[${neo_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="curios"
+type="required"
+reason="Provides the accessory slots used by the Fur Cloak and the Celestial amulets"
+versionRange="[14.0.0,)"
+ordering="AFTER"
+side="BOTH"
+
+[[mixins]]
+config="terrainlab.mixins.json"

@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:torchflower"
+  ],
+  "result": {
+    "components": {
+      "minecraft:suspicious_stew_effects": [
+        {
+          "duration": 100,
+          "id": "minecraft:night_vision"
+        }
+      ],
+      "minecraft:item_name": {
+        "translate": "item.terrainlab.suspicious_stew.night_vision"
+      },
+      "terrainlab:stew_flower": "torchflower"
+    },
+    "count": 1,
+    "id": "minecraft:suspicious_stew"
+  }
+}

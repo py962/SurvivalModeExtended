@@ -1,0 +1,46 @@
+{
+  "type": "minecraft:ruined_portal",
+  "biomes": [
+    "minecraft:forest",
+    "minecraft:flower_forest",
+    "minecraft:birch_forest",
+    "minecraft:old_growth_birch_forest",
+    "minecraft:dark_forest",
+    "minecraft:taiga",
+    "minecraft:snowy_taiga",
+    "minecraft:old_growth_pine_taiga",
+    "minecraft:old_growth_spruce_taiga",
+    "minecraft:windswept_forest",
+    "minecraft:jungle",
+    "minecraft:sparse_jungle",
+    "minecraft:bamboo_jungle",
+    "minecraft:swamp",
+    "minecraft:mangrove_swamp",
+    "minecraft:wooded_badlands",
+    "minecraft:grove"
+  ],
+  "setups": [
+    {
+      "air_pocket_probability": 1.0,
+      "can_be_cold": true,
+      "mossiness": 0.2,
+      "overgrown": false,
+      "placement": "underground",
+      "replace_with_blackstone": false,
+      "vines": false,
+      "weight": 0.5
+    },
+    {
+      "air_pocket_probability": 0.5,
+      "can_be_cold": true,
+      "mossiness": 0.2,
+      "overgrown": false,
+      "placement": "on_land_surface",
+      "replace_with_blackstone": false,
+      "vines": false,
+      "weight": 0.5
+    }
+  ],
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

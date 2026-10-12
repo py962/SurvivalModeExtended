@@ -1,0 +1,57 @@
+{
+  "parent": "terrainlab:survival/wrapped_up_warm",
+  "criteria": {
+    "spring": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "season_spring"
+      }
+    },
+    "summer": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "season_summer"
+      }
+    },
+    "autumn": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "season_autumn"
+      }
+    },
+    "winter": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "season_winter"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:calendar",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.turn_of_the_year.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.turn_of_the_year.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "spring"
+    ],
+    [
+      "summer"
+    ],
+    [
+      "autumn"
+    ],
+    [
+      "winter"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

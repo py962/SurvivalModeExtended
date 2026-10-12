@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " B ",
+    "L L",
+    " L "
+  ],
+  "key": {
+    "L": "minecraft:rabbit_hide",
+    "B": "#minecraft:wooden_buttons"
+  },
+  "result": {
+    "id": "terrainlab:leather_flask",
+    "count": 1
+  }
+}

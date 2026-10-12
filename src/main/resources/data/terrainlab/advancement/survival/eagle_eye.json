@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "spyglass_map": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "spyglass_map"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:spyglass",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.eagle_eye.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.eagle_eye.description"
+    }
+  },
+  "requirements": [
+    [
+      "spyglass_map"
+    ]
+  ],
+  "sends_telemetry_event": false
+}
