@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:jigsaw",
+  "biomes": [
+    "minecraft:soul_sand_valley"
+  ],
+  "step": "underground_decoration",
+  "spawn_overrides": {},
+  "start_pool": "terrainlab:bone_temple",
+  "size": 1,
+  "start_height": {
+    "absolute": 64
+  },
+  "max_distance_from_center": 80,
+  "use_expansion_hack": false,
+  "terrain_adaptation": "beard_thin"
+}

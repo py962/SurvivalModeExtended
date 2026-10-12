@@ -1,0 +1,57 @@
+{
+  "parent": "terrainlab:survival/lost_and_found",
+  "criteria": {
+    "mariner": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "quest_mariner"
+      }
+    },
+    "archeologist": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "quest_archeologist"
+      }
+    },
+    "ranger": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "quest_ranger"
+      }
+    },
+    "priest": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "quest_priest"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:compass",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.all_trails_lead_home.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.all_trails_lead_home.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "mariner"
+    ],
+    [
+      "archeologist"
+    ],
+    [
+      "ranger"
+    ],
+    [
+      "priest"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

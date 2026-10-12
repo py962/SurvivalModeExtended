@@ -1,0 +1,30 @@
+{
+  "parent": "terrainlab:survival/turn_of_the_year",
+  "criteria": {
+    "beacon_weather": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "beacon_weather"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:beacon",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.rainmaker.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.rainmaker.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "beacon_weather"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

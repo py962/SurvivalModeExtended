@@ -1,0 +1,39 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "downstream": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "river_wild_down"
+      }
+    },
+    "upstream": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "river_wild_up"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:oak_boat",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.river_wild.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.river_wild.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "downstream"
+    ],
+    [
+      "upstream"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

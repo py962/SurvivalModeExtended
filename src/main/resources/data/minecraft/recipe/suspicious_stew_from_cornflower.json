@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:cornflower"
+  ],
+  "result": {
+    "components": {
+      "minecraft:suspicious_stew_effects": [
+        {
+          "duration": 100,
+          "id": "minecraft:jump_boost"
+        }
+      ],
+      "minecraft:item_name": {
+        "translate": "item.terrainlab.suspicious_stew.jump_boost"
+      },
+      "terrainlab:stew_flower": "cornflower"
+    },
+    "count": 1,
+    "id": "minecraft:suspicious_stew"
+  }
+}

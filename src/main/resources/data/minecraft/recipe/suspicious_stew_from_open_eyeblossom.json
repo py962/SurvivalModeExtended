@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:open_eyeblossom"
+  ],
+  "result": {
+    "components": {
+      "minecraft:suspicious_stew_effects": [
+        {
+          "duration": 220,
+          "id": "minecraft:blindness"
+        }
+      ],
+      "minecraft:item_name": {
+        "translate": "item.terrainlab.suspicious_stew.blindness"
+      },
+      "terrainlab:stew_flower": "open_eyeblossom"
+    },
+    "count": 1,
+    "id": "minecraft:suspicious_stew"
+  }
+}

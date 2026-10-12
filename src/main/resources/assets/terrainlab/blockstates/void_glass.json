@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "terrainlab:block/void_glass" }
+  }
+}

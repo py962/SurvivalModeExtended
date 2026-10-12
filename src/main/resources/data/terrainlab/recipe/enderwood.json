@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": "terrainlab:endervine",
+  "result": {
+    "id": "terrainlab:enderwood"
+  },
+  "experience": 0.1,
+  "cookingtime": 200
+}

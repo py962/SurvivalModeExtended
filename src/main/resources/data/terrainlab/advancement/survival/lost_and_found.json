@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "guide_relic": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "guide_relic"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:filled_map",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.lost_and_found.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.lost_and_found.description"
+    }
+  },
+  "requirements": [
+    [
+      "guide_relic"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

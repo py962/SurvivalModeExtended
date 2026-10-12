@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "terrainlab:block/celestial_forge" },
+    "active=true": { "model": "terrainlab:block/celestial_forge_active" }
+  }
+}

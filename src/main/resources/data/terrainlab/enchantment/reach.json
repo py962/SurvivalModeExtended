@@ -1,0 +1,47 @@
+
+{
+"description": {
+"translate": "enchantment.terrainlab.reach"
+},
+"supported_items": "#terrainlab:enchantable/reach_group",
+"primary_items": "#terrainlab:enchantable/reach_group",
+"weight": 5,
+"max_level": 3,
+"min_cost": {
+"base": 8,
+"per_level_above_first": 9
+},
+"max_cost": {
+"base": 30,
+"per_level_above_first": 9
+},
+"anvil_cost": 3,
+"slots": [
+"mainhand"
+],
+"effects": {
+"minecraft:attributes": [
+{
+"id": "terrainlab:enchantment.reach.block",
+"attribute": "minecraft:block_interaction_range",
+"amount": {
+"type": "minecraft:linear",
+"base": 0.5,
+"per_level_above_first": 0.5
+},
+"operation": "add_value"
+},
+{
+"id": "terrainlab:enchantment.reach.entity",
+"attribute": "minecraft:entity_interaction_range",
+"amount": {
+"type": "minecraft:linear",
+"base": 0.5,
+"per_level_above_first": 0.5
+},
+"operation": "add_value"
+}
+]
+}
+}
+

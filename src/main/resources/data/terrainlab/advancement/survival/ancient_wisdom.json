@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "codex_enchant": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "codex_enchant"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_book",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.ancient_wisdom.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.ancient_wisdom.description"
+    }
+  },
+  "requirements": [
+    [
+      "codex_enchant"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

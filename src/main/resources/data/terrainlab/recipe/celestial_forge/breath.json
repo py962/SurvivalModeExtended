@@ -1,0 +1,7 @@
+{
+  "type": "terrainlab:celestial_forge",
+  "variant": "breath",
+  "core": "minecraft:heart_of_the_sea",
+  "thrown": "minecraft:nautilus_shell",
+  "thrown_count": 2
+}

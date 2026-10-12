@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "piglin_cure": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "piglin_cure"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:nether_wart",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.an_awkward_cure.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.an_awkward_cure.description"
+    }
+  },
+  "requirements": [
+    [
+      "piglin_cure"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

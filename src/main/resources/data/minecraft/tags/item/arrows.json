@@ -1,0 +1,11 @@
+{
+  "values": [
+    "minecraft:arrow",
+    "minecraft:spectral_arrow",
+    "terrainlab:normal_tiered_arrow",
+    "terrainlab:owl_tiered_arrow",
+    "terrainlab:parrot_tiered_arrow",
+    "terrainlab:vulture_tiered_arrow",
+    "terrainlab:goose_tiered_arrow"
+  ]
+}

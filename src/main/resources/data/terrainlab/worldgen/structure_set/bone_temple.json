@@ -1,0 +1,9 @@
+{
+  "structures": [{"structure": "terrainlab:bone_temple", "weight": 1}],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 918273645,
+    "spacing": 32,
+    "separation": 8
+  }
+}

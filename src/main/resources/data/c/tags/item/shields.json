@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "terrainlab:oak_shield",
+    "terrainlab:bamboo_shield",
+    "terrainlab:birch_shield",
+    "terrainlab:cherry_shield",
+    "terrainlab:acacia_shield",
+    "terrainlab:spruce_shield",
+    "terrainlab:pale_oak_shield",
+    "terrainlab:dark_oak_shield",
+    "terrainlab:jungle_shield",
+    "terrainlab:mangrove_shield",
+    "terrainlab:warped_shield",
+    "terrainlab:crimson_shield",
+    "terrainlab:enderwood_shield"
+  ]
+}

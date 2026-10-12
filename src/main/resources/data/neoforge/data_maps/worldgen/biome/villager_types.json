@@ -1,0 +1,59 @@
+{
+    "values": {
+        "terrainlab:marsh": {
+            "villager_type": "minecraft:taiga"
+        },
+        "terrainlab:frozen_marsh": {
+            "villager_type": "minecraft:snow"
+        },
+        "terrainlab:ice_caves": {
+            "villager_type": "minecraft:snow"
+        },
+        "terrainlab:inland_river": {
+            "villager_type": "minecraft:plains"
+        },
+
+        "minecraft:warm_ocean": {
+            "villager_type": "minecraft:savanna"
+        },
+        "minecraft:lukewarm_ocean": {
+            "villager_type": "minecraft:savanna"
+        },
+        "minecraft:deep_lukewarm_ocean": {
+            "villager_type": "minecraft:savanna"
+        },
+        "minecraft:frozen_ocean": {
+            "villager_type": "minecraft:snow"
+        },
+        "minecraft:deep_frozen_ocean": {
+            "villager_type": "minecraft:snow"
+        },
+        "minecraft:frozen_peaks": {
+            "villager_type": "minecraft:taiga"
+        },
+        "minecraft:jagged_peaks": {
+            "villager_type": "minecraft:taiga"
+        },
+        "minecraft:birch_forest": {
+            "villager_type": "minecraft:taiga"
+        },
+        "minecraft:old_growth_birch_forest": {
+            "villager_type": "minecraft:taiga"
+        },
+        "minecraft:lush_caves": {
+            "villager_type": "minecraft:desert"
+        },
+        "minecraft:windswept_hills": {
+            "villager_type": "minecraft:plains"
+        },
+        "minecraft:windswept_gravelly_hills": {
+            "villager_type": "minecraft:plains"
+        },
+        "minecraft:dark_forest": {
+            "villager_type": "minecraft:taiga"
+        },
+        "minecraft:pale_garden": {
+            "villager_type": "minecraft:taiga"
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "village_upgrade": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "village_upgrade"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:bell",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.moving_up.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.moving_up.description"
+    }
+  },
+  "requirements": [
+    [
+      "village_upgrade"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

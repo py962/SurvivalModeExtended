@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "minecraft:block/chiseled_sandstone",
+    "up": "terrainlab:block/ancient_codex_top",
+    "north": "minecraft:block/chiseled_sandstone",
+    "south": "minecraft:block/chiseled_sandstone",
+    "east": "minecraft:block/chiseled_sandstone",
+    "west": "minecraft:block/chiseled_sandstone",
+    "particle": "minecraft:block/chiseled_sandstone"
+  }
+}

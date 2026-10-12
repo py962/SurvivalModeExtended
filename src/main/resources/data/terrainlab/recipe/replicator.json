@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "R": "minecraft:redstone",
+    "W": "#minecraft:planks",
+    "S": "minecraft:shulker_shell"
+  },
+  "pattern": [
+    "CSC",
+    "SRS",
+    "WSW"
+  ],
+  "result": {
+    "count": 1,
+    "id": "terrainlab:replicator"
+  }
+}

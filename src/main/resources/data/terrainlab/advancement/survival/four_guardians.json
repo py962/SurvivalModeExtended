@@ -1,0 +1,89 @@
+{
+  "parent": "terrainlab:survival/moving_up",
+  "criteria": {
+    "iron_golem": {
+      "trigger": "minecraft:summoned_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "minecraft:iron_golem"
+            }
+          }
+        ]
+      }
+    },
+    "snow_golem": {
+      "trigger": "minecraft:summoned_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "minecraft:snow_golem"
+            }
+          }
+        ]
+      }
+    },
+    "copper_golem": {
+      "trigger": "minecraft:summoned_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "minecraft:copper_golem"
+            }
+          }
+        ]
+      }
+    },
+    "granite_golem": {
+      "trigger": "minecraft:summoned_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "terrainlab:granite_golem"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:carved_pumpkin",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.four_guardians.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.four_guardians.description"
+    },
+    "frame": "challenge"
+  },
+  "requirements": [
+    [
+      "iron_golem"
+    ],
+    [
+      "snow_golem"
+    ],
+    [
+      "copper_golem"
+    ],
+    [
+      "granite_golem"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

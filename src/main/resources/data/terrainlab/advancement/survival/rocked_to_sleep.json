@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "houseboat_night": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "houseboat_night"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:houseboat",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.rocked_to_sleep.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.rocked_to_sleep.description"
+    }
+  },
+  "requirements": [
+    [
+      "houseboat_night"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

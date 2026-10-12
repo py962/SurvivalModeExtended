@@ -1,0 +1,27 @@
+{
+  "type": "terrainlab:celestial_pair_shaped",
+  "category": "misc",
+  "group": "celestial_conduit",
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "key": {
+    "#": [
+      "minecraft:copper_block",
+      "minecraft:exposed_copper",
+      "minecraft:weathered_copper",
+      "minecraft:oxidized_copper",
+      "minecraft:waxed_copper_block",
+      "minecraft:waxed_exposed_copper",
+      "minecraft:waxed_weathered_copper",
+      "minecraft:waxed_oxidized_copper"
+    ],
+    "P": "terrainlab:shield_pearl"
+  },
+  "result": {
+    "id": "terrainlab:shield_conduit",
+    "count": 1
+  }
+}

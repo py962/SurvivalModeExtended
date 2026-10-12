@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "terrainlab:block/celestial_forge_top_active",
+    "bottom": "terrainlab:block/celestial_forge_top_bottom",
+    "side": "terrainlab:block/celestial_forge_side"
+  }
+}

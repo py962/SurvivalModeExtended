@@ -1,0 +1,48 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "terrainlab:nether_idol",
+          "weight": 1,
+          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 1 } }]
+        }
+      ]
+    },
+    {
+      "rolls": { "type": "minecraft:uniform", "min": 2, "max": 3 },
+      "entries": [
+        { "type": "minecraft:item", "name": "minecraft:golden_helmet", "weight": 6 },
+        { "type": "minecraft:item", "name": "minecraft:golden_chestplate", "weight": 6 },
+        { "type": "minecraft:item", "name": "minecraft:golden_leggings", "weight": 6 },
+        { "type": "minecraft:item", "name": "minecraft:golden_boots", "weight": 6 },
+        { "type": "minecraft:item", "name": "minecraft:golden_sword", "weight": 6 },
+        { "type": "minecraft:item", "name": "minecraft:golden_axe", "weight": 6 },
+        { "type": "minecraft:item", "name": "minecraft:golden_spear", "weight": 6 },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:ghast_tear",
+          "weight": 40,
+          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 3, "max": 5 } }]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:enchanted_book",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:set_enchantments",
+              "enchantments": {
+                "minecraft:soul_speed": { "type": "minecraft:uniform", "min": 1, "max": 3 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "terrainlab:chests/bone_temple_chest"
+}

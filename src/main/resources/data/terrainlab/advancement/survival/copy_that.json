@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/ancient_wisdom",
+  "criteria": {
+    "replicator": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "replicator"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:replicator",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.copy_that.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.copy_that.description"
+    }
+  },
+  "requirements": [
+    [
+      "replicator"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

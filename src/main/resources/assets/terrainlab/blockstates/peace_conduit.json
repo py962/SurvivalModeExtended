@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "terrainlab:block/peace_conduit"
+    },
+    "active=true": {
+      "model": "terrainlab:block/peace_conduit"
+    }
+  }
+}

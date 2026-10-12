@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down":     "terrainlab:block/replicator_top",
+    "up":       "terrainlab:block/replicator_top",
+    "north":    "terrainlab:block/replicator_front",
+    "south":    "terrainlab:block/replicator_side",
+    "east":     "terrainlab:block/replicator_side",
+    "west":     "terrainlab:block/replicator_side",
+    "particle": "terrainlab:block/replicator_side"
+  }
+}

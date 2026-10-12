@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "goat_horn_summon": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "goat_horn_summon"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:goat_horn",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.here_boy.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.here_boy.description"
+    }
+  },
+  "requirements": [
+    [
+      "goat_horn_summon"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

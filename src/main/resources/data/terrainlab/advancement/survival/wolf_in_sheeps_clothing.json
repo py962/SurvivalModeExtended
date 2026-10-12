@@ -1,0 +1,30 @@
+{
+  "parent": "terrainlab:survival/lost_and_found",
+  "criteria": {
+    "sentry_pass": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "sentry_pass"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:sentry_armor_trim_smithing_template",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.wolf_in_sheeps_clothing.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.wolf_in_sheeps_clothing.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "sentry_pass"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

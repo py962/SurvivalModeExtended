@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "wood_shield",
+  "pattern": [
+    "WIW",
+    "WWW",
+    " W "
+  ],
+  "key": {
+    "W": "minecraft:warped_planks",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "terrainlab:warped_shield",
+    "count": 1
+  }
+}

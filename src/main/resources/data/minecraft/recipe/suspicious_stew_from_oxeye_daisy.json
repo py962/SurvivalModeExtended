@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:oxeye_daisy"
+  ],
+  "result": {
+    "components": {
+      "minecraft:suspicious_stew_effects": [],
+      "minecraft:item_name": {
+        "translate": "item.terrainlab.suspicious_stew.healing"
+      },
+      "terrainlab:stew_flower": "oxeye_daisy"
+    },
+    "count": 1,
+    "id": "minecraft:suspicious_stew"
+  }
+}

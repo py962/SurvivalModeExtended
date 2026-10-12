@@ -1,0 +1,30 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "redstone_portal": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "redstone_portal"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:field_stone",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.wired_wanderer.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.wired_wanderer.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "redstone_portal"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

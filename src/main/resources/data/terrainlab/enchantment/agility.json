@@ -1,0 +1,21 @@
+{
+  "description": { "translate": "enchantment.terrainlab.agility" },
+  "supported_items": "#terrainlab:enchantable/agility_group",
+  "primary_items": "#terrainlab:enchantable/agility_group",
+  "weight": 5,
+  "max_level": 3,
+  "min_cost": { "base": 5, "per_level_above_first": 7 },
+  "max_cost": { "base": 25, "per_level_above_first": 7 },
+  "anvil_cost": 2,
+  "slots": ["saddle", "body"],
+  "effects": {
+    "minecraft:attributes": [
+      {
+        "id": "terrainlab:enchantment.agility",
+        "attribute": "minecraft:jump_strength",
+        "amount": { "type": "minecraft:linear", "base": 0.5, "per_level_above_first": 0.5 },
+        "operation": "add_multiplied_base"
+      }
+    ]
+  }
+}

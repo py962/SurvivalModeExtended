@@ -1,0 +1,18 @@
+{
+  "type": "terrainlab:celestial_pair_shaped",
+  "category": "equipment",
+  "group": "celestial_amulet",
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:gold_ingot",
+    "P": "terrainlab:luck_pearl"
+  },
+  "result": {
+    "id": "terrainlab:luck_amulet",
+    "count": 1
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_special_shielddecoration",
+  "banner": "#minecraft:banners",
+  "target": "terrainlab:dark_oak_shield",
+  "result": {
+    "id": "terrainlab:dark_oak_shield"
+  }
+}

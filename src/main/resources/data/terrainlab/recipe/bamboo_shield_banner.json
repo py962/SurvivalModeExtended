@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_special_shielddecoration",
+  "banner": "#minecraft:banners",
+  "target": "terrainlab:bamboo_shield",
+  "result": {
+    "id": "terrainlab:bamboo_shield"
+  }
+}

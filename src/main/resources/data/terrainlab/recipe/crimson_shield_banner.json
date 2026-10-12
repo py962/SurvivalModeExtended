@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_special_shielddecoration",
+  "banner": "#minecraft:banners",
+  "target": "terrainlab:crimson_shield",
+  "result": {
+    "id": "terrainlab:crimson_shield"
+  }
+}

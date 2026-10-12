@@ -1,0 +1,18 @@
+{
+  "type": "terrainlab:celestial_pair_shaped",
+  "category": "misc",
+  "group": "celestial_conduit",
+  "pattern": [
+    "###",
+    "#P#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:gilded_blackstone",
+    "P": "terrainlab:luck_pearl"
+  },
+  "result": {
+    "id": "terrainlab:luck_conduit",
+    "count": 1
+  }
+}

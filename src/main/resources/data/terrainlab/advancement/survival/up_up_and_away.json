@@ -1,0 +1,30 @@
+{
+  "parent": "terrainlab:survival/rocked_to_sleep",
+  "criteria": {
+    "houseboat_ghast": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "houseboat_ghast"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:lead",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.up_up_and_away.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.up_up_and_away.description"
+    },
+    "frame": "goal"
+  },
+  "requirements": [
+    [
+      "houseboat_ghast"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

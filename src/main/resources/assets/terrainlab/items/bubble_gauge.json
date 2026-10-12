@@ -1,0 +1,30 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "terrainlab:bubble_gauge_reading",
+    "scale": 1.0,
+    "entries": [
+      { "threshold": 0.00000, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_00" } },
+      { "threshold": 0.04762, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_01" } },
+      { "threshold": 0.09524, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_02" } },
+      { "threshold": 0.14286, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_03" } },
+      { "threshold": 0.19048, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_04" } },
+      { "threshold": 0.23810, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_05" } },
+      { "threshold": 0.28571, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_06" } },
+      { "threshold": 0.33333, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_07" } },
+      { "threshold": 0.38095, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_08" } },
+      { "threshold": 0.42857, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_09" } },
+      { "threshold": 0.47619, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_10" } },
+      { "threshold": 0.52381, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_11" } },
+      { "threshold": 0.57143, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_12" } },
+      { "threshold": 0.61905, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_13" } },
+      { "threshold": 0.66667, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_14" } },
+      { "threshold": 0.71429, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_15" } },
+      { "threshold": 0.76190, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_16" } },
+      { "threshold": 0.80952, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_17" } },
+      { "threshold": 0.85714, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_18" } },
+      { "threshold": 0.90476, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_19" } },
+      { "threshold": 0.95238, "model": { "type": "minecraft:model", "model": "terrainlab:item/bubble_gauge_20" } }
+    ]
+  }
+}

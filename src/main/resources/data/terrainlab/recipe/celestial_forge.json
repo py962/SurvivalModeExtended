@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:blue_ice",
+    "G": "minecraft:glowstone_dust"
+  },
+  "pattern": [
+    "IBI",
+    "IGI",
+    "IBI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "terrainlab:celestial_forge"
+  }
+}

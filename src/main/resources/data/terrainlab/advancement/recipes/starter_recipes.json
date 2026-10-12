@@ -1,0 +1,28 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "unlock_right_away": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "requirements": [
+    [
+      "unlock_right_away"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:torch",
+      "minecraft:campfire",
+      "minecraft:furnace",
+      "minecraft:bread",
+      "minecraft:white_bed",
+      "terrainlab:leather_flask",
+      "terrainlab:fur_cloak",
+      "minecraft:wooden_pickaxe",
+      "minecraft:stone_sword",
+      "minecraft:shears",
+      "minecraft:paper"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "feature": "terrainlab:ore_ancient_debris_bonus",
+  "placement": [
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:trapezoid",
+        "max_inclusive": {
+          "absolute": 100
+        },
+        "min_inclusive": {
+          "absolute": 24
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

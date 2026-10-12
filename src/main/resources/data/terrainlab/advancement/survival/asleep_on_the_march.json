@@ -1,0 +1,29 @@
+{
+  "parent": "terrainlab:survival/here_boy",
+  "criteria": {
+    "howdah_night": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "howdah_night"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "terrainlab:howdah",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.asleep_on_the_march.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.asleep_on_the_march.description"
+    }
+  },
+  "requirements": [
+    [
+      "howdah_night"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

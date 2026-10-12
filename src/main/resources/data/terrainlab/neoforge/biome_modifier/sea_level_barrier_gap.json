@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": "terrainlab:sea_level_barrier_gap",
+  "step": "lakes"
+}
