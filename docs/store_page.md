@@ -31,9 +31,9 @@ Everything to type into the two project forms. The long description is in `docs/
 | Categories (up to 3 primary) | Adventure, Game Mechanics, World Generation |
 | Additional categories | Mobs, Food |
 | Dependency | Curios API, project `curios`, **Required** |
-| Source code | https://github.com/py962/survival-mode-extended |
-| Issues | https://github.com/py962/survival-mode-extended/issues |
-| Licence | MIT, licence URL https://github.com/py962/survival-mode-extended/blob/main/LICENSE (or leave the URL blank and pick "MIT" from the list) |
+| Source code | https://github.com/py962/SurvivalModeExtended |
+| Issues | https://github.com/py962/SurvivalModeExtended/issues |
+| Licence | MIT, licence URL https://github.com/py962/SurvivalModeExtended/blob/main/LICENSE (or leave the URL blank and pick "MIT" from the list) |
 
 Modrinth reviews every new project before it is public. Keep it as a draft until the jar,
 description, icon and at least one gallery image are in, then press **Submit for review**.

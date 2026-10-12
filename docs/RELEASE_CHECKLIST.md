@@ -7,7 +7,7 @@
       where the TODO is. (`build.gradle` now packs `CREDITS.md` and `LICENSE` into the jar.)
 - [ ] **Make the GitHub repository public** (Settings > General > Danger Zone > Change visibility)
       before submitting to either site. The README, store description and `neoforge.mods.toml` link to
-      `github.com/py962/survival-mode-extended` for issues, the licence and `CREDITS.md`; while the
+      `github.com/py962/SurvivalModeExtended` for issues, the licence and `CREDITS.md`; while the
       repository is private those links show players a 404, and CC BY 4.0 requires the credits to be
       visible.
 - [ ] **Icon.** 512 x 512 PNG. Upload it to both sites. To show it in the in-game mod list too, put it at

@@ -2,7 +2,7 @@
 
 **Survival Mode Extended** is a survival overhaul that makes the world something to prepare for and live in, while keeping the look and feel of vanilla.
 
-> **Beta.** Expect bugs and balance changes, and keep backups of any world you use it in. Please report problems on the [issue tracker](https://github.com/py962/survival-mode-extended/issues).
+> **Beta.** Expect bugs and balance changes, and keep backups of any world you use it in. Please report problems on the [issue tracker](https://github.com/py962/SurvivalModeExtended/issues).
 
 ## Survive the weather
 
@@ -59,6 +59,6 @@ Owls, geese, vultures, caribou, grizzly bears, elephants (ride one in a howdah),
 
 ## Licence and credits
 
-The code is released under the MIT licence. Sounds and adapted code keep their own licences; see [CREDITS.md](https://github.com/py962/survival-mode-extended/blob/main/CREDITS.md).
+The code is released under the MIT licence. Sounds and adapted code keep their own licences; see [CREDITS.md](https://github.com/py962/SurvivalModeExtended/blob/main/CREDITS.md).
 
 *Survival Mode Extended is not an official Minecraft product and is not approved by or associated with Mojang or Microsoft.*
