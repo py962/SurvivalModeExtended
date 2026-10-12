@@ -2,13 +2,13 @@
 
 license="${mod_license}"
 
-issueTrackerURL="https://github.com/py962/survival-mode-extended/issues"
+issueTrackerURL="https://github.com/py962/SurvivalModeExtended/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-displayURL="https://github.com/py962/survival-mode-extended"
+displayURL="https://github.com/py962/SurvivalModeExtended"
 authors="TerrainLab"
 credits="Aurora rendering adapted from Auroral by Saereth (MIT). Sounds from Freesound contributors; see CREDITS.md."
 description='''
