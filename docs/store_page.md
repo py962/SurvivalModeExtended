@@ -15,7 +15,7 @@ Everything to type into the two project forms. The long description is in `docs/
 | Version number | 1.0.0-beta.1 |
 | Version name | Survival Mode Extended 1.0.0-beta.1 |
 | Release channel | Beta |
-| File | `build/libs/survival-mode-extended-neoforge-1.21.11-1.0.0-beta.1.jar` (upload only this one, not a `-sources` jar) |
+| File | `build/libs/SurvivalModeExtended-neoforge-1.21.11-1.0.0-beta.1.jar` (upload only this one, not a `-sources` jar) |
 | Changelog | the 1.0.0-beta.1 section of `CHANGELOG.md` |
 | Required dependency | Curios API |
 | Icon | 512 x 512 PNG (still to be made) |
@@ -24,7 +24,7 @@ Everything to type into the two project forms. The long description is in `docs/
 
 | Field | Value |
 |---|---|
-| URL slug | `survival-mode-extended` |
+| URL slug | `SurvivalModeExtended` |
 | Project type | Mod |
 | Client side | Required |
 | Server side | Required |

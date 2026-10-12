@@ -36,6 +36,8 @@ public final class BuriedHideoutPieces {
     static final int FLAG_ASCENDING = 1;  // rear: this rail climbs back towards the chamber
     static final int FLAG_BRIDGE = 2;     // rear: track carried over a drop
     static final int FLAG_STAIR = 4;      // front: staircase step down from a cliff mouth
+    static final int FLAG_CAVE = 8;       // rear: track crossing a small cave
+    static final int FLAG_INSIDE = 16;    // rear: re-laid track inside the template's corridor
 
     private BuriedHideoutPieces() {
     }
@@ -357,7 +359,8 @@ public final class BuriedHideoutPieces {
             return roll < 2 ? roll + 1 : 0;
         }
 
-        // ---- rear: rails falling 1 per REAR_GRADE (10), posts every 6, bridged over a drop, bumper at the end
+        // ---- rear: a drop after the bend, then rails falling 1 per REAR_GRADE (10), posts every 6 in
+        // the rock, dark oak across caves, bumper at the end
 
         private void buildRear(WorldGenLevel level, BoundingBox box) {
             Direction lat = dir.getClockWise();
@@ -394,7 +397,8 @@ public final class BuriedHideoutPieces {
                         .setValue(RailBlock.SHAPE, ascending ? climb : flat));
 
                 // Supports inside the rock: posts each side, a plank beam above.
-                if (i < keyIndex && !ascending && i % 6 == 2) {
+                if (i < keyIndex && !ascending && !bridged && i % 6 == 2
+                        && (flags[i] & (FLAG_CAVE | FLAG_INSIDE)) == 0) {
                     place(level, box, at(i, lat, -1, rail), log());
                     place(level, box, at(i, lat, -1, rail + 1), log());
                     place(level, box, at(i, lat, 1, rail), log());

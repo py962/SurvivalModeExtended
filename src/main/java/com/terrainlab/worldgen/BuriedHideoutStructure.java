@@ -32,8 +32,9 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * The Outlaws Hideout, buried in a badlands hill: the hideout template, a 3x3 front tunnel rising
  * 1 block per 2 from the cavern outside the west doors until it breaks out to open sky, and a rail
- * escape tunnel dropping 1 block per {@link #REAR_GRADE} east from the existing rail line until it reaches a cave or
- * the surface (bridged on dark oak if it comes out above a drop).
+ * escape tunnel that drops a block straight after the rail line's bend, then 1 block per
+ * {@link #REAR_GRADE} east, crossing caves narrower than 10 blocks and ending at a larger cave or
+ * where it comes out of the hillside (no bridge at the surface).
  * <p>
  * Everything is planned here from the generator's terrain noise, before any piece is built: the
  * chamber is placed as high as the hill allows with at least {@link #COVER} blocks over a low
@@ -64,8 +65,10 @@ public class BuriedHideoutStructure extends Structure {
     static final int TOP_LOCAL_Y = 13;
     /** Front tunnel: first cell outside the west face; y is the tunnel's floor block. */
     static final BlockPos FRONT_START = new BlockPos(-1, 2, 10);
-    /** Rear tunnel: first cell outside the east face; y is the rail block. */
-    static final BlockPos REAR_START = new BlockPos(31, 1, 22);
+    /** Rear tunnel: first rail after the bend (inside the template); y is the template's rail level. */
+    static final BlockPos REAR_START = new BlockPos(13, 1, 22);
+    /** Rear steps still inside the template's own corridor (x 13-30), re-laid a block lower. */
+    static final int REAR_INSIDE_STEPS = 18;
 
     static final int COVER = 2;
     static final int MARGIN = 1;
@@ -103,6 +106,8 @@ public class BuriedHideoutStructure extends Structure {
     /** The escape track drops 1 block every this many blocks. */
     static final int REAR_GRADE = 10;
     static final int REAR_MAX_BRIDGE = 40;
+    /** The escape tunnel crosses a cave and tunnels on if rock resumes within this many blocks. */
+    static final int REAR_MAX_CAVE_SPAN = 9;
     /** Most terrain columns one location may read before it is given up on. */
     static final int READ_BUDGET = 2000;
 
@@ -393,10 +398,11 @@ public class BuriedHideoutStructure extends Structure {
     }
 
     /**
-     * Falls 1 block per REAR_GRADE along the rail line. Ends at the first cave (air at rail and head height
-     * under rock) or where it comes out of the hillside. If that point is above a drop, the track
-     * runs on level across dark oak until it is over ground again. Rejected on water or lava, or if
-     * nothing is reached within the safety limit.
+     * Drops a block straight after the bend, then 1 block per REAR_GRADE along the rail line. The
+     * first REAR_INSIDE_STEPS steps re-lay the template's own track one block lower. A cave is
+     * crossed (on dark oak where its floor is lower) if rock resumes within REAR_MAX_CAVE_SPAN
+     * blocks; a larger cave ends the line, bridged over a drop. Coming out of the hillside ends the
+     * line at the mouth: no bridge is built at the surface.
      */
     private static BuriedHideoutPieces.TunnelPlan planRear(Terrain terrain, BlockPos start, Direction dir) {
         List<int[]> steps = new ArrayList<>();
@@ -408,10 +414,10 @@ public class BuriedHideoutStructure extends Structure {
     }
 
     /**
-     * The escape tunnel is never a reason to reject a location: when it cannot reach a cave or the
-     * surface (water or lava ahead, the step limit, a bridge too long or running into water), the
-     * track simply ends where it got to, against a hay bale bumper. Fluids beside the carved tunnel
-     * are sealed off as it is built. Null only if there is no room for even one step.
+     * The escape tunnel is never a reason to reject a location: when it cannot go on (water or lava
+     * ahead, the step limit, a bridge too long or running into water, the hillside over a drop),
+     * the track simply ends where it got to, against a hay bale bumper. Fluids beside the carved
+     * tunnel are sealed off as it is built. Null only if there is no room for even one step.
      */
     private static BuriedHideoutPieces.TunnelPlan endHere(Terrain terrain, List<int[]> steps, Direction dir,
                                                          String reason) {
@@ -419,16 +425,27 @@ public class BuriedHideoutStructure extends Structure {
         return steps.isEmpty() ? null : new BuriedHideoutPieces.TunnelPlan(false, dir, steps.size(), steps);
     }
 
+    /** Rail height at rear step i: one block down straight after the bend, then 1 per REAR_GRADE. */
+    private static int rearRail(BlockPos start, int i) {
+        return start.getY() - 1 - i / REAR_GRADE;
+    }
+
     private static BuriedHideoutPieces.TunnelPlan planRearSteps(Terrain terrain, BlockPos start, Direction dir,
                                                                List<int[]> steps) {
         for (int i = 0; i < REAR_MAX_STEPS; i++) {
             int x = start.getX() + dir.getStepX() * i;
             int z = start.getZ() + dir.getStepZ() * i;
+            int rail = rearRail(start, i);
+            int flags = (i % REAR_GRADE == 0) ? BuriedHideoutPieces.FLAG_ASCENDING : 0;
+
+            if (i < REAR_INSIDE_STEPS) {
+                // Still inside the template's corridor: no terrain checks, the template carved it.
+                steps.add(new int[]{x, z, rail, rail, flags | BuriedHideoutPieces.FLAG_INSIDE, Integer.MIN_VALUE});
+                continue;
+            }
             if (!terrain.withinReach(x, z, MAX_CHUNK_REACH)) {
                 return endHere(terrain, steps, dir, "ends at the structure's reach after " + i + " steps");
             }
-            int rail = start.getY() - i / REAR_GRADE;
-            int flags = (i > 0 && i % REAR_GRADE == 0) ? BuriedHideoutPieces.FLAG_ASCENDING : 0;
             NoiseColumn column = terrain.column(x, z);
             BlockState atRail = column.getBlock(rail);
             BlockState atHead = column.getBlock(rail + 1);
@@ -438,17 +455,64 @@ public class BuriedHideoutStructure extends Structure {
             int ground = terrain.height(x, z);
             boolean outside = ground <= rail + 1;
             boolean cave = !outside && atRail.isAir() && atHead.isAir();
-            steps.add(new int[]{x, z, rail, ground, flags, Integer.MIN_VALUE});
+            int groundTop = (outside || cave) ? topSolidBelow(column, rail - 1, terrain.ha.getMinY()) : rail - 1;
+            boolean overDrop = groundTop < rail - 1;
 
-            if (outside || cave) {
-                int groundTop = topSolidBelow(column, rail - 1, terrain.ha.getMinY());
-                if (groundTop >= rail - 1) {
+            if (outside) {
+                if (!overDrop) {
+                    steps.add(new int[]{x, z, rail, ground, flags, Integer.MIN_VALUE});
+                    return new BuriedHideoutPieces.TunnelPlan(false, dir, i, steps);
+                }
+                // Out of the hillside above a drop: end at the mouth, no bridge.
+                return endHere(terrain, steps, dir, "ends at the hillside mouth after " + i + " steps");
+            }
+            if (cave) {
+                if (inSmallCave(terrain, start, dir, i)) {
+                    // Cross it and tunnel on into the far wall.
+                    flags |= BuriedHideoutPieces.FLAG_CAVE;
+                    if (overDrop) {
+                        flags |= BuriedHideoutPieces.FLAG_BRIDGE;
+                    }
+                    steps.add(new int[]{x, z, rail, ground, flags, overDrop ? groundTop : Integer.MIN_VALUE});
+                    continue;
+                }
+                steps.add(new int[]{x, z, rail, ground, flags, Integer.MIN_VALUE});
+                if (!overDrop) {
                     return new BuriedHideoutPieces.TunnelPlan(false, dir, i, steps);
                 }
                 return bridge(terrain, steps, dir, i, rail);
             }
+            steps.add(new int[]{x, z, rail, ground, flags, Integer.MIN_VALUE});
         }
         return endHere(terrain, steps, dir, "ends after " + REAR_MAX_STEPS + " steps underground");
+    }
+
+    /**
+     * True if, from the open cell at step i, solid rock resumes at rail height within
+     * REAR_MAX_CAVE_SPAN steps, with no fluid and no way out to the hillside in between.
+     */
+    private static boolean inSmallCave(Terrain terrain, BlockPos start, Direction dir, int i) {
+        for (int k = i + 1; k <= i + REAR_MAX_CAVE_SPAN; k++) {
+            int x = start.getX() + dir.getStepX() * k;
+            int z = start.getZ() + dir.getStepZ() * k;
+            if (!terrain.withinReach(x, z, MAX_CHUNK_REACH)) {
+                return false;
+            }
+            int rail = rearRail(start, k);
+            NoiseColumn column = terrain.column(x, z);
+            BlockState atRail = column.getBlock(rail);
+            BlockState atHead = column.getBlock(rail + 1);
+            if (isFluid(atRail) || isFluid(atHead) || isFluid(column.getBlock(rail - 1))) {
+                return false;
+            }
+            if (terrain.height(x, z) <= rail + 1) {
+                return false; // opens onto the hillside instead
+            }
+            if (!(atRail.isAir() && atHead.isAir())) {
+                return true; // the far wall
+            }
+        }
+        return false;
     }
 
     /**

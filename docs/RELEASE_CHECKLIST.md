@@ -11,7 +11,7 @@
       repository is private those links show players a 404, and CC BY 4.0 requires the credits to be
       visible.
 - [ ] **Icon.** 512 x 512 PNG. Upload it to both sites. To show it in the in-game mod list too, put it at
-      `src/main/resources/survival_mode_extended_icon.png` and add `logoFile="survival_mode_extended_icon.png"`
+      `src/main/resources/SurvivalModeExtended_icon.png` and add `logoFile="SurvivalModeExtended_icon.png"`
       under `[[mods]]` in `neoforge.mods.toml`.
 - [ ] **Pickaxe tag.** `src/main/resources/data/minecraft/tags/block/mineable/pickaxe.json` lists
       `terrainlab:celestial_forge` (otherwise the forge drops nothing when mined).
@@ -32,7 +32,7 @@
 ## 2. Build and test the release jar
 
 - [ ] Gradle > Tasks > build > **clean**, then **build**. The jar is
-      `build/libs/survival-mode-extended-neoforge-1.21.11-1.0.0-beta.1.jar`.
+      `build/libs/SurvivalModeExtended-neoforge-1.21.11-1.0.0-beta.1.jar`.
 - [ ] Test the **built jar**, not the IntelliJ run: a clean instance (CurseForge app or Prism Launcher)
       with NeoForge 21.11.42+, Curios API 14.0.0+ and only this jar. Create a new world.
 - [ ] Check the log has no errors from `terrainlab` at startup (recipe, tag or mixin errors).
@@ -44,7 +44,7 @@
 ## 3. Modrinth
 
 1. modrinth.com > sign in > **Create a project**: name "Survival Mode Extended", slug
-   `survival-mode-extended`, visibility Draft.
+   `SurvivalModeExtended`, visibility Draft.
 2. Fill in summary, description (`docs/store_description.md`), icon, categories, client/server
    sides, licence and links from `docs/store_page.md`. Add the gallery images.
 3. **Versions > Create a version**: upload the jar, version number `1.0.0-beta.1`, channel Beta,

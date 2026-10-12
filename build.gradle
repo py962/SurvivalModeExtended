@@ -35,8 +35,8 @@ repositories {
 }
 
 base {
-    // Jar name for releases, e.g. survival-mode-extended-neoforge-1.21.11-1.0.0-beta.1.jar
-    archivesName = "survival-mode-extended-neoforge-${minecraft_version}"
+    // Jar name for releases, e.g. SurvivalModeExtended-neoforge-1.21.11-1.0.0-beta.1.jar
+    archivesName = "SurvivalModeExtended-neoforge-${minecraft_version}"
 }
 
 // Mojang ships Java 21 to end users in 1.21.11, so mods should target Java 21.
@@ -189,7 +189,7 @@ neoForge.ideSyncTask generateModMetadata
 // Ship the licence and the third-party credits inside the jar, so the attributions travel with the mod.
 tasks.named('jar', Jar).configure {
     from(rootProject.file('LICENSE')) {
-        rename { 'LICENSE_survival_mode_extended' }
+        rename { 'LICENSE_SurvivalModeExtended' }
     }
     from(rootProject.file('CREDITS.md'))
 }
