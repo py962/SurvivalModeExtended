@@ -2,180 +2,137 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1.0,
-      "bonus_rolls": 0.0,
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ],
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
       "entries": [
         {
           "type": "minecraft:alternatives",
           "children": [
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "1"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "1"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 1.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 1
+              },
               "name": "minecraft:sand"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "2"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "2"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 1.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 1
+              },
               "name": "minecraft:sand"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "3"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "3"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 2.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 2
+              },
               "name": "minecraft:sand"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "4"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "4"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 2.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 2
+              },
               "name": "minecraft:sand"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "5"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "5"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 3.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 3
+              },
               "name": "minecraft:sand"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "6"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "6"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 3.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 3
+              },
               "name": "minecraft:sand"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "7"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "7"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 4.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 4
+              },
               "name": "minecraft:sand"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "terrainlab:sand_layer",
-                  "properties": {
-                    "layers": "8"
-                  }
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "terrainlab:sand_layer",
+                "state": {
+                  "layers": "8"
                 }
-              ],
-              "functions": [
-                {
-                  "function": "minecraft:set_count",
-                  "count": 4.0,
-                  "add": false
-                }
-              ],
+              },
+              "modifier": {
+                "type": "minecraft:set_count",
+                "count": 4
+              },
               "name": "minecraft:sand"
             }
           ]
         }
-      ]
+      ],
+      "rolls": 1
     }
   ],
   "random_sequence": "terrainlab:blocks/sand_layer"

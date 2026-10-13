@@ -2,19 +2,21 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:cocoa_beans",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "type": "minecraft:uniform", "min": 2, "max": 6 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 2
             }
-          ]
+          },
+          "name": "minecraft:cocoa_beans"
         }
-      ]
+      ],
+      "rolls": 1
     }
   ],
   "random_sequence": "terrainlab:chests/pirates_cove_pot"

@@ -1,25 +1,21 @@
 package com.terrainlab.client;
 
 import com.terrainlab.TerrainLab;
-import com.terrainlab.block.ModWoodTypes;
 import com.terrainlab.registry.ModEntities;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.object.boat.BoatModel;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.BoatRenderer;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 /**
  * Client registration for the Pine, Azalea and Enderwood wood sets.
  *
- * <p>Signs need no renderer of their own: vanilla's sign and hanging sign renderers build a
- * model for every registered WoodType, and the sign atlas lists every namespace's
- * textures/entity/signs. Sheets only snapshots the vanilla wood types, so ours are added here.
+ * <p>Signs need nothing here: since 26.3 they are ordinary block models (see the sign
+ * blockstates) and vanilla's sign renderers only draw the text.
  *
  * <p>Boats use vanilla's BoatRenderer, which derives its texture from the model layer id:
  * terrainlab:boat/pine -> terrainlab:textures/entity/boat/pine.png.
@@ -39,15 +35,6 @@ public final class WoodSetsClient {
 
     private static ModelLayerLocation layer(String path) {
         return new ModelLayerLocation(Identifier.fromNamespaceAndPath(TerrainLab.MODID, path), "main");
-    }
-
-    @SubscribeEvent
-    static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> {
-            Sheets.addWoodType(ModWoodTypes.PINE);
-            Sheets.addWoodType(ModWoodTypes.AZALEA);
-            Sheets.addWoodType(ModWoodTypes.ENDERWOOD);
-        });
     }
 
     @SubscribeEvent

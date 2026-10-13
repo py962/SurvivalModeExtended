@@ -5,25 +5,23 @@ import com.terrainlab.registry.ModBlocks;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.FlowerPotBlock;
-import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 
-import java.util.Map;
+import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 /**
  * Common hookups for the Pine, Azalea and Enderwood wood sets (blocks in ModBlocks):
- * signs join vanilla's sign / hanging sign block entity types, axes strip logs and wood,
- * the pine sapling can be potted, and the pine and azalea blocks burn like vanilla wood
- * (enderwood, like the nether woods, does not).
+ * signs join vanilla's sign / hanging sign block entity types, and the pine and azalea blocks
+ * burn like vanilla wood (enderwood, like the nether woods, does not).
+ *
+ * <p>Since 26.3 axe stripping is data-driven (block transformers): the strippables live in
+ * data/neoforge/data_maps/block/transformables.json. The potted pine sapling is linked to the
+ * empty flower pot automatically by NeoForge when it is registered.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class WoodSetEvents {
@@ -34,11 +32,11 @@ public final class WoodSetEvents {
     // Mod bus.
     @SubscribeEvent
     public static void onBlockEntityValidBlocks(BlockEntityTypeAddBlocksEvent event) {
-        event.modify(BlockEntityType.SIGN,
+        event.modify(BlockEntityTypes.SIGN,
                 ModBlocks.PINE_SIGN.get(), ModBlocks.PINE_WALL_SIGN.get(),
                 ModBlocks.AZALEA_SIGN.get(), ModBlocks.AZALEA_WALL_SIGN.get(),
                 ModBlocks.ENDERWOOD_SIGN.get(), ModBlocks.ENDERWOOD_WALL_SIGN.get());
-        event.modify(BlockEntityType.HANGING_SIGN,
+        event.modify(BlockEntityTypes.HANGING_SIGN,
                 ModBlocks.PINE_HANGING_SIGN.get(), ModBlocks.PINE_WALL_HANGING_SIGN.get(),
                 ModBlocks.AZALEA_HANGING_SIGN.get(), ModBlocks.AZALEA_WALL_HANGING_SIGN.get(),
                 ModBlocks.ENDERWOOD_HANGING_SIGN.get(), ModBlocks.ENDERWOOD_WALL_HANGING_SIGN.get());
@@ -48,8 +46,6 @@ public final class WoodSetEvents {
     @SubscribeEvent
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-            ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ModBlocks.PINE_SAPLING.getId(), ModBlocks.POTTED_PINE_SAPLING);
-
             // Encouragement / flammability values from vanilla FireBlock.bootStrap.
             FireBlock fire = (FireBlock) Blocks.FIRE;
             flammable(fire, 5, 20,
@@ -64,38 +60,24 @@ public final class WoodSetEvents {
         });
     }
 
+    // FireBlock.setFlammable is private in 26.3 (it was public under NeoForge 1.21.11) and there is
+    // no other registration hook, so it is called reflectively. Minecraft is an automatic module,
+    // so its packages are open to reflection.
+    private static Method setFlammable;
+
     @SafeVarargs
     private static void flammable(FireBlock fire, int encouragement, int flammability,
                                   Supplier<? extends Block>... blocks) {
-        for (Supplier<? extends Block> block : blocks) {
-            fire.setFlammable(block.get(), encouragement, flammability);
+        try {
+            if (setFlammable == null) {
+                setFlammable = FireBlock.class.getDeclaredMethod("setFlammable", Block.class, int.class, int.class);
+                setFlammable.setAccessible(true);
+            }
+            for (Supplier<? extends Block> block : blocks) {
+                setFlammable.invoke(fire, block.get(), encouragement, flammability);
+            }
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            TerrainLab.LOGGER.error("Could not register wood-set flammability", e);
         }
-    }
-
-    // Game bus: axe stripping (NeoForge replacement for AxeItem.STRIPPABLES).
-    @SubscribeEvent
-    public static void onToolModification(BlockEvent.BlockToolModificationEvent event) {
-        if (event.getItemAbility() != ItemAbilities.AXE_STRIP) {
-            return;
-        }
-        BlockState state = event.getState();
-        Block stripped = strippedFor(state.getBlock());
-        if (stripped != null) {
-            event.setFinalState(stripped.defaultBlockState()
-                    .setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)));
-        }
-    }
-
-    private static Map<Block, Block> strippables;
-
-    private static Block strippedFor(Block block) {
-        if (strippables == null) {
-            strippables = Map.of(
-                    ModBlocks.PINE_LOG.get(), ModBlocks.STRIPPED_PINE_LOG.get(),
-                    ModBlocks.PINE_WOOD.get(), ModBlocks.STRIPPED_PINE_WOOD.get(),
-                    ModBlocks.AZALEA_LOG.get(), ModBlocks.STRIPPED_AZALEA_LOG.get(),
-                    ModBlocks.AZALEA_WOOD.get(), ModBlocks.STRIPPED_AZALEA_WOOD.get());
-        }
-        return strippables.get(block);
     }
 }

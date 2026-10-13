@@ -2,167 +2,137 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 3,
+              "min": 1
             }
-          ],
+          },
           "name": "minecraft:diamond",
           "weight": 3
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 5,
+              "min": 1
             }
-          ],
+          },
           "name": "minecraft:iron_ingot",
           "weight": 10
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 7.0,
-                "min": 2.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 7,
+              "min": 2
             }
-          ],
+          },
           "name": "minecraft:gold_ingot",
           "weight": 15
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 1.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 1,
+              "min": 1
             }
-          ],
+          },
           "name": "minecraft:sniffer_egg",
           "weight": 20
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 6.0,
-                "min": 3.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 3
             }
-          ],
+          },
           "name": "minecraft:slime_ball",
           "weight": 10
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 6.0,
-                "min": 4.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 4
             }
-          ],
+          },
           "name": "minecraft:redstone",
           "weight": 20
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 7.0,
-                "min": 3.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 7,
+              "min": 3
             }
-          ],
+          },
           "name": "terrainlab:parrot_feather",
           "weight": 20
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 5.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 5,
+              "min": 1
             }
-          ],
+          },
           "name": "minecraft:leather",
           "weight": 3
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_potion",
+            "id": "minecraft:night_vision"
+          },
           "name": "minecraft:potion",
-          "weight": 10,
-          "functions": [
-            {
-              "function": "minecraft:set_potion",
-              "id": "minecraft:night_vision"
-            }
-          ]
+          "weight": 10
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:enchant_with_levels",
-              "levels": 30.0,
-              "options": "#minecraft:on_random_loot"
-            }
-          ],
+          "modifier": {
+            "type": "minecraft:enchant_with_levels",
+            "levels": 30,
+            "options": "#minecraft:on_random_loot"
+          },
           "name": "minecraft:book"
         }
       ],
       "rolls": {
         "type": "minecraft:uniform",
-        "max": 6.0,
-        "min": 4.0
+        "max": 6,
+        "min": 4
       }
     },
     {
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:empty",
@@ -170,29 +140,22 @@
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": 2.0,
-              "function": "minecraft:set_count"
-            }
-          ],
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": 2
+          },
           "name": "minecraft:wild_armor_trim_smithing_template"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     },
     {
-      "bonus_rolls": 0.0,
-      "rolls": 1.0,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:map",
-          "weight": 1,
-          "functions": [
+          "modifier": [
             {
-              "function": "minecraft:exploration_map",
+              "type": "minecraft:exploration_map",
               "destination": "terrainlab:locate/ancient_city",
               "decoration": "minecraft:red_x",
               "zoom": 2,
@@ -200,44 +163,44 @@
               "skip_existing_chunks": true
             },
             {
-              "function": "minecraft:set_custom_data",
+              "type": "minecraft:set_custom_data",
               "tag": {
                 "terrainlab_relic_map": "temple_map"
               }
             },
             {
-              "function": "minecraft:set_name",
+              "type": "minecraft:set_name",
               "name": {
                 "translate": "item.terrainlab.temple_map"
               },
               "target": "item_name"
             }
-          ]
+          ],
+          "name": "minecraft:map",
+          "weight": 1
         }
-      ]
+      ],
+      "rolls": 1
     },
     {
-      "bonus_rolls": 0.0,
-      "rolls": 1.0,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:goat_horn",
-          "weight": 3,
-          "functions": [
-            {
-              "function": "minecraft:set_components",
-              "components": {
-                "minecraft:instrument": "minecraft:admire_goat_horn"
-              }
+          "modifier": {
+            "type": "minecraft:set_components",
+            "components": {
+              "minecraft:instrument": "minecraft:admire_goat_horn"
             }
-          ]
+          },
+          "name": "minecraft:goat_horn",
+          "weight": 3
         },
         {
           "type": "minecraft:empty",
           "weight": 1
         }
-      ]
+      ],
+      "rolls": 1
     }
   ],
   "random_sequence": "minecraft:chests/jungle_temple"

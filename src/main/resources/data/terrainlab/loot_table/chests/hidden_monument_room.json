@@ -2,7 +2,6 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 10,
       "entries": [
         {
           "type": "minecraft:item",
@@ -51,42 +50,36 @@
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_potion",
+            "id": "terrainlab:warmth"
+          },
           "name": "minecraft:potion",
-          "weight": 5,
-          "functions": [
-            {
-              "function": "minecraft:set_potion",
-              "id": "terrainlab:warmth"
-            }
-          ]
+          "weight": 5
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:enchant_randomly",
+            "options": [
+              "minecraft:channeling",
+              "minecraft:impaling",
+              "minecraft:riptide"
+            ]
+          },
           "name": "minecraft:enchanted_book",
-          "weight": 5,
-          "functions": [
-            {
-              "function": "minecraft:enchant_randomly",
-              "options": [
-                "minecraft:channeling",
-                "minecraft:impaling",
-                "minecraft:riptide"
-              ]
-            }
-          ]
+          "weight": 5
         }
-      ]
+      ],
+      "rolls": 10
     },
     {
-      "rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:map",
-          "weight": 1,
-          "functions": [
+          "modifier": [
             {
-              "function": "minecraft:exploration_map",
+              "type": "minecraft:exploration_map",
               "destination": "terrainlab:locate/trial_chamber",
               "decoration": "minecraft:red_x",
               "zoom": 2,
@@ -94,21 +87,24 @@
               "skip_existing_chunks": true
             },
             {
-              "function": "minecraft:set_custom_data",
+              "type": "minecraft:set_custom_data",
               "tag": {
                 "terrainlab_relic_map": "sunken_chart"
               }
             },
             {
-              "function": "minecraft:set_name",
+              "type": "minecraft:set_name",
               "name": {
                 "translate": "item.terrainlab.sunken_chart"
               },
               "target": "item_name"
             }
-          ]
+          ],
+          "name": "minecraft:map",
+          "weight": 1
         }
-      ]
+      ],
+      "rolls": 1
     }
   ]
 }

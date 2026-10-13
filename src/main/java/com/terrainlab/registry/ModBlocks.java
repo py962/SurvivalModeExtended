@@ -43,6 +43,7 @@ import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.UntintedParticleLeavesBlock;
 import net.minecraft.world.level.block.WallHangingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
+import net.minecraft.world.level.block.sounds.AmbientLeavesBlockSoundPlayer;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -296,7 +297,8 @@ public class ModBlocks {
     public static final DeferredBlock<UntintedParticleLeavesBlock> PINE_LEAVES =
             BLOCKS.registerBlock("pine_leaves",
                     p -> new UntintedParticleLeavesBlock(0.01F,
-                            ColorParticleOption.create(ParticleTypes.TINTED_LEAVES, 0xFF768E68), p),
+                            ColorParticleOption.create(ParticleTypes.TINTED_LEAVES, 0xFF768E68),
+                            AmbientLeavesBlockSoundPlayer.noAmbientSound(), p),
                     () -> BlockBehaviour.Properties.of()
                             .mapColor(MapColor.PLANT)
                             .strength(0.2F)
@@ -305,9 +307,9 @@ public class ModBlocks {
                             .noOcclusion()
                             .isValidSpawn(Blocks::ocelotOrParrot)
                             .isSuffocating((state, level, pos) -> false)
-                            .isViewBlocking((state, level, pos) -> false)
+                            .isViewBlocking((state, level, pos, nearPlaneBox) -> false)
                             .ignitedByLava()
-                            .pushReaction(PushReaction.DESTROY)
+                            .pushReaction(PushReaction.POPPED)
                             .isRedstoneConductor((state, level, pos) -> false));
     public static final DeferredBlock<SaplingBlock> PINE_SAPLING =
             BLOCKS.registerBlock("pine_sapling",
@@ -318,7 +320,7 @@ public class ModBlocks {
                             .randomTicks()
                             .instabreak()
                             .sound(SoundType.GRASS)
-                            .pushReaction(PushReaction.DESTROY));
+                            .pushReaction(PushReaction.POPPED));
     // Registered on the vanilla empty pot in WoodSetEvents (common setup).
     public static final DeferredBlock<FlowerPotBlock> POTTED_PINE_SAPLING =
             BLOCKS.registerBlock("potted_pine_sapling",
@@ -326,7 +328,7 @@ public class ModBlocks {
                     () -> BlockBehaviour.Properties.of()
                             .instabreak()
                             .noOcclusion()
-                            .pushReaction(PushReaction.DESTROY));
+                            .pushReaction(PushReaction.POPPED));
 
     // Azalea (pale blue-slate mauve); grown by vanilla's azalea_tree feature (data override).
     public static final DeferredBlock<RotatedPillarBlock> AZALEA_LOG = log("azalea_log", MapColor.TERRACOTTA_LIGHT_BLUE, MapColor.TERRACOTTA_BLUE);
@@ -409,7 +411,7 @@ public class ModBlocks {
 
     private static DeferredBlock<DoorBlock> door(String name, BlockSetType set, MapColor color, boolean flammable) {
         return BLOCKS.registerBlock(name, p -> new DoorBlock(set, p),
-                () -> woodBase(color, flammable).strength(3.0F).noOcclusion().pushReaction(PushReaction.DESTROY));
+                () -> woodBase(color, flammable).strength(3.0F).noOcclusion().pushReaction(PushReaction.POPPED));
     }
 
     private static DeferredBlock<TrapDoorBlock> trapdoor(String name, BlockSetType set, MapColor color, boolean flammable) {
@@ -420,13 +422,13 @@ public class ModBlocks {
 
     private static DeferredBlock<ButtonBlock> button(String name, BlockSetType set) {
         return BLOCKS.registerBlock(name, p -> new ButtonBlock(set, 30, p),
-                () -> BlockBehaviour.Properties.of().noCollision().strength(0.5F).pushReaction(PushReaction.DESTROY));
+                () -> BlockBehaviour.Properties.of().noCollision().strength(0.5F).pushReaction(PushReaction.POPPED));
     }
 
     private static DeferredBlock<PressurePlateBlock> pressurePlate(String name, BlockSetType set, MapColor color, boolean flammable) {
         return BLOCKS.registerBlock(name, p -> new PressurePlateBlock(set, p),
                 () -> woodBase(color, flammable).forceSolidOn().noCollision().strength(0.5F)
-                        .pushReaction(PushReaction.DESTROY));
+                        .pushReaction(PushReaction.POPPED));
     }
 
     private static DeferredBlock<StandingSignBlock> sign(String name, WoodType type, MapColor color, boolean flammable) {

@@ -2,48 +2,96 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": { "type": "minecraft:uniform", "min": 5, "max": 6 },
       "entries": [
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 2,
+              "min": 1
+            }
+          },
           "name": "minecraft:compass",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+          "weight": 10
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 3,
+              "min": 1
+            }
+          },
           "name": "minecraft:ink_sac",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } }]
+          "weight": 10
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 3,
+              "min": 1
+            }
+          },
           "name": "minecraft:resin_clump",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } }]
+          "weight": 10
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 2,
+              "min": 1
+            }
+          },
           "name": "minecraft:spyglass",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+          "weight": 10
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 15,
+              "min": 10
+            }
+          },
           "name": "minecraft:paper",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 10, "max": 15 } }]
+          "weight": 10
         },
-        { "type": "minecraft:item", "name": "minecraft:crossbow", "weight": 5 },
-
         {
           "type": "minecraft:item",
+          "name": "minecraft:crossbow",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 10,
+              "min": 4
+            }
+          },
           "name": "minecraft:prismarine_shard",
-          "weight": 8,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 4, "max": 10 } }]
+          "weight": 8
         }
-
-      ]
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 6,
+        "min": 5
+      }
     }
   ],
   "random_sequence": "terrainlab:chests/pirates_cove_chest"

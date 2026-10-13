@@ -2,63 +2,130 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": { "type": "minecraft:uniform", "min": 5, "max": 10 },
       "entries": [
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 12,
+              "min": 4
+            }
+          },
           "name": "minecraft:rabbit_hide",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 4, "max": 12 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 3,
+              "min": 1
+            }
+          },
           "name": "minecraft:rabbit_stew",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 10,
+              "min": 5
+            }
+          },
           "name": "minecraft:bone",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 5, "max": 10 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 2
+            }
+          },
           "name": "terrainlab:venison",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 6 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 2
+            }
+          },
           "name": "minecraft:tripwire_hook",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 6 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 10,
+              "min": 4
+            }
+          },
           "name": "minecraft:string",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 4, "max": 10 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 2
+            }
+          },
           "name": "terrainlab:cooked_venison",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 6 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 4,
+              "min": 1
+            }
+          },
           "name": "terrainlab:caribou_fur",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 4 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 12,
+              "min": 9
+            }
+          },
           "name": "minecraft:coal",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 9, "max": 12 } }]
+          "weight": 7
         }
-      ]
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 10,
+        "min": 5
+      }
     }
   ],
   "random_sequence": "terrainlab:chests/trappers_lodge_barrel"

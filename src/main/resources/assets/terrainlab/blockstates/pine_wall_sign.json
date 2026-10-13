@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "terrainlab:block/pine_sign"
+    "facing=east": {
+      "model": "terrainlab:block/pine_wall_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "terrainlab:block/pine_wall_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "terrainlab:block/pine_wall_sign"
+    },
+    "facing=west": {
+      "model": "terrainlab:block/pine_wall_sign",
+      "y": 90
     }
   }
 }

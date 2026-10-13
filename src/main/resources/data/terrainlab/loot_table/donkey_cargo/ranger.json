@@ -1,58 +1,87 @@
 {
-
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": { "type": "minecraft:uniform", "min": 3, "max": 7 },
       "entries": [
-        { "type": "minecraft:item", "name": "minecraft:bow" },
         {
           "type": "minecraft:item",
-          "name": "minecraft:arrow",
-          "functions": [
-            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 6 } }
-          ]
+          "name": "minecraft:bow"
         },
- {
+        {
           "type": "minecraft:item",
-          "name": "minecraft:goat_horn",
-          "weight": 10,
-          "functions": [
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 1
+            }
+          },
+          "name": "minecraft:arrow"
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": [
             {
-              "function": "minecraft:set_components",
+              "type": "minecraft:set_components",
               "components": {
                 "minecraft:instrument": "minecraft:seek_goat_horn"
               }
             },
             {
-              "function": "minecraft:set_count",
+              "type": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
-                "min": 1,
-                "max": 2
+                "max": 2,
+                "min": 1
               }
             }
-          ]
+          ],
+          "name": "minecraft:goat_horn",
+          "weight": 10
         },
-
-        { "type": "minecraft:item", "name": "terrainlab:leather_flask" },
-        { "type": "minecraft:item", "name": "minecraft:campfire" },
         {
           "type": "minecraft:item",
-          "name": "minecraft:lead",
-          "functions": [
-            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }
-          ]
+          "name": "terrainlab:leather_flask"
         },
-        { "type": "minecraft:item", "name": "terrainlab:fur_cloak" },
         {
           "type": "minecraft:item",
-          "name": "minecraft:flint",
-          "functions": [
-            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } }
-          ]
+          "name": "minecraft:campfire"
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 2,
+              "min": 1
+            }
+          },
+          "name": "minecraft:lead"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "terrainlab:fur_cloak"
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 3,
+              "min": 1
+            }
+          },
+          "name": "minecraft:flint"
         }
-      ]
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 7,
+        "min": 3
+      }
     }
   ]
 }

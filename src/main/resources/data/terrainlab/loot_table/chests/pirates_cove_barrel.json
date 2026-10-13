@@ -2,47 +2,96 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": { "type": "minecraft:uniform", "min": 5, "max": 6 },
       "entries": [
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 12,
+              "min": 4
+            }
+          },
           "name": "minecraft:arrow",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 4, "max": 12 } }]
+          "weight": 10
         },
-        { "type": "minecraft:item", "name": "minecraft:crossbow", "weight": 3 },
         {
           "type": "minecraft:item",
+          "name": "minecraft:crossbow",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 1,
+              "min": 1
+            }
+          },
           "name": "minecraft:iron_sword",
-          "weight": 7,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 1 } }]
+          "weight": 7
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 4,
+              "min": 1
+            }
+          },
           "name": "minecraft:sea_pickle",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 4 } }]
+          "weight": 10
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 4,
+              "min": 1
+            }
+          },
           "name": "minecraft:cod",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 4 } }]
+          "weight": 10
         },
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 8,
+              "min": 3
+            }
+          },
           "name": "minecraft:kelp",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 3, "max": 8 } }]
+          "weight": 10
         },
-
         {
           "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 4,
+              "min": 1
+            }
+          },
           "name": "terrainlab:goose_feather",
-          "weight": 10,
-          "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 4 } }]
+          "weight": 10
         }
-      ]
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 6,
+        "min": 5
+      }
     }
   ],
   "random_sequence": "terrainlab:chests/pirates_cove_barrel"

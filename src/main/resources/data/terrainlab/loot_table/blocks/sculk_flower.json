@@ -2,13 +2,13 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
           "name": "terrainlab:sculk_flower"
         }
-      ]
+      ],
+      "rolls": 1
     }
   ]
 }

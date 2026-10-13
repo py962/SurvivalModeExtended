@@ -2,19 +2,21 @@
   "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:gunpowder",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "type": "minecraft:uniform", "min": 2, "max": 15 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 15,
+              "min": 2
             }
-          ]
+          },
+          "name": "minecraft:gunpowder"
         }
-      ]
+      ],
+      "rolls": 1
     }
   ],
   "random_sequence": "terrainlab:chests/outloaws_hideout_pot"

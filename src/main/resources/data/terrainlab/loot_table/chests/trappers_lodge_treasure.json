@@ -2,106 +2,94 @@
   "type": "minecraft:chest",
   "pools": [
     {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 6,
+              "min": 3
+            }
+          },
+          "name": "minecraft:emerald",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 1,
+              "min": 1
+            }
+          },
+          "name": "minecraft:iron_chain",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 1,
+              "min": 1
+            }
+          },
+          "name": "minecraft:shears",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_components",
+            "components": {
+              "minecraft:instrument": "minecraft:ponder_goat_horn"
+            }
+          },
+          "name": "minecraft:goat_horn",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 1,
+              "min": 1
+            }
+          },
+          "name": "minecraft:lava_bucket",
+          "weight": 10
+        }
+      ],
       "rolls": {
         "type": "minecraft:uniform",
-        "min": 4,
-        "max": 5
-      },
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:emerald",
-          "weight": 20,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 3,
-                "max": 6
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:iron_chain",
-          "weight": 10,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 1,
-                "max": 1
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:shears",
-          "weight": 10,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 1,
-                "max": 1
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:goat_horn",
-          "weight": 20,
-          "functions": [
-            {
-              "function": "minecraft:set_components",
-              "components": {
-                "minecraft:instrument": "minecraft:ponder_goat_horn"
-              }
-            }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:lava_bucket",
-          "weight": 10,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 1,
-                "max": 1
-              }
-            }
-          ]
-        }
-      ]
+        "max": 5,
+        "min": 4
+      }
     },
     {
-      "rolls": 1,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:sentry_armor_trim_smithing_template",
-          "weight": 1,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 1,
-                "max": 1
-              }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "max": 1,
+              "min": 1
             }
-          ]
+          },
+          "name": "minecraft:sentry_armor_trim_smithing_template",
+          "weight": 1
         }
-      ]
+      ],
+      "rolls": 1
     }
   ],
   "random_sequence": "terrainlab:chests/trappers_lodge_treasure"

@@ -2,24 +2,21 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:conduit",
-          "functions": [
-            {
-              "function": "minecraft:copy_components",
-              "source": "block_entity",
-              "include": [
-                "terrainlab:celestial_pair_id",
-                "terrainlab:celestial_variant"
-              ]
-            }
-          ]
+          "modifier": {
+            "type": "minecraft:copy_components",
+            "source": "block_entity",
+            "include": [
+              "terrainlab:celestial_pair_id",
+              "terrainlab:celestial_variant"
+            ]
+          },
+          "name": "minecraft:conduit"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "minecraft:blocks/conduit"
