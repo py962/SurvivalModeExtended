@@ -80,10 +80,10 @@ public final class WeaponsmithTrades {
     // Wood Planks: same wood per type as Shield 1.
     private static final Map<ResourceKey<VillagerType>, Item> PLANKS_BY_TYPE = Map.of(
             VillagerType.PLAINS, Items.BIRCH_PLANKS,
-            VillagerType.SAVANNA, Items.ACACIA_PLANKS,
+            VillagerType.SAVANNA, Items.OAK_PLANKS,
             VillagerType.DESERT, Items.OAK_PLANKS,
             VillagerType.TAIGA, Items.SPRUCE_PLANKS,
-            VillagerType.SNOW, Items.SPRUCE_PLANKS,
+            VillagerType.SNOW, ModItems.PINE_PLANKS.get(),
             VillagerType.SWAMP, Items.DARK_OAK_PLANKS,
             VillagerType.JUNGLE, Items.BAMBOO_PLANKS
     );
@@ -92,22 +92,22 @@ public final class WeaponsmithTrades {
     // Shield 1 (Apprentice).
     private static final Map<ResourceKey<VillagerType>, Item> SHIELD_1_BY_TYPE = Map.of(
             VillagerType.PLAINS, ModItems.BIRCH_SHIELD.get(),
-            VillagerType.SAVANNA, ModItems.ACACIA_SHIELD.get(),
+            VillagerType.SAVANNA, ModItems.OAK_SHIELD.get(),
             VillagerType.DESERT, ModItems.OAK_SHIELD.get(),
             VillagerType.TAIGA, ModItems.SPRUCE_SHIELD.get(),
-            VillagerType.SNOW, ModItems.SPRUCE_SHIELD.get(),
+            VillagerType.SNOW, ModItems.PINE_SHIELD.get(),
             VillagerType.SWAMP, ModItems.DARK_OAK_SHIELD.get(),
             VillagerType.JUNGLE, ModItems.BAMBOO_SHIELD.get()
     );
     private static final Item SHIELD_1_FALLBACK = ModItems.BIRCH_SHIELD.get();
 
-    // Shield 2 (Journeyman).
+    // Shield 2 (Journeyman). Snow is Spruce in 1.21.11; Poplar in 26.3.
     private static final Map<ResourceKey<VillagerType>, Item> SHIELD_2_BY_TYPE = Map.of(
             VillagerType.PLAINS, ModItems.CHERRY_SHIELD.get(),
-            VillagerType.SAVANNA, ModItems.JUNGLE_SHIELD.get(),
-            VillagerType.DESERT, ModItems.ACACIA_SHIELD.get(),
-            VillagerType.TAIGA, ModItems.BIRCH_SHIELD.get(),
-            VillagerType.SNOW, ModItems.PALE_OAK_SHIELD.get(),
+            VillagerType.SAVANNA, ModItems.ACACIA_SHIELD.get(),
+            VillagerType.DESERT, ModItems.AZALEA_SHIELD.get(),
+            VillagerType.TAIGA, ModItems.PALE_OAK_SHIELD.get(),
+            VillagerType.SNOW, ModItems.SPRUCE_SHIELD.get(),
             VillagerType.SWAMP, ModItems.MANGROVE_SHIELD.get(),
             VillagerType.JUNGLE, ModItems.JUNGLE_SHIELD.get()
     );
