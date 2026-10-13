@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "terrainlab:enderwood",
+    "terrainlab:enderwood_stairs",
+    "terrainlab:enderwood_slab",
+    "terrainlab:enderwood_fence",
+    "terrainlab:enderwood_fence_gate",
+    "terrainlab:enderwood_door",
+    "terrainlab:enderwood_trapdoor",
+    "terrainlab:enderwood_button",
+    "terrainlab:enderwood_pressure_plate",
+    "terrainlab:enderwood_sign",
+    "terrainlab:enderwood_hanging_sign"
+  ]
+}

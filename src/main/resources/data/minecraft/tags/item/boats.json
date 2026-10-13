@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "terrainlab:pine_boat",
+    "terrainlab:azalea_boat",
+    "terrainlab:enderwood_boat"
+  ]
+}

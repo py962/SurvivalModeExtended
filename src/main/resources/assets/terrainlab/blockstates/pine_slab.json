@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "terrainlab:block/pine_slab"
+    },
+    "type=double": {
+      "model": "terrainlab:block/pine_planks"
+    },
+    "type=top": {
+      "model": "terrainlab:block/pine_slab_top"
+    }
+  }
+}

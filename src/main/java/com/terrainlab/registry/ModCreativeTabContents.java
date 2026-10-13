@@ -19,9 +19,48 @@ public class ModCreativeTabContents {
 
     private static void buildContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            // Wood sets, in vanilla's per-wood order.
+            event.accept(ModItems.PINE_LOG);
+            event.accept(ModItems.PINE_WOOD);
+            event.accept(ModItems.STRIPPED_PINE_LOG);
+            event.accept(ModItems.STRIPPED_PINE_WOOD);
+            event.accept(ModItems.PINE_PLANKS);
+            event.accept(ModItems.PINE_STAIRS);
+            event.accept(ModItems.PINE_SLAB);
+            event.accept(ModItems.PINE_FENCE);
+            event.accept(ModItems.PINE_FENCE_GATE);
+            event.accept(ModItems.PINE_DOOR);
+            event.accept(ModItems.PINE_TRAPDOOR);
+            event.accept(ModItems.PINE_PRESSURE_PLATE);
+            event.accept(ModItems.PINE_BUTTON);
+            event.accept(ModItems.AZALEA_LOG);
+            event.accept(ModItems.AZALEA_WOOD);
+            event.accept(ModItems.STRIPPED_AZALEA_LOG);
+            event.accept(ModItems.STRIPPED_AZALEA_WOOD);
+            event.accept(ModItems.AZALEA_PLANKS);
+            event.accept(ModItems.AZALEA_STAIRS);
+            event.accept(ModItems.AZALEA_SLAB);
+            event.accept(ModItems.AZALEA_FENCE);
+            event.accept(ModItems.AZALEA_FENCE_GATE);
+            event.accept(ModItems.AZALEA_DOOR);
+            event.accept(ModItems.AZALEA_TRAPDOOR);
+            event.accept(ModItems.AZALEA_PRESSURE_PLATE);
+            event.accept(ModItems.AZALEA_BUTTON);
             event.accept(ModItems.ENDERWOOD);
+            event.accept(ModItems.ENDERWOOD_STAIRS);
+            event.accept(ModItems.ENDERWOOD_SLAB);
+            event.accept(ModItems.ENDERWOOD_FENCE);
+            event.accept(ModItems.ENDERWOOD_FENCE_GATE);
+            event.accept(ModItems.ENDERWOOD_DOOR);
+            event.accept(ModItems.ENDERWOOD_TRAPDOOR);
+            event.accept(ModItems.ENDERWOOD_PRESSURE_PLATE);
+            event.accept(ModItems.ENDERWOOD_BUTTON);
 
         } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            event.accept(ModItems.PINE_LOG);
+            event.accept(ModItems.AZALEA_LOG);
+            event.accept(ModItems.PINE_LEAVES);
+            event.accept(ModItems.PINE_SAPLING);
             event.accept(ModItems.ENDERVINE);
             event.accept(ModItems.SCULK_FLOWER);
             event.accept(ModItems.NIGHTCAP_MUSHROOM);
@@ -43,6 +82,12 @@ public class ModCreativeTabContents {
             // The mod's Ominous Banner is already here: vanilla's own slot builds it (RaidOminousBannerMixin).
             event.accept(ModItems.FLETCHING_TABLE_ITEM);
             event.accept(ModItems.CELESTIAL_FORGE_ITEM);
+            event.accept(ModItems.PINE_SIGN);
+            event.accept(ModItems.PINE_HANGING_SIGN);
+            event.accept(ModItems.AZALEA_SIGN);
+            event.accept(ModItems.AZALEA_HANGING_SIGN);
+            event.accept(ModItems.ENDERWOOD_SIGN);
+            event.accept(ModItems.ENDERWOOD_HANGING_SIGN);
             for (CelestialVariant variant : CelestialVariant.values()) {
                 if (variant.usesVanillaConduit()) continue; // vanilla Conduit is already in this tab
                 event.accept(ModItems.CELESTIAL_CONDUIT_ITEMS.get(variant));
@@ -51,6 +96,12 @@ public class ModCreativeTabContents {
         } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.HOWDAH);
             event.accept(ModItems.HOUSEBOAT_ITEM);
+            event.accept(ModItems.PINE_BOAT);
+            event.accept(ModItems.PINE_CHEST_BOAT);
+            event.accept(ModItems.AZALEA_BOAT);
+            event.accept(ModItems.AZALEA_CHEST_BOAT);
+            event.accept(ModItems.ENDERWOOD_BOAT);
+            event.accept(ModItems.ENDERWOOD_CHEST_BOAT);
             event.accept(ModItems.GHOST_FISH_BUCKET);
             event.accept(ModItems.FUR_CLOAK);
             event.accept(ModItems.ATLAS);

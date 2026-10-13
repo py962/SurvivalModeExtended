@@ -442,6 +442,13 @@ public class ModItems {
                                     net.minecraft.resources.ResourceKey.create(
                                             net.minecraft.core.registries.Registries.ITEM, id)),
                             com.terrainlab.item.ShieldDefinitions.byId("acacia_shield"))));
+    public static final DeferredItem<Item> AZALEA_SHIELD =
+            ITEMS.register("azalea_shield", id ->
+                    new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
+                            new Item.Properties().setId(
+                                    net.minecraft.resources.ResourceKey.create(
+                                            net.minecraft.core.registries.Registries.ITEM, id)),
+                            com.terrainlab.item.ShieldDefinitions.byId("azalea_shield"))));
     public static final DeferredItem<Item> SPRUCE_SHIELD =
             ITEMS.register("spruce_shield", id ->
                     new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
@@ -449,6 +456,13 @@ public class ModItems {
                                     net.minecraft.resources.ResourceKey.create(
                                             net.minecraft.core.registries.Registries.ITEM, id)),
                             com.terrainlab.item.ShieldDefinitions.byId("spruce_shield"))));
+    public static final DeferredItem<Item> PINE_SHIELD =
+            ITEMS.register("pine_shield", id ->
+                    new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
+                            new Item.Properties().setId(
+                                    net.minecraft.resources.ResourceKey.create(
+                                            net.minecraft.core.registries.Registries.ITEM, id)),
+                            com.terrainlab.item.ShieldDefinitions.byId("pine_shield"))));
     public static final DeferredItem<Item> PALE_OAK_SHIELD =
             ITEMS.register("pale_oak_shield", id ->
                     new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
@@ -507,9 +521,11 @@ public class ModItems {
         SHIELD_ITEMS.put("birch_shield", BIRCH_SHIELD);
         SHIELD_ITEMS.put("cherry_shield", CHERRY_SHIELD);
         SHIELD_ITEMS.put("acacia_shield", ACACIA_SHIELD);
+        SHIELD_ITEMS.put("azalea_shield", AZALEA_SHIELD);
         SHIELD_ITEMS.put("spruce_shield", SPRUCE_SHIELD);
-        SHIELD_ITEMS.put("pale_oak_shield", PALE_OAK_SHIELD);
+        SHIELD_ITEMS.put("pine_shield", PINE_SHIELD);
         SHIELD_ITEMS.put("dark_oak_shield", DARK_OAK_SHIELD);
+        SHIELD_ITEMS.put("pale_oak_shield", PALE_OAK_SHIELD);
         SHIELD_ITEMS.put("jungle_shield", JUNGLE_SHIELD);
         SHIELD_ITEMS.put("mangrove_shield", MANGROVE_SHIELD);
         SHIELD_ITEMS.put("warped_shield", WARPED_SHIELD);
@@ -578,6 +594,92 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("sand_layer", ModBlocks.SAND_LAYER);
     public static final DeferredItem<BlockItem> RED_SAND_LAYER =
             ITEMS.registerSimpleBlockItem("red_sand_layer", ModBlocks.RED_SAND_LAYER);
+
+    // Wood sets (blocks in ModBlocks). Enderwood's planks item is ENDERWOOD above.
+    // Pine
+    public static final DeferredItem<BlockItem> PINE_LOG = ITEMS.registerSimpleBlockItem("pine_log", ModBlocks.PINE_LOG);
+    public static final DeferredItem<BlockItem> PINE_WOOD = ITEMS.registerSimpleBlockItem("pine_wood", ModBlocks.PINE_WOOD);
+    public static final DeferredItem<BlockItem> STRIPPED_PINE_LOG = ITEMS.registerSimpleBlockItem("stripped_pine_log", ModBlocks.STRIPPED_PINE_LOG);
+    public static final DeferredItem<BlockItem> STRIPPED_PINE_WOOD = ITEMS.registerSimpleBlockItem("stripped_pine_wood", ModBlocks.STRIPPED_PINE_WOOD);
+    public static final DeferredItem<BlockItem> PINE_PLANKS = ITEMS.registerSimpleBlockItem("pine_planks", ModBlocks.PINE_PLANKS);
+    public static final DeferredItem<BlockItem> PINE_STAIRS = ITEMS.registerSimpleBlockItem("pine_stairs", ModBlocks.PINE_STAIRS);
+    public static final DeferredItem<BlockItem> PINE_SLAB = ITEMS.registerSimpleBlockItem("pine_slab", ModBlocks.PINE_SLAB);
+    public static final DeferredItem<BlockItem> PINE_FENCE = ITEMS.registerSimpleBlockItem("pine_fence", ModBlocks.PINE_FENCE);
+    public static final DeferredItem<BlockItem> PINE_FENCE_GATE = ITEMS.registerSimpleBlockItem("pine_fence_gate", ModBlocks.PINE_FENCE_GATE);
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> PINE_DOOR = doorItem("pine_door", ModBlocks.PINE_DOOR);
+    public static final DeferredItem<BlockItem> PINE_TRAPDOOR = ITEMS.registerSimpleBlockItem("pine_trapdoor", ModBlocks.PINE_TRAPDOOR);
+    public static final DeferredItem<BlockItem> PINE_BUTTON = ITEMS.registerSimpleBlockItem("pine_button", ModBlocks.PINE_BUTTON);
+    public static final DeferredItem<BlockItem> PINE_PRESSURE_PLATE = ITEMS.registerSimpleBlockItem("pine_pressure_plate", ModBlocks.PINE_PRESSURE_PLATE);
+    public static final DeferredItem<net.minecraft.world.item.SignItem> PINE_SIGN = signItem("pine_sign", ModBlocks.PINE_SIGN, ModBlocks.PINE_WALL_SIGN);
+    public static final DeferredItem<net.minecraft.world.item.HangingSignItem> PINE_HANGING_SIGN = hangingSignItem("pine_hanging_sign", ModBlocks.PINE_HANGING_SIGN, ModBlocks.PINE_WALL_HANGING_SIGN);
+    public static final DeferredItem<BlockItem> PINE_LEAVES = ITEMS.registerSimpleBlockItem("pine_leaves", ModBlocks.PINE_LEAVES);
+    public static final DeferredItem<BlockItem> PINE_SAPLING = ITEMS.registerSimpleBlockItem("pine_sapling", ModBlocks.PINE_SAPLING);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> PINE_BOAT = boatItem("pine_boat", ModEntities.PINE_BOAT);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> PINE_CHEST_BOAT = boatItem("pine_chest_boat", ModEntities.PINE_CHEST_BOAT);
+
+    // Azalea
+    public static final DeferredItem<BlockItem> AZALEA_LOG = ITEMS.registerSimpleBlockItem("azalea_log", ModBlocks.AZALEA_LOG);
+    public static final DeferredItem<BlockItem> AZALEA_WOOD = ITEMS.registerSimpleBlockItem("azalea_wood", ModBlocks.AZALEA_WOOD);
+    public static final DeferredItem<BlockItem> STRIPPED_AZALEA_LOG = ITEMS.registerSimpleBlockItem("stripped_azalea_log", ModBlocks.STRIPPED_AZALEA_LOG);
+    public static final DeferredItem<BlockItem> STRIPPED_AZALEA_WOOD = ITEMS.registerSimpleBlockItem("stripped_azalea_wood", ModBlocks.STRIPPED_AZALEA_WOOD);
+    public static final DeferredItem<BlockItem> AZALEA_PLANKS = ITEMS.registerSimpleBlockItem("azalea_planks", ModBlocks.AZALEA_PLANKS);
+    public static final DeferredItem<BlockItem> AZALEA_STAIRS = ITEMS.registerSimpleBlockItem("azalea_stairs", ModBlocks.AZALEA_STAIRS);
+    public static final DeferredItem<BlockItem> AZALEA_SLAB = ITEMS.registerSimpleBlockItem("azalea_slab", ModBlocks.AZALEA_SLAB);
+    public static final DeferredItem<BlockItem> AZALEA_FENCE = ITEMS.registerSimpleBlockItem("azalea_fence", ModBlocks.AZALEA_FENCE);
+    public static final DeferredItem<BlockItem> AZALEA_FENCE_GATE = ITEMS.registerSimpleBlockItem("azalea_fence_gate", ModBlocks.AZALEA_FENCE_GATE);
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> AZALEA_DOOR = doorItem("azalea_door", ModBlocks.AZALEA_DOOR);
+    public static final DeferredItem<BlockItem> AZALEA_TRAPDOOR = ITEMS.registerSimpleBlockItem("azalea_trapdoor", ModBlocks.AZALEA_TRAPDOOR);
+    public static final DeferredItem<BlockItem> AZALEA_BUTTON = ITEMS.registerSimpleBlockItem("azalea_button", ModBlocks.AZALEA_BUTTON);
+    public static final DeferredItem<BlockItem> AZALEA_PRESSURE_PLATE = ITEMS.registerSimpleBlockItem("azalea_pressure_plate", ModBlocks.AZALEA_PRESSURE_PLATE);
+    public static final DeferredItem<net.minecraft.world.item.SignItem> AZALEA_SIGN = signItem("azalea_sign", ModBlocks.AZALEA_SIGN, ModBlocks.AZALEA_WALL_SIGN);
+    public static final DeferredItem<net.minecraft.world.item.HangingSignItem> AZALEA_HANGING_SIGN = hangingSignItem("azalea_hanging_sign", ModBlocks.AZALEA_HANGING_SIGN, ModBlocks.AZALEA_WALL_HANGING_SIGN);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> AZALEA_BOAT = boatItem("azalea_boat", ModEntities.AZALEA_BOAT);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> AZALEA_CHEST_BOAT = boatItem("azalea_chest_boat", ModEntities.AZALEA_CHEST_BOAT);
+
+    // Enderwood
+    public static final DeferredItem<BlockItem> ENDERWOOD_STAIRS = ITEMS.registerSimpleBlockItem("enderwood_stairs", ModBlocks.ENDERWOOD_STAIRS);
+    public static final DeferredItem<BlockItem> ENDERWOOD_SLAB = ITEMS.registerSimpleBlockItem("enderwood_slab", ModBlocks.ENDERWOOD_SLAB);
+    public static final DeferredItem<BlockItem> ENDERWOOD_FENCE = ITEMS.registerSimpleBlockItem("enderwood_fence", ModBlocks.ENDERWOOD_FENCE);
+    public static final DeferredItem<BlockItem> ENDERWOOD_FENCE_GATE = ITEMS.registerSimpleBlockItem("enderwood_fence_gate", ModBlocks.ENDERWOOD_FENCE_GATE);
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> ENDERWOOD_DOOR = doorItem("enderwood_door", ModBlocks.ENDERWOOD_DOOR);
+    public static final DeferredItem<BlockItem> ENDERWOOD_TRAPDOOR = ITEMS.registerSimpleBlockItem("enderwood_trapdoor", ModBlocks.ENDERWOOD_TRAPDOOR);
+    public static final DeferredItem<BlockItem> ENDERWOOD_BUTTON = ITEMS.registerSimpleBlockItem("enderwood_button", ModBlocks.ENDERWOOD_BUTTON);
+    public static final DeferredItem<BlockItem> ENDERWOOD_PRESSURE_PLATE = ITEMS.registerSimpleBlockItem("enderwood_pressure_plate", ModBlocks.ENDERWOOD_PRESSURE_PLATE);
+    public static final DeferredItem<net.minecraft.world.item.SignItem> ENDERWOOD_SIGN = signItem("enderwood_sign", ModBlocks.ENDERWOOD_SIGN, ModBlocks.ENDERWOOD_WALL_SIGN);
+    public static final DeferredItem<net.minecraft.world.item.HangingSignItem> ENDERWOOD_HANGING_SIGN = hangingSignItem("enderwood_hanging_sign", ModBlocks.ENDERWOOD_HANGING_SIGN, ModBlocks.ENDERWOOD_WALL_HANGING_SIGN);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> ENDERWOOD_BOAT = boatItem("enderwood_boat", ModEntities.ENDERWOOD_BOAT);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> ENDERWOOD_CHEST_BOAT = boatItem("enderwood_chest_boat", ModEntities.ENDERWOOD_CHEST_BOAT);
+
+    // Item helpers mirroring vanilla Items.registerBlock (block description prefix, sign stack size 16).
+    private static DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> doorItem(
+            String name, java.util.function.Supplier<? extends net.minecraft.world.level.block.Block> door) {
+        return ITEMS.registerItem(name,
+                p -> new net.minecraft.world.item.DoubleHighBlockItem(door.get(), p),
+                p -> p.useBlockDescriptionPrefix());
+    }
+
+    private static DeferredItem<net.minecraft.world.item.SignItem> signItem(String name,
+            java.util.function.Supplier<? extends net.minecraft.world.level.block.Block> standing,
+            java.util.function.Supplier<? extends net.minecraft.world.level.block.Block> wall) {
+        return ITEMS.registerItem(name,
+                p -> new net.minecraft.world.item.SignItem(standing.get(), wall.get(), p),
+                p -> p.stacksTo(16).useBlockDescriptionPrefix());
+    }
+
+    private static DeferredItem<net.minecraft.world.item.HangingSignItem> hangingSignItem(String name,
+            java.util.function.Supplier<? extends net.minecraft.world.level.block.Block> ceiling,
+            java.util.function.Supplier<? extends net.minecraft.world.level.block.Block> wall) {
+        return ITEMS.registerItem(name,
+                p -> new net.minecraft.world.item.HangingSignItem(ceiling.get(), wall.get(), p),
+                p -> p.stacksTo(16).useBlockDescriptionPrefix());
+    }
+
+    private static DeferredItem<net.minecraft.world.item.BoatItem> boatItem(String name,
+            java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.vehicle.boat.AbstractBoat>> type) {
+        return ITEMS.registerItem(name,
+                p -> new net.minecraft.world.item.BoatItem(type.get(), p),
+                p -> p.stacksTo(1));
+    }
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

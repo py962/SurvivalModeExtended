@@ -4,6 +4,8 @@ package com.terrainlab.event;
 import com.terrainlab.item.ShieldDefinitions;
 import com.terrainlab.item.ShieldStats;
 import com.terrainlab.registry.ModItems;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
@@ -14,22 +16,27 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.EvokerFangs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
+import net.neoforged.neoforge.event.level.ExplosionKnockbackEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Wood-shield behaviour the {@code blocks_attacks} component cannot express: knockback taken and
+ * dealt, thorns, autoblock, magic ward, fire immunity, directional blast coverage, and the
+ * lightness energy drain hook used by PlayerEnergySystem.
+ */
 public final class ShieldCombatEvents {
 
     private ShieldCombatEvents() {}
@@ -122,6 +129,10 @@ public final class ShieldCombatEvents {
         tryAutoBlock(event, entity, source);
     }
 
+    /**
+     * A raised shield that blocks a melee hit shoves the attacker (knockback rating) and deals thorns
+     * damage (thorns rating). Autoblocks never reach this event, so they trigger neither.
+     */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onShieldBash(LivingShieldBlockEvent event) {
         if (!event.getBlocked() || event.getBlockedDamage() <= 0.0f) {
@@ -135,6 +146,12 @@ public final class ShieldCombatEvents {
 
         DamageSource source = event.getDamageSource();
 
+        // Explosions (a creeper is its own direct source) and thorns (two thorns shields facing each
+        // other would otherwise retaliate forever) are not melee hits.
+        if (source.is(DamageTypeTags.IS_EXPLOSION) || source.is(DamageTypes.THORNS)) {
+            return;
+        }
+
         if (!(source.getEntity() instanceof LivingEntity attacker)
                 || source.getDirectEntity() != attacker
                 || attacker == blocker
@@ -145,6 +162,11 @@ public final class ShieldCombatEvents {
         ShieldStats stats = statsFor(blocker.getUseItem());
         if (stats == null) {
             return;
+        }
+
+        float thorns = stats.thornsDamage();
+        if (thorns > 0.0f && blocker.level() instanceof ServerLevel serverLevel) {
+            attacker.hurtServer(serverLevel, blocker.damageSources().thorns(blocker), thorns);
         }
 
         float strength = stats.bashStrength();
@@ -162,6 +184,18 @@ public final class ShieldCombatEvents {
         attacker.needsSync = true;
     }
 
+    /**
+     * Extra energy drained this tick by the shield the player is raising (lightness 0-1); 0 when not
+     * raising a wood shield. Called from PlayerEnergySystem#tick next to the sprint drain.
+     */
+    public static float raisedShieldEnergyDrain(ServerPlayer player) {
+        if (!player.isUsingItem()) {
+            return 0.0f;
+        }
+        ShieldStats stats = statsFor(player.getUseItem());
+        return stats == null ? 0.0f : stats.raisedEnergyDrainPerTick();
+    }
+
     @SubscribeEvent
     public static void onPlayerTickFireImmunity(PlayerTickEvent.Post event) {
         LivingEntity player = event.getEntity();
@@ -176,6 +210,26 @@ public final class ShieldCombatEvents {
         if (stats != null && stats.fireImmunityFraction() >= 1.0f) {
             player.clearFire();
         }
+    }
+
+    /** Ticks of Slow Falling granted per refresh; renewed every tick while the shield is raised. */
+    private static final int PARACHUTE_DURATION_TICKS = 5;
+
+    /**
+     * Bamboo shield only: while raised it acts as a parachute, giving Slow Falling. The effect is
+     * hidden (no particles) and lapses a few ticks after the shield is lowered.
+     */
+    @SubscribeEvent
+    public static void onPlayerTickBambooParachute(PlayerTickEvent.Post event) {
+        LivingEntity player = event.getEntity();
+        if (player.level().isClientSide()
+                || !player.isBlocking()
+                || !player.getUseItem().is(ModItems.SHIELD_ITEMS.get("bamboo_shield").get())) {
+            return;
+        }
+        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                net.minecraft.world.effect.MobEffects.SLOW_FALLING,
+                PARACHUTE_DURATION_TICKS, 0, true, false, true));
     }
 
     private static void applyFireImmunity(
@@ -338,27 +392,87 @@ public final class ShieldCombatEvents {
         return now - window[0] < ShieldStats.MAGIC_2_WARD_TICKS;
     }
 
-    @SubscribeEvent
-    public static void onExplosionDetonate(ExplosionEvent.Detonate event) {
-        List<Entity> affected = event.getAffectedEntities();
-        affected.removeIf(
-                entity -> entity instanceof LivingEntity living
-                        && shouldExemptFromExplosion(living)
-        );
+    /**
+     * Explosion damage against a raised wood shield is blocked by blast coverage instead of the
+     * blocks_attacks angle (which follows the knockback rating): fully blocked when the explosion
+     * lies within {@link ShieldStats#blastCoverageDegrees()} of the facing direction (blast 4: from
+     * anywhere, even with no known position), otherwise not blocked at all. Blast 2 therefore matches
+     * vanilla's 90 degrees. Runs before {@link #onShieldBash}.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onShieldBlockExplosion(LivingShieldBlockEvent event) {
+        DamageSource source = event.getDamageSource();
+        if (!source.is(DamageTypeTags.IS_EXPLOSION) || source.is(DamageTypeTags.BYPASSES_SHIELD)) {
+            return;
+        }
+
+        LivingEntity blocker = event.getEntity();
+        if (blocker.level().isClientSide() || !isBlockingWithShield(blocker)) {
+            return;
+        }
+
+        ShieldStats stats = statsFor(blocker.getUseItem());
+        if (stats == null) {
+            return;
+        }
+
+        if (blastCovers(blocker, stats, source.getSourcePosition())) {
+            event.setBlocked(true);
+            event.setBlockedDamage(event.getDamageContainer().getNewDamage());
+        } else {
+            event.setBlocked(false);
+            event.setBlockedDamage(0.0f);
+        }
     }
 
-    private static boolean shouldExemptFromExplosion(LivingEntity entity) {
-        if (!isBlockingWithShield(entity)) {
+    /** Blast 3+: a raised shield covering the explosion also cancels its knockback. */
+    @SubscribeEvent
+    public static void onExplosionKnockback(ExplosionKnockbackEvent event) {
+        if (!(event.getAffectedEntity() instanceof LivingEntity living)
+                || !living.isBlocking()
+                || !isBlockingWithShield(living)) {
+            return;
+        }
+
+        ShieldStats stats = statsFor(living.getUseItem());
+        if (stats == null || !stats.blastBlocksKnockback()) {
+            return;
+        }
+
+        if (blastCovers(living, stats, event.getExplosion().center())) {
+            event.setKnockbackVelocity(Vec3.ZERO);
+        }
+    }
+
+    /**
+     * Whether a raised shield covers an explosion at {@code center}, measuring the horizontal angle
+     * from the head's facing as vanilla's shield blocking does. A null position counts as behind.
+     */
+    private static boolean blastCovers(LivingEntity entity, ShieldStats stats, Vec3 center) {
+        if (stats.blastBlocksAllDirections()) {
+            return true;
+        }
+        float coverage = stats.blastCoverageDegrees();
+        if (coverage <= 0.0f || center == null) {
             return false;
         }
 
-        ShieldStats stats = statsFor(entity.getUseItem());
-        if (stats == null) {
-            return false;
-        }
+        double dx = center.x - entity.getX();
+        double dz = center.z - entity.getZ();
+        double length = Math.sqrt(dx * dx + dz * dz);
 
-        float chance = stats.blastExemptionChance();
-        return chance > 0.0f && entity.getRandom().nextFloat() < chance;
+        double angleDegrees;
+        if (length < 1.0E-4) {
+            // Centred on the player: vanilla's zero vector gives a 90 degree angle.
+            angleDegrees = 90.0;
+        } else {
+            double yaw = Math.toRadians(entity.getYHeadRot());
+            double facingX = -Math.sin(yaw);
+            double facingZ = Math.cos(yaw);
+            double dot = (dx * facingX + dz * facingZ) / length;
+            angleDegrees = Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, dot))));
+        }
+        return angleDegrees <= coverage;
     }
 
     private static boolean isMagicDamageType(DamageSource source) {

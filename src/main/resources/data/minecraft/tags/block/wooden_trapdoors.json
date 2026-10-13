@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "terrainlab:pine_trapdoor",
+    "terrainlab:azalea_trapdoor",
+    "terrainlab:enderwood_trapdoor"
+  ]
+}

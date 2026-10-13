@@ -20,6 +20,8 @@ import com.terrainlab.entity.TrapperRaiderEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.vehicle.boat.Boat;
+import net.minecraft.world.entity.vehicle.boat.ChestBoat;
 import net.neoforged.bus.api.IEventBus;
 import com.terrainlab.entity.TieredArrowEntity;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -224,6 +226,44 @@ public class ModEntities {
                             .sized(0.6F, 1.95F)
                             .build(net.minecraft.resources.ResourceKey.create(
                                     Registries.ENTITY_TYPE, id)));
+
+    // Wood-set boats: vanilla Boat / ChestBoat with their own entity types (as vanilla does per
+    // wood since 1.21.2); the entity type decides the dropped item and the renderer's texture.
+    public static final DeferredHolder<EntityType<?>, EntityType<Boat>> PINE_BOAT =
+            boat("pine_boat", () -> ModItems.PINE_BOAT.get());
+    public static final DeferredHolder<EntityType<?>, EntityType<ChestBoat>> PINE_CHEST_BOAT =
+            chestBoat("pine_chest_boat", () -> ModItems.PINE_CHEST_BOAT.get());
+    public static final DeferredHolder<EntityType<?>, EntityType<Boat>> AZALEA_BOAT =
+            boat("azalea_boat", () -> ModItems.AZALEA_BOAT.get());
+    public static final DeferredHolder<EntityType<?>, EntityType<ChestBoat>> AZALEA_CHEST_BOAT =
+            chestBoat("azalea_chest_boat", () -> ModItems.AZALEA_CHEST_BOAT.get());
+    public static final DeferredHolder<EntityType<?>, EntityType<Boat>> ENDERWOOD_BOAT =
+            boat("enderwood_boat", () -> ModItems.ENDERWOOD_BOAT.get());
+    public static final DeferredHolder<EntityType<?>, EntityType<ChestBoat>> ENDERWOOD_CHEST_BOAT =
+            chestBoat("enderwood_chest_boat", () -> ModItems.ENDERWOOD_CHEST_BOAT.get());
+
+    // Size, eye height and tracking range copied from vanilla's EntityType.OAK_BOAT.
+    private static DeferredHolder<EntityType<?>, EntityType<Boat>> boat(
+            String name, java.util.function.Supplier<net.minecraft.world.item.Item> dropItem) {
+        return ENTITY_TYPES.register(name, id ->
+                EntityType.Builder.<Boat>of((type, level) -> new Boat(type, level, dropItem), MobCategory.MISC)
+                        .noLootTable()
+                        .sized(1.375F, 0.5625F)
+                        .eyeHeight(0.5625F)
+                        .clientTrackingRange(10)
+                        .build(net.minecraft.resources.ResourceKey.create(Registries.ENTITY_TYPE, id)));
+    }
+
+    private static DeferredHolder<EntityType<?>, EntityType<ChestBoat>> chestBoat(
+            String name, java.util.function.Supplier<net.minecraft.world.item.Item> dropItem) {
+        return ENTITY_TYPES.register(name, id ->
+                EntityType.Builder.<ChestBoat>of((type, level) -> new ChestBoat(type, level, dropItem), MobCategory.MISC)
+                        .noLootTable()
+                        .sized(1.375F, 0.5625F)
+                        .eyeHeight(0.5625F)
+                        .clientTrackingRange(10)
+                        .build(net.minecraft.resources.ResourceKey.create(Registries.ENTITY_TYPE, id)));
+    }
 
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "chest_boat",
+  "ingredients": [
+    "minecraft:chest",
+    "terrainlab:azalea_boat"
+  ],
+  "result": {
+    "count": 1,
+    "id": "terrainlab:azalea_chest_boat"
+  }
+}

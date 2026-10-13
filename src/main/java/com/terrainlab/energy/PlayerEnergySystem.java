@@ -12,7 +12,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import static com.terrainlab.energy.PlayerEnergyConstants.*;
 
 /**
- * Per-tick energy drain for sprinting, jumping and attacking/mining, plus HUD sync.
+ * Per-tick energy drain for sprinting, raising a heavy wood shield (lightness 0-1), jumping and
+ * attacking/mining, plus HUD sync.
  *
  * <p>Each actual jump drains once ({@link #onJump}, fired when the server detects a jump from the
  * player's movement, as vanilla does for jump exhaustion). Attack/mine drains once on press and then every
@@ -35,6 +36,8 @@ public final class PlayerEnergySystem {
         if (player.isSprinting()) {
             energy -= SPRINT_DRAIN_PER_TICK;
         }
+
+        energy -= com.terrainlab.event.ShieldCombatEvents.raisedShieldEnergyDrain(player);
 
         energy -= attackHoldDrain(player);
 
