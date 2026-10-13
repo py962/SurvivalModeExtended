@@ -1,0 +1,15 @@
+{
+  "wants": {
+    "id": "minecraft:bundle",
+    "components": {
+      "terrainlab:requires_enchantment": {},
+      "minecraft:enchantment_glint_override": true
+    }
+  },
+  "gives": {
+    "id": "minecraft:emerald"
+  },
+  "max_uses": 4,
+  "xp": 10,
+  "reputation_discount": 0.05
+}

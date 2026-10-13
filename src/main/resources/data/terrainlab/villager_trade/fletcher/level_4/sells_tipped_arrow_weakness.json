@@ -1,0 +1,26 @@
+{
+  "wants": {
+    "id": "minecraft:emerald"
+  },
+  "gives": {
+    "id": "minecraft:tipped_arrow",
+    "count": 2,
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "minecraft:weakness"
+      }
+    }
+  },
+  "max_uses": 4,
+  "xp": 10,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:desert"
+      }
+    }
+  }
+}

@@ -71,6 +71,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 
 import java.util.Set;
+import net.minecraft.world.entity.EntityTypes;
 
 /** Client entry point: registers renderers, model layers, screens, item-model properties and Curios renderers. */
 @Mod(value = TerrainLab.MODID, dist = Dist.CLIENT)
@@ -231,7 +232,7 @@ public class TerrainLabClient {
                 VultureRenderer::new);
 
         // Vanilla goat gets a renderer with the sheared fluff layer; entity and AI stay vanilla.
-        event.registerEntityRenderer(EntityType.GOAT,
+        event.registerEntityRenderer(EntityTypes.GOAT,
                 TerrainLabGoatRenderer::new);
 
         // Trail Traders share one renderer (vanilla wandering-trader model) with a per-variant

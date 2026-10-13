@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
  * Makes endermen pick up blocks far more often (vanilla 1-in-20 chance per tick), but never a block
  * a player placed in the last day, or one an enderman placed continuing a player's pattern.
  */
-@Mixin(targets = "net.minecraft.world.entity.monster.EnderMan$EndermanTakeBlockGoal")
+@Mixin(targets = "net.minecraft.world.entity.monster.Enderman$EndermanTakeBlockGoal")
 public class EndermanTakeMixin {
 
     @ModifyConstant(method = "canUse", constant = @Constant(intValue = 20))

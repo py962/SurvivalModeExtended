@@ -1,0 +1,18 @@
+{
+  "wants": {
+    "id": "minecraft:brown_wool",
+    "count": 13
+  },
+  "gives": {
+    "id": "minecraft:emerald"
+  },
+  "max_uses": 12,
+  "xp": 2,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "terrainlab:merchant_pick",
+    "group": "shepherd/level_2/buys_choice",
+    "index": 0,
+    "count": 3
+  }
+}

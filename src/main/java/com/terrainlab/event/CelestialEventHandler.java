@@ -49,7 +49,7 @@ import com.terrainlab.entity.AbstractTrailTraderEntity;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import net.minecraft.world.entity.NeutralMob;
-import net.neoforged.neoforge.event.entity.living.EnderManAngerEvent;
+import net.neoforged.neoforge.event.entity.living.EndermanAngerEvent;
 import java.util.UUID;
 
 public class CelestialEventHandler {
@@ -332,7 +332,7 @@ public class CelestialEventHandler {
     private static final String END_FLIGHT_TAG = "terrainlab_end_flight";
 
     private static void updateEndFloat(ServerPlayer player, boolean wantsFloat) {
-        boolean applied = player.getTags().contains(END_FLOAT_TAG);
+        boolean applied = player.entityTags().contains(END_FLOAT_TAG);
         boolean exempt = player.getAbilities().instabuild || player.isSpectator();
 
         if (wantsFloat && applied && !exempt && !player.isNoGravity()) {
@@ -364,7 +364,7 @@ public class CelestialEventHandler {
     }
 
     private static void updateEndFlight(ServerPlayer player, boolean wantsFlight) {
-        boolean applied = player.getTags().contains(END_FLIGHT_TAG);
+        boolean applied = player.entityTags().contains(END_FLIGHT_TAG);
         boolean exempt = player.getAbilities().instabuild || player.isSpectator();
 
         if (exempt) {
@@ -511,7 +511,7 @@ public class CelestialEventHandler {
      * or an active paired Peace amulet). Hitting it still does, as with every Peace mob.
      */
     @SubscribeEvent
-    public static void onEnderManAnger(EnderManAngerEvent event) {
+    public static void onEnderManAnger(EndermanAngerEvent event) {
         if (event.getPlayer() instanceof ServerPlayer player
                 && !isProvoked(event.getEntity())
                 && isPeaceProtectedPlayer(player)) {
@@ -680,7 +680,11 @@ public class CelestialEventHandler {
 
     @SubscribeEvent
     public static void onGetEnchantmentLevel(GetEnchantmentLevelEvent event) {
-        ServerPlayer player = findHoldingPlayer(event.getStack());
+        // Only real stacks can be held by a player (26.x also queries item templates).
+        if (!(event.getStack() instanceof ItemStack heldStack)) {
+            return;
+        }
+        ServerPlayer player = findHoldingPlayer(heldStack);
 
         if (player == null) {
             return;
@@ -690,7 +694,7 @@ public class CelestialEventHandler {
             CelestialDebug.log(
                     "LUCK: enchant boost applied to {}'s held {} (amulet={} conduitInRange={})",
                     player.getName().getString(),
-                    event.getStack().getItem(),
+                    heldStack.getItem(),
                     player.getData(ModAttachments.LUCK_AMULET_ACTIVE.get()),
                     player.getData(ModAttachments.LUCK_CONDUIT_NEARBY.get())
             );

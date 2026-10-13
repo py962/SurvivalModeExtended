@@ -41,7 +41,7 @@ public class PlayerMilestoneData extends SavedData {
     }
 
     public static final SavedDataType<PlayerMilestoneData> TYPE = new SavedDataType<>(
-            "terrainlab_player_milestones",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "player_milestones"),
             PlayerMilestoneData::new,
             level -> RecordCodecBuilder.create(instance -> instance.group(
                     RecordCodecBuilder.point(level),

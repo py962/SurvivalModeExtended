@@ -1,0 +1,21 @@
+{
+  "wants": {
+    "id": "minecraft:magenta_bed",
+    "count": 5
+  },
+  "gives": {
+    "id": "minecraft:emerald"
+  },
+  "max_uses": 8,
+  "xp": 5,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:swamp"
+      }
+    }
+  }
+}

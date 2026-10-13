@@ -32,7 +32,7 @@ public class PortalNetworkSavedData extends SavedData {
     }
 
     public static final SavedDataType<PortalNetworkSavedData> TYPE = new SavedDataType<>(
-            "terrainlab_portal_network",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "portal_network"),
             level -> new PortalNetworkSavedData(),
             level -> PortalEntry.CODEC.listOf()
                     .xmap(PortalNetworkSavedData::fromEntries, PortalNetworkSavedData::copyEntries)

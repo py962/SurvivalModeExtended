@@ -1,0 +1,31 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 10
+  },
+  "gives": {
+    "id": "minecraft:enchanted_book"
+  },
+  "max_uses": 4,
+  "xp": 10,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:taiga"
+      }
+    }
+  },
+  "given_item_modifier": {
+    "type": "minecraft:set_enchantments",
+    "enchantments": {
+      "minecraft:fire_aspect": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+      }
+    }
+  }
+}

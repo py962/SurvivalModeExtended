@@ -5,7 +5,7 @@ import com.terrainlab.village.VillageTier;
 import com.terrainlab.village.VillageTierRequirements;
 import com.terrainlab.village.VillageInfoSnapshot;
 import com.terrainlab.village.VillagerThermalState;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -39,14 +39,18 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
     private static final int LEVEL_WIDTH = 22;
 
     private int visibleRows;
+    /**
+     * Panel height, sized to the screen in {@link #init()}. {@code imageHeight} is final since 26.x, so the
+     * dynamic height lives here and {@code topPos}/outside-click checks are recomputed from it.
+     */
+    private int panelHeight = LIST_TOP_Y + MIN_VISIBLE_ROWS * ROW_HEIGHT + PADDING;
     private int scrollOffset;
     private boolean draggingThumb;
     private double dragStartY;
     private int dragStartOffset;
 
     public VillageInfoScreen(VillageInfoMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = PANEL_WIDTH;
+        super(menu, playerInventory, title, PANEL_WIDTH, LIST_TOP_Y + MIN_VISIBLE_ROWS * ROW_HEIGHT + PADDING);
         // No inventory slots, so hide the vanilla "Inventory" label.
         this.inventoryLabelY = -1000;
     }
@@ -57,10 +61,11 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
         int rows = Math.max(rows().size(), 1);
         int fit = (this.height - 20 - LIST_TOP_Y - PADDING) / ROW_HEIGHT;
         this.visibleRows = Mth.clamp(Math.min(rows, fit), Math.min(rows, MIN_VISIBLE_ROWS), MAX_VISIBLE_ROWS);
-        this.imageHeight = LIST_TOP_Y + this.visibleRows * ROW_HEIGHT + PADDING;
+        this.panelHeight = LIST_TOP_Y + this.visibleRows * ROW_HEIGHT + PADDING;
         this.scrollOffset = Mth.clamp(this.scrollOffset, 0, maxScroll());
 
         super.init();
+        this.topPos = (this.height - this.panelHeight) / 2;
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
         this.titleLabelY = 6;
     }
@@ -118,11 +123,12 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
         int left = this.leftPos;
         int top = this.topPos;
         int right = left + this.imageWidth;
-        int bottom = top + this.imageHeight;
+        int bottom = top + this.panelHeight;
 
         graphics.fill(left, top, right, bottom, 0xE0101010);
         graphics.fill(left, top, right, top + 1, 0xFF808080);
@@ -134,11 +140,11 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
 
         int y = top + 20;
         int summaryX = left + PADDING;
-        graphics.drawString(this.font,
+        graphics.text(this.font,
                 "Villagers: " + snapshot.population() + "    Tier: " + tierLabel(snapshot.tier()),
                 summaryX, y, 0xFFFFFFFF, false);
         y += LINE;
-        graphics.drawString(this.font,
+        graphics.text(this.font,
                 "Happy: " + percent(snapshot.happiness()) + " now"
                         + (snapshot.dayAverageHappiness() >= 0.0 ? ", " + percent(snapshot.dayAverageHappiness()) + " today" : "")
                         + "    Points: " + snapshot.tradeQuality(),
@@ -147,14 +153,14 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
         drawNextTier(graphics, snapshot, summaryX, y);
 
         int headerY = top + LIST_HEADER_Y;
-        graphics.drawString(this.font, "Profession", listLeft(), headerY, 0xFFA0A0A0, false);
-        graphics.drawString(this.font, "Lvl", levelX(), headerY, 0xFFA0A0A0, false);
-        graphics.drawString(this.font, "Status", statusX(), headerY, 0xFFA0A0A0, false);
+        graphics.text(this.font, "Profession", listLeft(), headerY, 0xFFA0A0A0, false);
+        graphics.text(this.font, "Lvl", levelX(), headerY, 0xFFA0A0A0, false);
+        graphics.text(this.font, "Status", statusX(), headerY, 0xFFA0A0A0, false);
         graphics.fill(left + PADDING, headerY + 10, right - PADDING, headerY + 11, 0xFF505050);
 
         List<VillageInfoSnapshot.Row> rows = rows();
         if (rows.isEmpty()) {
-            graphics.drawString(this.font, "(no villagers found)", listLeft(), listTop() + 1, 0xFF808080, false);
+            graphics.text(this.font, "(no villagers found)", listLeft(), listTop() + 1, 0xFF808080, false);
         } else {
             int professionWidth = PROFESSION_WIDTH;
             int statusWidth = listRight() - statusX();
@@ -173,9 +179,9 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
                 String shownProfession = fit(profession, professionWidth);
                 String shownStatus = fit(status, statusWidth);
 
-                graphics.drawString(this.font, shownProfession, listLeft(), rowY + 1, 0xFFFFFFFF, false);
-                graphics.drawString(this.font, String.valueOf(row.level()), levelX(), rowY + 1, 0xFFFFFFFF, false);
-                graphics.drawString(this.font, shownStatus, statusX(), rowY + 1, statusColor(row), false);
+                graphics.text(this.font, shownProfession, listLeft(), rowY + 1, 0xFFFFFFFF, false);
+                graphics.text(this.font, String.valueOf(row.level()), levelX(), rowY + 1, 0xFFFFFFFF, false);
+                graphics.text(this.font, shownStatus, statusX(), rowY + 1, statusColor(row), false);
 
                 // Full text on hover when a column had to be trimmed.
                 boolean hoverRow = mouseY >= rowY - 1 && mouseY < rowY + ROW_HEIGHT - 1;
@@ -197,17 +203,21 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
-        renderTooltip(graphics, mouseX, mouseY);
+    protected boolean hasClickedOutside(double mx, double my, int xo, int yo) {
+        return mx < xo || my < yo || mx >= xo + this.imageWidth || my >= yo + this.panelHeight;
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFFFF, false);
+    public int getImageHeight() {
+        return this.panelHeight;
+    }
+
+    @Override
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        graphics.text(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xFFFFFFFF, false);
         if (needsScrollbar()) {
             String range = (this.scrollOffset + 1) + "-" + (this.scrollOffset + this.visibleRows) + " of " + rows().size();
-            graphics.drawString(this.font, range, this.imageWidth - PADDING - this.font.width(range), 20, 0xFF808080, false);
+            graphics.text(this.font, range, this.imageWidth - PADDING - this.font.width(range), 20, 0xFF808080, false);
         }
     }
 
@@ -308,10 +318,10 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
      * Draws "Next (T3): 16 villagers, 65% happy, 15 pts", each figure green when met. These are the
      * promotion thresholds the daily tier check uses.
      */
-    private void drawNextTier(GuiGraphics graphics, VillageInfoSnapshot.Snapshot snapshot, int x, int y) {
+    private void drawNextTier(GuiGraphicsExtractor graphics, VillageInfoSnapshot.Snapshot snapshot, int x, int y) {
         VillageTier tier = snapshot.tier();
         if (tier == VillageTier.TIER_4_TOWN) {
-            graphics.drawString(this.font, "Top tier reached", x, y, 0xFF55FF55, false);
+            graphics.text(this.font, "Top tier reached", x, y, 0xFF55FF55, false);
             return;
         }
         VillageTier next = tier.next();
@@ -331,8 +341,8 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
                 x, y, metColor(snapshot.tradeQuality() >= req.promotionTradeQuality()));
     }
 
-    private int drawPart(GuiGraphics graphics, String text, int x, int y, int color) {
-        graphics.drawString(this.font, text, x, y, color, false);
+    private int drawPart(GuiGraphicsExtractor graphics, String text, int x, int y, int color) {
+        graphics.text(this.font, text, x, y, color, false);
         return x + this.font.width(text);
     }
 

@@ -2,14 +2,12 @@ package com.terrainlab.mixin;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.entity.HouseboatEntity;
-import net.minecraft.world.entity.InterpolationHandler;
 import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -36,42 +34,16 @@ public class AbstractBoatGravityMixin {
         ci.cancel();
     }
 
-    // Server-side interpolation pulls a suspended boat back toward a stale target, overriding
-    // the position set directly by the ghast; skip it there.
-    @Redirect(method = "tick", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/InterpolationHandler;interpolate()V"))
-    private void skipInterpolateWhenSuspended(InterpolationHandler handler) {
-        AbstractBoat boat = (AbstractBoat) (Object) this;
+    // 26.x: entity interpolation only runs client-side (Entity#commonTick), so the old server-side
+    // interpolate() skip for suspended boats is no longer needed and was removed.
 
-        // The client needs interpolate() to apply incoming position-sync packets.
-        if (boat.level().isClientSide()) {
-            handler.interpolate();
-            return;
-        }
-
-        if (boat instanceof HouseboatEntity houseboat && houseboat.isSuspendedFromGhast()) {
-            return;
-        }
-        handler.interpolate();
-    }
-
-    // Position trace (HEAD / after interpolate / TAIL) for a suspended boat.
+    // Position trace (HEAD / TAIL) for a suspended boat.
     @Inject(method = "tick", at = @At("HEAD"))
     private void traceHead(CallbackInfo ci) {
         AbstractBoat boat = (AbstractBoat) (Object) this;
         if (!(boat instanceof HouseboatEntity houseboat) || !houseboat.isSuspendedFromGhast()) return;
         if (boat.tickCount % 10 != 0) return;
         // TerrainLab.LOGGER.info("[BOAT-POS] tick={} side={} HEAD y={}",
-        //         boat.tickCount, boat.level().isClientSide() ? "CLIENT" : "SERVER", boat.getY());
-    }
-
-    @Inject(method = "tick", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/InterpolationHandler;interpolate()V", shift = At.Shift.AFTER))
-    private void traceAfterInterpolate(CallbackInfo ci) {
-        AbstractBoat boat = (AbstractBoat) (Object) this;
-        if (!(boat instanceof HouseboatEntity houseboat) || !houseboat.isSuspendedFromGhast()) return;
-        if (boat.tickCount % 10 != 0) return;
-        // TerrainLab.LOGGER.info("[BOAT-POS] tick={} side={} AFTER-INTERPOLATE y={}",
         //         boat.tickCount, boat.level().isClientSide() ? "CLIENT" : "SERVER", boat.getY());
     }
 

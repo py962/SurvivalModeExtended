@@ -20,7 +20,7 @@ public class HeatSourceIndex {
     private final Long2ObjectOpenHashMap<Map<BlockPos, HeatSourceData>> byChunk = new Long2ObjectOpenHashMap<>();
 
     private static long key(BlockPos pos) {
-        return ChunkPos.asLong(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+        return ChunkPos.pack(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
     }
 
     /** Adds or replaces a heat source. */
@@ -80,7 +80,7 @@ public class HeatSourceIndex {
         int maxCZ = SectionPos.blockToSectionCoord(pos.getZ() + radius);
         for (int cx = minCX; cx <= maxCX; cx++) {
             for (int cz = minCZ; cz <= maxCZ; cz++) {
-                Map<BlockPos, HeatSourceData> bucket = byChunk.get(ChunkPos.asLong(cx, cz));
+                Map<BlockPos, HeatSourceData> bucket = byChunk.get(ChunkPos.pack(cx, cz));
                 if (bucket == null) {
                     continue;
                 }
@@ -96,13 +96,13 @@ public class HeatSourceIndex {
 
     /** Snapshot of one chunk's sources. */
     public synchronized List<HeatSourceData> inChunk(int chunkX, int chunkZ) {
-        Map<BlockPos, HeatSourceData> bucket = byChunk.get(ChunkPos.asLong(chunkX, chunkZ));
+        Map<BlockPos, HeatSourceData> bucket = byChunk.get(ChunkPos.pack(chunkX, chunkZ));
         return bucket == null ? List.of() : new ArrayList<>(bucket.values());
     }
 
     /** Drops one chunk's sources (chunk unloaded). */
     public synchronized void removeChunk(int chunkX, int chunkZ) {
-        byChunk.remove(ChunkPos.asLong(chunkX, chunkZ));
+        byChunk.remove(ChunkPos.pack(chunkX, chunkZ));
     }
 
     /**
@@ -118,7 +118,7 @@ public class HeatSourceIndex {
         int maxCZ = SectionPos.blockToSectionCoord(changed.getZ() + r);
         for (int cx = minCX; cx <= maxCX; cx++) {
             for (int cz = minCZ; cz <= maxCZ; cz++) {
-                Map<BlockPos, HeatSourceData> bucket = byChunk.get(ChunkPos.asLong(cx, cz));
+                Map<BlockPos, HeatSourceData> bucket = byChunk.get(ChunkPos.pack(cx, cz));
                 if (bucket == null) {
                     continue;
                 }

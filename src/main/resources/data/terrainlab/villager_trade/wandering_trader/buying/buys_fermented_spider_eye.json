@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:fermented_spider_eye"
+  },
+  "gives": {
+    "id": "minecraft:emerald",
+    "count": 3
+  },
+  "max_uses": 1,
+  "xp": 0,
+  "reputation_discount": 0.05
+}

@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:weaponsmith/level_1/buys_iron_ingot",
+    "terrainlab:weaponsmith/level_1/sells_iron_ingot",
+    "terrainlab:weaponsmith/level_1/buys_coal",
+    "terrainlab:weaponsmith/level_1/sells_coal"
+  ]
+}

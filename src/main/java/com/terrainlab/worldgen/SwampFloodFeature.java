@@ -1,7 +1,9 @@
 
 package com.terrainlab.worldgen;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -14,8 +16,6 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import java.util.List;
  * columns, continuing through underground biome boundaries until solid ground
  * is reached.
  */
-public class SwampFloodFeature extends Feature<NoneFeatureConfiguration> {
+public final class SwampFloodFeature implements Feature {
 
     private static final int SEA_LEVEL = 63;
 
@@ -41,15 +41,19 @@ public class SwampFloodFeature extends Feature<NoneFeatureConfiguration> {
             )
     );
 
-    public SwampFloodFeature(Codec<NoneFeatureConfiguration> codec) {
-        super(codec);
+    public static final MapCodec<SwampFloodFeature> CODEC = MapCodec.unit(SwampFloodFeature::new);
+
+    public SwampFloodFeature() {
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
-        BlockPos origin = context.origin();
-        ChunkPos chunkPos = new ChunkPos(origin);
+    public MapCodec<SwampFloodFeature> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
+        ChunkPos chunkPos = ChunkPos.containing(origin);
 
         boolean placedAny = false;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();

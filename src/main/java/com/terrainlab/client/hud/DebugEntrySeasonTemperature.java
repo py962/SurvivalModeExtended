@@ -48,7 +48,7 @@ public class DebugEntrySeasonTemperature implements DebugScreenEntry {
 
         // Temporary diagnostic: client vs (single-player) server solar time and sky darkness,
         // which should always match.
-        long raw = Math.floorMod(minecraft.level.getDayTime(), 24000L);
+        long raw = Math.floorMod(minecraft.level.getOverworldClockTime(), 24000L);
         String line = "Solar time: client " + com.terrainlab.season.SolarTime.solarTimeOfDay(minecraft.level)
                 + " (darken " + minecraft.level.getSkyDarken() + ")";
         if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {

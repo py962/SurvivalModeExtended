@@ -22,7 +22,8 @@ import java.util.Map;
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public class DayLengthHandler {
 
-    // TODO: re-enable or remove; the handler is a no-op while false (SolarTime now warps seasonal time of day).
+    // ABANDONED - NEVER REINSTATE. Pushing the clock back a tick at a time broke the game severely.
+    // Seasonal time of day is handled by SolarTime instead; this stays disabled for reference only.
     private static final boolean ENABLED = false;
 
     private static final Map<ServerLevel, Double> shortfallAccumulator = new HashMap<>();
@@ -33,7 +34,7 @@ public class DayLengthHandler {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         if (!level.dimension().equals(Level.OVERWORLD)) return;
 
-        long dayTime = level.getDayTime();
+        long dayTime = level.getOverworldClockTime();
         long dayTimeMod = ((dayTime % 24_000L) + 24_000L) % 24_000L; // defensive against negative dayTime
         long seasonalOffset = SeasonSavedData.get(level).getSeasonalOffset();
         long yearTick = SeasonManager.yearRelativeTick(level.getGameTime(), seasonalOffset);
@@ -42,7 +43,7 @@ public class DayLengthHandler {
         // targetRate is in (0, 1): accumulate the per-tick shortfall and repay it one tick at a time.
         double shortfall = shortfallAccumulator.merge(level, 1.0 - targetRate, Double::sum);
         if (shortfall >= 1.0) {
-            level.setDayTime(level.getDayTime() - 1);
+            WorldClockUtil.setOverworldTime(level, level.getOverworldClockTime() - 1);
             shortfallAccumulator.put(level, shortfall - 1.0);
         }
     }

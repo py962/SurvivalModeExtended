@@ -5,9 +5,11 @@ import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Aquifer;
-import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.NoiseRouter;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.densityfunction.DensitySampler;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import org.slf4j.Logger;
 
 /**
@@ -29,8 +31,10 @@ public final class BandedFluidPicker implements Aquifer.FluidPicker {
     private static final int LAVA_FLOOR_Y = -54;
     private static final BlockState LAVA = Blocks.LAVA.defaultBlockState();
 
-    private final DensityFunction continentalness;
-    private final DensityFunction erosion;
+    // Seeded samplers for the router's continents/erosion functions (26.x: RandomState no longer exposes a
+    // seeded NoiseRouter; DensityFunctions are compiled into DensitySamplers via RandomState.getSampler).
+    private final DensitySampler continentalness;
+    private final DensitySampler erosion;
     private final BlockState defaultFluid;
     private final int lavaThresholdY;
 
@@ -61,7 +65,7 @@ public final class BandedFluidPicker implements Aquifer.FluidPicker {
     // One shared, immutable FluidStatus per possible banded level, indexed by level - BASE_SEA_LEVEL.
     private final Aquifer.FluidStatus[] statusByLevel;
 
-    public BandedFluidPicker(DensityFunction continentalness, DensityFunction erosion, NoiseGeneratorSettings settings) {
+    public BandedFluidPicker(DensitySampler continentalness, DensitySampler erosion, NoiseGeneratorSettings settings) {
         this.continentalness = continentalness;
         this.erosion = erosion;
         this.defaultFluid = settings.defaultFluid();
@@ -81,7 +85,10 @@ public final class BandedFluidPicker implements Aquifer.FluidPicker {
     }
 
     public static BandedFluidPicker fromRandomState(RandomState randomState, NoiseGeneratorSettings settings) {
-        return new BandedFluidPicker(randomState.router().continents(), randomState.router().erosion(), settings);
+        NoiseRouter router = settings.noiseRouter();
+        // Mirror the router for SeaLevelBarrierSuppressionMixin, which only has the cached RandomState.
+        SeaLevelRandomStateHolder.setNoiseRouter(router);
+        return new BandedFluidPicker(randomState.getSampler(router.continents()), randomState.getSampler(router.erosion()), settings);
     }
 
     @Override
@@ -115,9 +122,9 @@ public final class BandedFluidPicker implements Aquifer.FluidPicker {
 
     private int computeLevelForColumn(int x, int z) {
         {
-            DensityFunction.SinglePointContext context = new DensityFunction.SinglePointContext(x, 0, z);
-            double continentalnessSample = this.continentalness.compute(context);
-            double erosionSample = this.erosion.compute(context);
+            // Uncached single-point context: thread-safe, as used by vanilla for ad-hoc climate sampling.
+            double continentalnessSample = this.continentalness.sampleValue(SamplerContext.EMPTY_UNCACHED, x, 0, z);
+            double erosionSample = this.erosion.sampleValue(SamplerContext.EMPTY_UNCACHED, x, 0, z);
             double combinedScore = continentalnessSample - erosionSample;
 
             int level = SeaLevelBandingService.bandedLevel(continentalnessSample, combinedScore);

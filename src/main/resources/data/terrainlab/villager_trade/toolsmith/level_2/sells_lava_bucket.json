@@ -1,0 +1,11 @@
+{
+  "wants": {
+    "id": "minecraft:emerald"
+  },
+  "gives": {
+    "id": "minecraft:lava_bucket"
+  },
+  "max_uses": 12,
+  "xp": 2,
+  "reputation_discount": 0.05
+}

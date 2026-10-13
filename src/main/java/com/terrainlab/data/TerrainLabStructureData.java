@@ -24,7 +24,7 @@ public class TerrainLabStructureData extends SavedData {
     }
 
     public static final SavedDataType<TerrainLabStructureData> TYPE = new SavedDataType<TerrainLabStructureData>(
-            "terrainlab_structure_tracking",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "structure_tracking"),
             TerrainLabStructureData::new,
             level -> RecordCodecBuilder.<TerrainLabStructureData>create(instance -> instance.group(
                     Codec.LONG.listOf().fieldOf("processed_temples")

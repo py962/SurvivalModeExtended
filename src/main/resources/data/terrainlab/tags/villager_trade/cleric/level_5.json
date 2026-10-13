@@ -1,0 +1,18 @@
+{
+  "values": [
+    "terrainlab:cleric/level_5/buys_potion_fire_resistance",
+    "terrainlab:cleric/level_5/buys_potion_night_vision",
+    "terrainlab:cleric/level_5/buys_potion_leaping",
+    "terrainlab:cleric/level_5/buys_potion_swiftness",
+    "terrainlab:cleric/level_5/buys_potion_warmth",
+    "terrainlab:cleric/level_5/buys_potion_water_breathing",
+    "terrainlab:cleric/level_5/buys_potion_strength",
+    "terrainlab:cleric/level_5/sells_potion_fire_resistance",
+    "terrainlab:cleric/level_5/sells_potion_night_vision",
+    "terrainlab:cleric/level_5/sells_potion_leaping",
+    "terrainlab:cleric/level_5/sells_potion_swiftness",
+    "terrainlab:cleric/level_5/sells_potion_warmth",
+    "terrainlab:cleric/level_5/sells_potion_water_breathing",
+    "terrainlab:cleric/level_5/sells_potion_strength"
+  ]
+}

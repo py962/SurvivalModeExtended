@@ -35,7 +35,7 @@ public record CodexResultPacket(boolean success, int glyphMask) implements Custo
 
     public static void handle(CodexResultPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (net.minecraft.client.Minecraft.getInstance().screen
+            if (net.minecraft.client.Minecraft.getInstance().gui.screen()
                     instanceof com.terrainlab.screen.AncientCodexScreen screen) {
                 screen.onCodexResult(packet.success(), packet.glyphMask());
             }

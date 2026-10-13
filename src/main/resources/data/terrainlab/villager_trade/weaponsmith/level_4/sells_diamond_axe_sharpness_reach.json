@@ -1,0 +1,36 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 16
+  },
+  "gives": {
+    "id": "minecraft:diamond_axe"
+  },
+  "max_uses": 4,
+  "xp": 10,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:savanna"
+      }
+    }
+  },
+  "given_item_modifier": {
+    "type": "minecraft:set_enchantments",
+    "enchantments": {
+      "minecraft:sharpness": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 5
+      },
+      "terrainlab:reach": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 3
+      }
+    }
+  }
+}

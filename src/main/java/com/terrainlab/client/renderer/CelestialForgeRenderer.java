@@ -1,10 +1,9 @@
 package com.terrainlab.client.renderer;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.math.Axis;
 import com.terrainlab.blockentity.CelestialForgeBlockEntity;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -17,7 +16,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -44,13 +43,10 @@ public class CelestialForgeRenderer implements BlockEntityRenderer<CelestialForg
     private static final int FULL_BRIGHT = 0xF000F0;
 
     // The dragon-ray pipeline with ordinary alpha blending, so dark rays shade what is behind them.
-    private static final RenderPipeline DARK_RAYS_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+    // (26.x: like vanilla's dragon rays, this pipeline writes depth itself; there is no separate depth pass.)
+    private static final RenderPipeline DARK_RAYS_PIPELINE = RenderPipeline.builder(RenderPipelines.DRAGON_RAYS_SNIPPET)
             .withLocation("terrainlab/pipeline/dark_rays")
-            .withVertexShader("core/rendertype_lightning")
-            .withFragmentShader("core/rendertype_lightning")
-            .withDepthWrite(false)
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .build();
     private static final RenderType DARK_RAYS =
             RenderType.create("terrainlab_dark_rays", RenderSetup.builder(DARK_RAYS_PIPELINE).sortOnUpload().createRenderSetup());
@@ -100,7 +96,8 @@ public class CelestialForgeRenderer implements BlockEntityRenderer<CelestialForg
         float time = state.time;
         float bob = Mth.sin(time * 0.1F) * 0.08F;
 
-        // Rays, drawn twice like the dragon's: once for colour, once for depth.
+        // Rays. 26.x's dragon-ray render type writes depth itself, so the old separate
+        // dragonRaysDepth pass (removed from vanilla) is no longer needed.
         poseStack.pushPose();
         poseStack.translate(0.5F, GEM_HEIGHT + bob, 0.5F);
         if (state.colour == 0x000000) {
@@ -108,14 +105,13 @@ public class CelestialForgeRenderer implements BlockEntityRenderer<CelestialForg
         } else {
             submitRays(poseStack, collector, RenderTypes.dragonRays(), state);
         }
-        submitRays(poseStack, collector, RenderTypes.dragonRaysDepth(), state);
         poseStack.popPose();
 
         // The gem, turning; it swells and flashes as the transformation completes.
         if (!state.gem.isEmpty()) {
             poseStack.pushPose();
             poseStack.translate(0.5F, GEM_HEIGHT + bob, 0.5F);
-            poseStack.mulPose(Axis.YP.rotationDegrees(time * (state.transforming ? 12.0F : 3.0F)));
+            poseStack.rotateDegrees(Axis.YP, time * (state.transforming ? 12.0F : 3.0F));
             float scale = 0.6F + state.transformProgress * 0.3F;
             poseStack.scale(scale, scale, scale);
             state.gem.submit(poseStack, collector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
@@ -130,7 +126,7 @@ public class CelestialForgeRenderer implements BlockEntityRenderer<CelestialForg
             float height = GEM_HEIGHT + bob + Mth.sin(time * 0.15F + i) * 0.15F;
             poseStack.pushPose();
             poseStack.translate(0.5F + Mth.cos(angle) * radius, height, 0.5F + Mth.sin(angle) * radius);
-            poseStack.mulPose(Axis.YP.rotationDegrees(time * 8.0F));
+            poseStack.rotateDegrees(Axis.YP, time * 8.0F);
             float scale = 0.45F * (1.0F - state.transformProgress * 0.9F);
             poseStack.scale(scale, scale, scale);
             state.components.get(i).submit(poseStack, collector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);

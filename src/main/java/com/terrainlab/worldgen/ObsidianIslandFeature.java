@@ -1,29 +1,33 @@
 package com.terrainlab.worldgen;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /** Places a flat obsidian platform covering the chunks within PLATFORM_CHUNK_RADIUS of chunk (0, 0). */
-public class ObsidianIslandFeature extends Feature<NoneFeatureConfiguration> {
+public final class ObsidianIslandFeature implements Feature {
 
     // Radius in chunks: 2 gives a 5x5-chunk (80x80 block) platform.
     private static final int PLATFORM_CHUNK_RADIUS = 2;
     private static final int PLATFORM_Y = 30;
     private static final int THICKNESS = 3;
 
-    public ObsidianIslandFeature(Codec<NoneFeatureConfiguration> codec) {
-        super(codec);
+    public static final MapCodec<ObsidianIslandFeature> CODEC = MapCodec.unit(ObsidianIslandFeature::new);
+
+    public ObsidianIslandFeature() {
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
-        BlockPos origin = context.origin();
+    public MapCodec<ObsidianIslandFeature> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
 
         int chunkX = origin.getX() >> 4;
         int chunkZ = origin.getZ() >> 4;

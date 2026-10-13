@@ -1,0 +1,16 @@
+{
+  "wants": {
+    "id": "minecraft:emerald"
+  },
+  "gives": {
+    "id": "minecraft:potion",
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "minecraft:invisibility"
+      }
+    }
+  },
+  "max_uses": 1,
+  "xp": 0,
+  "reputation_discount": 0.05
+}

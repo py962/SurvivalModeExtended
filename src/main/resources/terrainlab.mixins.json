@@ -70,9 +70,6 @@
     "FollowOwnerGoalMixin",
     "TamableAnimalMixin",
     "ItemFrameClockComparatorMixin",
-    "VillagerTradesPerLevelMixin",
-    "WanderingTraderSampleCountMixin",
-    "AbstractVillagerAccessor",
     "ConduitBlockEntityCelestialMixin",
     "BlockDisplayInvoker",
     "DisplayInvoker",
@@ -98,6 +95,7 @@
   ],
   "client": [
     "SkyRendererAccessor",
+    "SkyRendererInvoker",
     "HouseboatClientPaddleSyncMixin",
     "BorrowingSleepScreenSuppressMixin",
     "BorrowingSleepScreenCloseMixin",

@@ -35,7 +35,7 @@ public final class ModMapDecorations {
     // Same flags as vanilla's structure icons: shown in item frames, no map tint, counted.
     private static DeferredHolder<MapDecorationType, MapDecorationType> register(String name) {
         return MAP_DECORATIONS.register(name, () -> new MapDecorationType(
-                Identifier.fromNamespaceAndPath(TerrainLab.MODID, name), true, MapDecorationType.NO_MAP_COLOR, false, true));
+                Identifier.fromNamespaceAndPath(TerrainLab.MODID, name), true, true));
     }
 
     public static void register(IEventBus modEventBus) {

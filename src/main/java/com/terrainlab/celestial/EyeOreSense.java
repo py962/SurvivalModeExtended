@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Display;
@@ -25,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Eye conduit ore vision. Around each player in range of an active Eye conduit, ores within
@@ -53,14 +55,14 @@ public final class EyeOreSense {
     private static final Map<TagKey<Block>, Integer> ORE_COLOURS = new LinkedHashMap<>();
 
     static {
-        ORE_COLOURS.put(BlockTags.DIAMOND_ORES, 0x5DECF5);
-        ORE_COLOURS.put(BlockTags.EMERALD_ORES, 0x17DD62);
+        ORE_COLOURS.put(BlockItemTags.DIAMOND_ORES.block(), 0x5DECF5);
+        ORE_COLOURS.put(BlockItemTags.EMERALD_ORES.block(), 0x17DD62);
         ORE_COLOURS.put(BlockTags.GOLD_ORES, 0xFCEE4B);
         ORE_COLOURS.put(BlockTags.IRON_ORES, 0xD8AF93);
-        ORE_COLOURS.put(BlockTags.LAPIS_ORES, 0x345EC3);
-        ORE_COLOURS.put(BlockTags.REDSTONE_ORES, 0xFF2020);
+        ORE_COLOURS.put(BlockItemTags.LAPIS_ORES.block(), 0x345EC3);
+        ORE_COLOURS.put(BlockItemTags.REDSTONE_ORES.block(), 0xFF2020);
         ORE_COLOURS.put(BlockTags.COPPER_ORES, 0xE0734D);
-        ORE_COLOURS.put(BlockTags.COAL_ORES, 0x8A8A8A);
+        ORE_COLOURS.put(BlockItemTags.COAL_ORES.block(), 0x8A8A8A);
     }
 
     // Ores with no block tag, matched by block.
@@ -176,7 +178,7 @@ public final class EyeOreSense {
     /** Rejects tagged markers loaded back from disk. */
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
-        if (event.loadedFromDisk() && entity.getTags().contains(MARKER_TAG)) {
+        if (event.loadedFromDisk() && entity.entityTags().contains(MARKER_TAG)) {
             event.setCanceled(true);
             if (CelestialDebug.VERBOSE) {
                 CelestialDebug.log("EYE: dropped stale ore marker loaded from disk at {}", entity.blockPosition());
@@ -186,7 +188,7 @@ public final class EyeOreSense {
 
     private static UUID spawnMarker(ServerLevel level, BlockPos pos, BlockState state) {
         Integer colour = colourFor(state);
-        Display.BlockDisplay display = EntityType.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
+        Display.BlockDisplay display = EntityTypes.BLOCK_DISPLAY.create(level, EntitySpawnReason.TRIGGERED);
         if (display == null || colour == null) {
             if (CelestialDebug.VERBOSE) {
                 CelestialDebug.log("  EYE: could not create marker at {} (display={}, colour={})", pos, display, colour);

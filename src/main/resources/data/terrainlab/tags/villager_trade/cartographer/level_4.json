@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:cartographer/level_4/buys_bubble_gauge",
+    "terrainlab:cartographer/level_4/sells_bubble_gauge",
+    "terrainlab:cartographer/level_4/buys_rangefinder_compass",
+    "terrainlab:cartographer/level_4/sells_rangefinder_compass"
+  ]
+}

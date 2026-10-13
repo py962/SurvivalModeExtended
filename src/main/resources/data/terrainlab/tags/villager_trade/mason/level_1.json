@@ -1,0 +1,20 @@
+{
+  "values": [
+    "terrainlab:mason/level_1/buys_sandstone",
+    "terrainlab:mason/level_1/buys_calcite",
+    "terrainlab:mason/level_1/buys_clay",
+    "terrainlab:mason/level_1/buys_terracotta",
+    "terrainlab:mason/level_1/buys_packed_ice",
+    "terrainlab:mason/level_1/buys_packed_mud",
+    "terrainlab:mason/level_1/buys_mossy_cobblestone",
+    "terrainlab:mason/level_1/sells_sandstone",
+    "terrainlab:mason/level_1/sells_calcite",
+    "terrainlab:mason/level_1/sells_clay",
+    "terrainlab:mason/level_1/sells_terracotta",
+    "terrainlab:mason/level_1/sells_packed_ice",
+    "terrainlab:mason/level_1/sells_packed_mud",
+    "terrainlab:mason/level_1/sells_mossy_cobblestone",
+    "terrainlab:mason/level_1/buys_stone",
+    "terrainlab:mason/level_1/sells_stone"
+  ]
+}

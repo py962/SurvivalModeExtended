@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 3
+  },
+  "gives": {
+    "id": "minecraft:tropical_fish_bucket"
+  },
+  "max_uses": 1,
+  "xp": 0,
+  "reputation_discount": 0.05
+}

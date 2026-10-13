@@ -130,7 +130,7 @@ public class CelestialConduitBlockEntity extends BlockEntity {
 
         if (be.active) {
             CelestialEffects.tickConduit(serverLevel, pos, variant, be.effectRadius(), be.fullPower);
-            com.terrainlab.advancement.ModAdvancements.awardNearby(serverLevel, pos.getCenter(), 16.0,
+            com.terrainlab.advancement.ModAdvancements.awardNearby(serverLevel, net.minecraft.world.phys.Vec3.atCenterOf(pos), 16.0,
                     "conduit_" + variant.name().toLowerCase(java.util.Locale.ROOT));
         }
 

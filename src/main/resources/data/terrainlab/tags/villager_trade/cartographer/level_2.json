@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:cartographer/level_2/buys_glass",
+    "terrainlab:cartographer/level_2/sells_glass",
+    "terrainlab:cartographer/level_2/buys_map",
+    "terrainlab:cartographer/level_2/sells_map"
+  ]
+}

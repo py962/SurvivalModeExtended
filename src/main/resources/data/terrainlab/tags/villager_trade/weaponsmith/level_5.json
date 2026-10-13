@@ -1,0 +1,12 @@
+{
+  "values": [
+    "terrainlab:weaponsmith/level_5/buys_diamond_sword",
+    "terrainlab:weaponsmith/level_5/sells_diamond_sword_sharpness_unbreaking",
+    "terrainlab:weaponsmith/level_5/sells_diamond_sword_reach_unbreaking",
+    "terrainlab:weaponsmith/level_5/sells_diamond_sword_sharpness_knockback",
+    "terrainlab:weaponsmith/level_5/sells_diamond_sword_sharpness_reach",
+    "terrainlab:weaponsmith/level_5/sells_diamond_sword_knockback_unbreaking",
+    "terrainlab:weaponsmith/level_5/sells_diamond_sword_reach_sweeping_edge",
+    "terrainlab:weaponsmith/level_5/sells_diamond_sword_sharpness_sweeping_edge"
+  ]
+}

@@ -32,6 +32,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Spawns a one-time pirate garrison per generated pirates_cove: four pirates on the shore
@@ -103,8 +104,7 @@ public class PiratePatrolSpawnHandler {
 
         Structure piratesCove = piratesCoveOpt.get().value();
 
-        List<StructureStart> starts = structureManager.startsForStructure(
-                chunkPos, s -> s == piratesCove);
+        List<StructureStart> starts = structureManager.startsForStructure(chunkPos.x(), chunkPos.z(), s -> s == piratesCove);
         if (starts.isEmpty()) return;
 
         StructureStart start = starts.get(0);
@@ -261,9 +261,9 @@ public class PiratePatrolSpawnHandler {
 
     /** Spawns one boat and up to PIRATES_PER_BOAT riders on it; returns how many riders actually boarded. */
     private static int spawnBoatWithPirates(ServerLevel level, BlockPos waterPos, RandomSource random) {
-        Boat boat = EntityType.OAK_BOAT.create(level, EntitySpawnReason.MOB_SUMMONED);
+        Boat boat = EntityTypes.OAK_BOAT.create(level, EntitySpawnReason.MOB_SUMMONED);
         if (boat == null) {
-            TerrainLab.LOGGER.warn("EntityType.OAK_BOAT.create() returned null - skipping one boat");
+            TerrainLab.LOGGER.warn("EntityTypes.OAK_BOAT.create() returned null - skipping one boat");
             return 0;
         }
 

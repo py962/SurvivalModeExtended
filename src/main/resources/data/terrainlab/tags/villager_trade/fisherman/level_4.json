@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:fisherman/level_4/buys_resin_clump",
+    "terrainlab:fisherman/level_4/sells_resin_clump",
+    "terrainlab:fisherman/level_4/buys_sponge",
+    "terrainlab:fisherman/level_4/sells_sponge"
+  ]
+}

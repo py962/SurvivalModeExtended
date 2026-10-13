@@ -1,0 +1,10 @@
+{
+  "values": [
+    "terrainlab:farmer/level_3/buys_beetroot",
+    "terrainlab:farmer/level_3/buys_apple",
+    "terrainlab:farmer/level_3/sells_beetroot",
+    "terrainlab:farmer/level_3/sells_apple",
+    "terrainlab:farmer/level_3/buys_bread",
+    "terrainlab:farmer/level_3/sells_bread"
+  ]
+}

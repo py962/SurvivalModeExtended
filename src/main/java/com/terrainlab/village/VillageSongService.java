@@ -69,11 +69,11 @@ public final class VillageSongService {
         if (level.getGameTime() % 20 != 0) {
             return;
         }
-        long timeOfDay = Math.floorMod(level.getDayTime(), 24000L);
+        long timeOfDay = Math.floorMod(level.getOverworldClockTime(), 24000L);
         if (timeOfDay < SONG_START_TICK || timeOfDay >= SONG_START_TICK + START_WINDOW_TICKS) {
             return;
         }
-        long day = Math.floorDiv(level.getDayTime(), 24000L);
+        long day = Math.floorDiv(level.getOverworldClockTime(), 24000L);
         VillageSavedData data = VillageSavedData.get(level);
         for (VillageId id : data.knownVillageIds()) {
             if (!id.dimension().equals(level.dimension()) || Long.valueOf(day).equals(lastSungDay.get(id))) {
@@ -118,7 +118,7 @@ public final class VillageSongService {
 
         VillageSongs.Song song = VillageSongs.forVillagerType(majorityType(singers));
         performances.add(new Performance(bell, song, level.getGameTime(), parts));
-        com.terrainlab.advancement.ModAdvancements.awardNearby(level, bell.getCenter(), LISTENER_RADIUS, "village_song");
+        com.terrainlab.advancement.ModAdvancements.awardNearby(level, net.minecraft.world.phys.Vec3.atCenterOf(bell), LISTENER_RADIUS, "village_song");
     }
 
     /** Most common villager type among the singers, as a registry path ("plains", "desert", ...). */

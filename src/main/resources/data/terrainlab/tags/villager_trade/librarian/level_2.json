@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:librarian/level_2/buys_lapis_lazuli",
+    "terrainlab:librarian/level_2/sells_lapis_lazuli",
+    "terrainlab:librarian/level_2/buys_thermometer",
+    "terrainlab:librarian/level_2/sells_thermometer"
+  ]
+}

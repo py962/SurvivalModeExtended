@@ -149,7 +149,7 @@ public final class StructureStatsCommand {
         ChunkGenerator generator = level.getChunkSource().getGenerator();
         ChunkGeneratorStructureState state = level.getChunkSource().getGeneratorState();
         RandomState randomState = level.getChunkSource().randomState();
-        StructureTemplateManager templates = server.getStructureManager();
+        StructureTemplateManager templates = server.getStructureTemplateManager();
         long seed = state.getLevelSeed();
 
         int minChunk = Math.floorDiv(-radius, 16);
@@ -198,7 +198,7 @@ public final class StructureStatsCommand {
 
                     if (ownSet && TerrainLabDebug.ENABLED) {
                         LOGGER.info("[TerrainLab/survey] {}: testing chunk {},{} ({}/{})",
-                                prefix, chunk.x, chunk.z, checked + 1, setCandidates);
+                                prefix, chunk.x(), chunk.z(), checked + 1, setCandidates);
                     }
                     long candidateStart = System.currentTimeMillis();
                     Future<Found> task = worker.submit(
@@ -212,7 +212,7 @@ public final class StructureStatsCommand {
                         }
                         if (ms >= SLOW_LOG_MS || (ownSet && TerrainLabDebug.ENABLED)) {
                             LOGGER.info("[TerrainLab/survey] {}: chunk {},{} -> {} in {} ms",
-                                    prefix, chunk.x, chunk.z, f == null ? "nothing" : f.structure() + " at "
+                                    prefix, chunk.x(), chunk.z(), f == null ? "nothing" : f.structure() + " at "
                                             + f.pos().toShortString(), ms);
                         }
                     } catch (TimeoutException e) {
@@ -223,12 +223,12 @@ public final class StructureStatsCommand {
                         setSkipped++;
                         String msg = String.format(Locale.ROOT,
                                 "%s: chunk %d,%d took over %ds - skipped (worker abandoned)",
-                                prefix, chunk.x, chunk.z, CANDIDATE_TIMEOUT_SECONDS);
+                                prefix, chunk.x(), chunk.z(), CANDIDATE_TIMEOUT_SECONDS);
                         LOGGER.warn(msg);
                         say(server, source, msg);
                     } catch (ExecutionException e) {
                         setSkipped++;
-                        LOGGER.warn("{}: chunk {},{} failed to test-build", prefix, chunk.x, chunk.z, e.getCause());
+                        LOGGER.warn("{}: chunk {},{} failed to test-build", prefix, chunk.x(), chunk.z(), e.getCause());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         stopped = true;
@@ -279,7 +279,7 @@ public final class StructureStatsCommand {
             for (Found f : found) {
                 w.write(String.format(Locale.ROOT, "%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d%n",
                         f.structure(), f.set(), f.pos().getX(), f.pos().getY(), f.pos().getZ(),
-                        f.chunk().x, f.chunk().z, f.pieces(),
+                        f.chunk().x(), f.chunk().z(), f.pieces(),
                         f.box().getXSpan(), f.box().getYSpan(), f.box().getZSpan()));
             }
         }
@@ -358,7 +358,7 @@ public final class StructureStatsCommand {
                 }
                 Thread worker = WORKER_THREAD.get();
                 String msg = String.format(Locale.ROOT, "%s: chunk %d,%d still running after %ds (worker %s)",
-                        prefix, chunk.x, chunk.z, waited, worker == null ? "?" : worker.getState());
+                        prefix, chunk.x(), chunk.z(), waited, worker == null ? "?" : worker.getState());
                 say(server, source, msg + " - stack in the log");
                 StringBuilder out = new StringBuilder("[TerrainLab/survey] ").append(msg).append('\n');
                 if (worker != null) {
@@ -382,7 +382,7 @@ public final class StructureStatsCommand {
             for (int cx = Math.floorDiv(minChunk, spacing); cx <= Math.floorDiv(maxChunk, spacing); cx++) {
                 for (int cz = Math.floorDiv(minChunk, spacing); cz <= Math.floorDiv(maxChunk, spacing); cz++) {
                     ChunkPos chunk = spread.getPotentialStructureChunk(seed, cx * spacing, cz * spacing);
-                    if (inRange(chunk, minChunk, maxChunk) && spread.isStructureChunk(state, chunk.x, chunk.z)) {
+                    if (inRange(chunk, minChunk, maxChunk) && spread.isStructureChunk(state, chunk.x(), chunk.z())) {
                         result.add(chunk);
                     }
                 }
@@ -391,7 +391,7 @@ public final class StructureStatsCommand {
             List<ChunkPos> positions = state.getRingPositionsFor(rings);
             if (positions != null) {
                 for (ChunkPos chunk : positions) {
-                    if (inRange(chunk, minChunk, maxChunk) && rings.isStructureChunk(state, chunk.x, chunk.z)) {
+                    if (inRange(chunk, minChunk, maxChunk) && rings.isStructureChunk(state, chunk.x(), chunk.z())) {
                         result.add(chunk);
                     }
                 }
@@ -410,7 +410,7 @@ public final class StructureStatsCommand {
     }
 
     private static boolean inRange(ChunkPos chunk, int min, int max) {
-        return chunk.x >= min && chunk.x <= max && chunk.z >= min && chunk.z <= max;
+        return chunk.x() >= min && chunk.x() <= max && chunk.z() >= min && chunk.z() <= max;
     }
 
     /** The weighted structure choice from ChunkGenerator#createStructures, for one candidate chunk. */
@@ -423,7 +423,7 @@ public final class StructureStatsCommand {
         }
 
         WorldgenRandom random = new WorldgenRandom(new LegacyRandomSource(0L));
-        random.setLargeFeatureSeed(seed, chunk.x, chunk.z);
+        random.setLargeFeatureSeed(seed, chunk.x(), chunk.z());
         int totalWeight = 0;
         for (StructureSet.StructureSelectionEntry entry : entries) {
             totalWeight += entry.weight();
@@ -457,7 +457,9 @@ public final class StructureStatsCommand {
         Holder<Structure> holder = entry.structure();
         Structure structure = holder.value();
         StructureStart start = structure.generate(holder, level.dimension(), level.registryAccess(), generator,
-                generator.getBiomeSource(), randomState, templates, seed, chunk, 0, level,
+                generator.getBiomeSource(),
+                randomState.createClimateSampler(net.minecraft.world.level.levelgen.densityfunction.SamplerContext.EMPTY_UNCACHED),
+                randomState, templates, seed, chunk, 0, level,
                 structure.biomes()::contains);
         if (!start.isValid()) {
             return null;

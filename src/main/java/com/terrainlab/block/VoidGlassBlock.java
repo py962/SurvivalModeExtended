@@ -1,6 +1,5 @@
 package com.terrainlab.block;
 
-import com.mojang.serialization.MapCodec;
 import com.terrainlab.entity.VoidGlassFallingEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -30,10 +29,6 @@ public class VoidGlassBlock extends FallingBlock {
         return true;
     }
 
-    @Override
-    public MapCodec<? extends FallingBlock> codec() {
-        return simpleCodec(VoidGlassBlock::new);
-    }
 
     // Replaces FallingBlock#tick entirely: checks upward and spawns a rising entity.
     @Override

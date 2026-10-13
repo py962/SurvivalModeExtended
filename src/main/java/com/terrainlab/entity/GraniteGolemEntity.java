@@ -94,7 +94,7 @@ public class GraniteGolemEntity extends AbstractGolem {
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
         if (!level().isClientSide() && getGolemState() == STATE_IDLE) {
             if (player.getItemInHand(hand).is(Items.GRAVEL)) {
                 // Face away from player

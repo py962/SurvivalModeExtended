@@ -29,7 +29,7 @@ public class VultureEntity extends Parrot {
     private static final double SCAVENGE_RANGE = 12.0; // blocks
 
     private static boolean isDayTime(Level level) {
-        long dayTime = level.getDayTime() % 24000L;
+        long dayTime = level.getOverworldClockTime() % 24000L;
         return dayTime < 12000L;
     }
 

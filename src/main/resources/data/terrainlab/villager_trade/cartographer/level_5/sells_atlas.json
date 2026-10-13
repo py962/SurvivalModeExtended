@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 7
+  },
+  "gives": {
+    "id": "terrainlab:atlas"
+  },
+  "max_uses": 2,
+  "xp": 0,
+  "reputation_discount": 0.05
+}

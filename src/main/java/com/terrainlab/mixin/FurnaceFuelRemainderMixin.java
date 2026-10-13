@@ -23,7 +23,7 @@ public abstract class FurnaceFuelRemainderMixin {
 
     @Inject(method = "canPlaceItem", at = @At("HEAD"), cancellable = true)
     private void terrainlab$singleRemainderFuel(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (slot == SLOT_FUEL && !stack.getCraftingRemainder().isEmpty()
+        if (slot == SLOT_FUEL && stack.getCraftingRemainder() != null
                 && (stack.getCount() > 1 || !this.items.get(SLOT_FUEL).isEmpty())) {
             cir.setReturnValue(false);
         }

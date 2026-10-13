@@ -157,7 +157,7 @@ public class ElephantEntity extends Camel {
         // Clean up any temporary bed saved by a previous session.
         if (staleBedPos != null || staleBedFootPos != null) {
             for (BlockPos stale : new BlockPos[]{staleBedPos, staleBedFootPos}) {
-                if (stale != null && level().getBlockState(stale).is(Blocks.RED_BED)) {
+                if (stale != null && level().getBlockState(stale).is(Blocks.BED.red())) {
                     level().setBlock(
                             stale,
                             Blocks.AIR.defaultBlockState(),
@@ -296,27 +296,18 @@ public class ElephantEntity extends Camel {
         }
 
         if (isSleepingOnElephant) {
-            player.displayClientMessage(
-                    Component.literal("Someone is already sleeping."),
-                    true
-            );
+            player.sendOverlayMessage(Component.literal("Someone is already sleeping."));
             return;
         }
 
         // Sleeping in water or lava is not allowed.
         if (this.isInWater() || this.isInLava()) {
-            player.displayClientMessage(
-                    Component.literal("The elephant must be out of the water to sleep."),
-                    true
-            );
+            player.sendOverlayMessage(Component.literal("The elephant must be out of the water to sleep."));
             return;
         }
 
         if (!isStationary()) {
-            player.displayClientMessage(
-                    Component.literal("The elephant must be still to sleep."),
-                    true
-            );
+            player.sendOverlayMessage(Component.literal("The elephant must be still to sleep."));
             return;
         }
 
@@ -336,21 +327,15 @@ public class ElephantEntity extends Camel {
 
         if (level.dimension().equals(Level.NETHER)
                 || level.dimension().equals(Level.END)) {
-            player.displayClientMessage(
-                    Component.literal("You cannot sleep in this dimension."),
-                    true
-            );
+            player.sendOverlayMessage(Component.literal("You cannot sleep in this dimension."));
             return;
         }
 
-        long dayTime = level.getDayTime() % 24000;
+        long dayTime = level.getOverworldClockTime() % 24000;
         boolean isNight = dayTime >= 12000 && dayTime < 24000;
 
         if (!isNight && !level.isThundering()) {
-            player.displayClientMessage(
-                    Component.literal("You can only sleep at night."),
-                    true
-            );
+            player.sendOverlayMessage(Component.literal("You can only sleep at night."));
             return;
         }
 
@@ -367,19 +352,16 @@ public class ElephantEntity extends Camel {
         // Do not overwrite existing blocks or fluids.
         if (!isFreeForTempBed(level, footPos)
                 || !isFreeForTempBed(level, headPos)) {
-            player.displayClientMessage(
-                    Component.literal("There is not enough room above the elephant to sleep."),
-                    true
-            );
+            player.sendOverlayMessage(Component.literal("There is not enough room above the elephant to sleep."));
             return;
         }
 
-        BlockState footState = Blocks.RED_BED.defaultBlockState()
+        BlockState footState = Blocks.BED.red().defaultBlockState()
                 .setValue(BedBlock.FACING, bedFacing)
                 .setValue(BedBlock.PART, BedPart.FOOT)
                 .setValue(BedBlock.OCCUPIED, false);
 
-        BlockState headState = Blocks.RED_BED.defaultBlockState()
+        BlockState headState = Blocks.BED.red().defaultBlockState()
                 .setValue(BedBlock.FACING, bedFacing)
                 .setValue(BedBlock.PART, BedPart.HEAD)
                 .setValue(BedBlock.OCCUPIED, false);
@@ -390,7 +372,9 @@ public class ElephantEntity extends Camel {
         tempBedPos = headPos;
         tempBedFootPos = footPos;
 
-        var result = player.startSleepInBed(headPos);
+        net.minecraft.world.level.block.AbstractBedBlock bedBlock =
+                (net.minecraft.world.level.block.AbstractBedBlock) headState.getBlock();
+        var result = player.startSleepInBed(bedBlock, headState, bedBlock.getBedRule(level, headPos), headPos);
 
         // Preserve the existing fallback for the NOT_SAFE sleep result.
         if (result.left().isPresent()
@@ -412,12 +396,9 @@ public class ElephantEntity extends Camel {
             removeTempBed();
             sleepingPlayerUUID = null;
 
-            player.displayClientMessage(
-                    Component.literal(
+            player.sendOverlayMessage(Component.literal(
                             "Cannot sleep here: " + result.left().get()
-                    ),
-                    true
-            );
+                    ));
         } else {
             isSleepingOnElephant = true;
             sleepingPlayerUUID = player.getUUID();
@@ -450,7 +431,7 @@ public class ElephantEntity extends Camel {
 
     private void removeTempBed() {
         if (tempBedPos != null) {
-            if (level().getBlockState(tempBedPos).is(Blocks.RED_BED)) {
+            if (level().getBlockState(tempBedPos).is(Blocks.BED.red())) {
                 level().setBlock(
                         tempBedPos,
                         Blocks.AIR.defaultBlockState(),
@@ -462,7 +443,7 @@ public class ElephantEntity extends Camel {
         }
 
         if (tempBedFootPos != null) {
-            if (level().getBlockState(tempBedFootPos).is(Blocks.RED_BED)) {
+            if (level().getBlockState(tempBedFootPos).is(Blocks.BED.red())) {
                 level().setBlock(
                         tempBedFootPos,
                         Blocks.AIR.defaultBlockState(),

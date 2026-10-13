@@ -31,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Server-side sandstorm effects in the Overworld (sand layers are handled by SeasonalPrecipitationTickMixin).
@@ -117,7 +118,7 @@ public final class SandstormSpawner {
             List<Husk> nearby = level.getEntitiesOfClass(
                     Husk.class,
                     player.getBoundingBox().inflate(WeatherConstants.STORM_HUSK_MAX_DISTANCE),
-                    husk -> husk.getTags().contains(STORM_HUSK_TAG));
+                    husk -> husk.entityTags().contains(STORM_HUSK_TAG));
             if (nearby.size() >= cap) {
                 continue;
             }
@@ -137,7 +138,7 @@ public final class SandstormSpawner {
                 continue;
             }
 
-            Husk husk = EntityType.HUSK.create(level, EntitySpawnReason.EVENT);
+            Husk husk = EntityTypes.HUSK.create(level, EntitySpawnReason.EVENT);
             if (husk == null) {
                 continue;
             }
@@ -160,7 +161,7 @@ public final class SandstormSpawner {
             List<Husk> husks = level.getEntitiesOfClass(
                     Husk.class,
                     player.getBoundingBox().inflate(128.0),
-                    husk -> husk.getTags().contains(STORM_HUSK_TAG));
+                    husk -> husk.entityTags().contains(STORM_HUSK_TAG));
 
             for (Husk husk : husks) {
                 if (husk.isRemoved()

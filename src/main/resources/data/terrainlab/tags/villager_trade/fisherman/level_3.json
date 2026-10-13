@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:fisherman/level_3/buys_cooked_salmon",
+    "terrainlab:fisherman/level_3/sells_cooked_salmon",
+    "terrainlab:fisherman/level_3/buys_ink_sac",
+    "terrainlab:fisherman/level_3/sells_ink_sac"
+  ]
+}

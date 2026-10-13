@@ -45,16 +45,16 @@ public class ModSpawnHandler {
                 new BlockPos(bestPos.getX(), y, bestPos.getZ()),
                 0.0F, 0.0F));
 
-        serverLevel.setDayTime(1400L);
+        com.terrainlab.worldtime.WorldClockUtil.setOverworldTime(serverLevel, 1400L);
 
         // Cancelling skips vanilla's bonus-chest step, so place it here when the option is on.
-        if (serverLevel.getServer().getWorldData().worldGenOptions().generateBonusChest()) {
+        if (serverLevel.getServer().getWorldGenSettings().options().generateBonusChest()) {
             BlockPos spawn = settings.getRespawnData().pos();
             serverLevel.registryAccess()
-                    .lookup(Registries.CONFIGURED_FEATURE)
+                    .lookup(Registries.FEATURE)
                     .flatMap(features -> features.get(MiscOverworldFeatures.BONUS_CHEST))
                     .ifPresent(feature -> feature.value().place(serverLevel,
-                            serverLevel.getChunkSource().getGenerator(), serverLevel.random, spawn));
+                            serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), spawn));
         }
 
         event.setCanceled(true);

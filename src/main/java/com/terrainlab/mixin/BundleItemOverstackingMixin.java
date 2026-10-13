@@ -1,5 +1,6 @@
 package com.terrainlab.mixin;
 
+import com.mojang.serialization.DataResult;
 import com.terrainlab.registry.ModEnchantments;
 import com.terrainlab.util.BundleOverstackingState;
 import net.minecraft.core.Holder;
@@ -105,12 +106,15 @@ public class BundleItemOverstackingMixin {
         if (contents == null || !display.shows(DataComponents.BUNDLE_CONTENTS)) {
             return;
         }
-        BundleOverstackingState.set(true);
-        try {
-            cir.setReturnValue(Optional.of(new BundleTooltip(new BundleContents.Mutable(contents).toImmutable())));
-        } finally {
-            BundleOverstackingState.clear();
-        }
+        // 26.x: an immutable BundleContents computes its weight lazily with vanilla weights, so the
+        // copy's weight is overridden with the Overstacking total.
+        // asMutable() keeps the selected item but returns an empty container if the vanilla weight overflowed.
+        BundleContents copy = contents.weight().isError()
+                ? new BundleContents(contents.items())
+                : contents.asMutable().toImmutable();
+        Fraction overstackingWeight = BundleOverstackingState.overstackContentsWeight(contents.items());
+        ((BundleContentsAccessorMixin) (Object) copy).terrainlab$setWeight(() -> DataResult.success(overstackingWeight));
+        cir.setReturnValue(Optional.of(new BundleTooltip(copy)));
     }
 
     /** True when the bundle item itself, not its contents, has Overstacking. */
@@ -119,17 +123,12 @@ public class BundleItemOverstackingMixin {
     }
 
     /**
-     * Recomputes the bundle's Overstacking weight through a fresh {@code Mutable}, ignoring the
+     * Recomputes the bundle's Overstacking weight from its contents, ignoring the
      * possibly vanilla-computed weight stored on the component.
      */
     private static Fraction terrainlab$effectiveWeight(ItemStack bundleStack) {
         BundleContents contents = bundleStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY);
-        BundleOverstackingState.set(true);
-        try {
-            return new BundleContents.Mutable(contents).weight();
-        } finally {
-            BundleOverstackingState.clear();
-        }
+        return BundleOverstackingState.overstackContentsWeight(contents.items());
     }
 
     @Inject(

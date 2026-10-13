@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 
 /**
  * Village economy events: tier-up rewards and the bell-destruction
@@ -32,7 +33,7 @@ public final class VillageEconomyHandler {
 
     /** Breaking a bell costs the player reputation with that village. */
     @SubscribeEvent
-    public static void onBellBroken(BlockEvent.BreakEvent event) {
+    public static void onBellBroken(BreakBlockEvent event) {
         if (!event.getState().is(Blocks.BELL)) {
             return;
         }

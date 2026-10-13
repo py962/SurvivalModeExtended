@@ -38,7 +38,7 @@ public class SafeSpotFinder {
         BlockState at = level.getBlockState(pos);
         BlockState above = level.getBlockState(pos.above());
 
-        if (!below.blocksMotion()) return false;
+        if (!below.isSolid()) return false;
         if (!at.getFluidState().isEmpty() || !above.getFluidState().isEmpty()) return false;
         if (at.is(Blocks.FIRE)) return false;
         if (at.is(Blocks.LAVA)) return false;

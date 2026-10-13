@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:leatherworker/level_1/buys_leather",
+    "terrainlab:leatherworker/level_1/sells_leather",
+    "terrainlab:leatherworker/level_1/buys_item_frame",
+    "terrainlab:leatherworker/level_1/sells_item_frame"
+  ]
+}

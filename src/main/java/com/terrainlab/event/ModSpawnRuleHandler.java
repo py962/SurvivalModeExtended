@@ -8,6 +8,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Spawn placement rules: blocks daytime phantom spawns and enforces one living guide trader
@@ -19,7 +20,7 @@ public class ModSpawnRuleHandler {
 
     @SubscribeEvent
     public static void onCheckSpawn(MobSpawnEvent.SpawnPlacementCheck event) {
-        if (event.getEntityType() != EntityType.PHANTOM) return;
+        if (event.getEntityType() != EntityTypes.PHANTOM) return;
 
         ServerLevelAccessor level = event.getLevel();
         if (!(level instanceof ServerLevel serverLevel)) return;

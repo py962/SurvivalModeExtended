@@ -13,7 +13,7 @@ public abstract class FurnaceFuelSlotRemainderMixin {
 
     @Inject(method = "getMaxStackSize(Lnet/minecraft/world/item/ItemStack;)I", at = @At("HEAD"), cancellable = true)
     private void terrainlab$singleRemainderFuel(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
-        if (!stack.getCraftingRemainder().isEmpty()) {
+        if (stack.getCraftingRemainder() != null) {
             cir.setReturnValue(1);
         }
     }

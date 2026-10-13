@@ -22,7 +22,7 @@ public enum CelestialVariant {
     LIFE("life", () -> Blocks.MOSS_BLOCK, 0x4AEDD9),
     DEATH("death", () -> Blocks.CRYING_OBSIDIAN, 0x000000),
     // Shield's frame also accepts every other copper block (see isFrameBlock); this is the one shown.
-    SHIELD("shield", () -> Blocks.COPPER_BLOCK, 0xF2EEE3),
+    SHIELD("shield", () -> Blocks.COPPER_BLOCK.weathering().unaffected(), 0xF2EEE3),
     PEACE("peace", () -> Blocks.BONE_BLOCK, 0x385B96),
     EYE("eye", () -> Blocks.POLISHED_DEEPSLATE, 0x8C4797),
     LUCK("luck", () -> Blocks.GILDED_BLACKSTONE, 0x17A44C),
@@ -60,10 +60,10 @@ public enum CelestialVariant {
      */
     public boolean isFrameBlock(BlockState state) {
         if (this == SHIELD) {
-            return state.is(Blocks.COPPER_BLOCK) || state.is(Blocks.EXPOSED_COPPER)
-                    || state.is(Blocks.WEATHERED_COPPER) || state.is(Blocks.OXIDIZED_COPPER)
-                    || state.is(Blocks.WAXED_COPPER_BLOCK) || state.is(Blocks.WAXED_EXPOSED_COPPER)
-                    || state.is(Blocks.WAXED_WEATHERED_COPPER) || state.is(Blocks.WAXED_OXIDIZED_COPPER);
+            return state.is(Blocks.COPPER_BLOCK.weathering().unaffected()) || state.is(Blocks.COPPER_BLOCK.weathering().exposed())
+                    || state.is(Blocks.COPPER_BLOCK.weathering().weathered()) || state.is(Blocks.COPPER_BLOCK.weathering().oxidized())
+                    || state.is(Blocks.COPPER_BLOCK.waxed().unaffected()) || state.is(Blocks.COPPER_BLOCK.waxed().exposed())
+                    || state.is(Blocks.COPPER_BLOCK.waxed().weathered()) || state.is(Blocks.COPPER_BLOCK.waxed().oxidized());
         }
         return state.is(frameBlock());
     }

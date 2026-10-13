@@ -155,9 +155,11 @@ public final class ShieldCombatEvents {
         attacker.knockback(
                 strength,
                 blocker.getX() - attacker.getX(),
-                blocker.getZ() - attacker.getZ()
+                blocker.getZ() - attacker.getZ(),
+                attacker.damageSources().mobAttack(blocker),
+                event.getBlockedDamage()
         );
-        attacker.hurtMarked = true;
+        attacker.needsSync = true;
     }
 
     @SubscribeEvent

@@ -33,7 +33,7 @@ public class ThermometerReading implements RangeSelectItemModelProperty {
         long gameTime = level.getGameTime();
         long seasonalOffset = ClientSeasonState.getSeasonalOffset();
         var season = SeasonManager.getCurrentTemperatureSeason(gameTime, seasonalOffset);
-        boolean isDay = (level.getDayTime() % 24000L) < 12000L;
+        boolean isDay = (level.getOverworldClockTime() % 24000L) < 12000L;
 
         Vec3 posVec = owner.position();
         BlockPos pos = BlockPos.containing(posVec.x(), posVec.y(), posVec.z());

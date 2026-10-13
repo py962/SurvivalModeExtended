@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import com.mojang.serialization.MapCodec;
 
 import javax.annotation.Nullable;
 
@@ -26,7 +25,6 @@ import javax.annotation.Nullable;
  */
 public class CelestialForgeBlock extends BaseEntityBlock {
 
-    public static final MapCodec<CelestialForgeBlock> CODEC = simpleCodec(CelestialForgeBlock::new);
 
     /** True while the forge is usable (aurora active and open to sky); selects the top-face model. */
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
@@ -42,10 +40,6 @@ public class CelestialForgeBlock extends BaseEntityBlock {
         builder.add(ACTIVE);
     }
 
-    @Override
-    public MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

@@ -69,11 +69,11 @@ public final class SpyglassStructureMarker {
 
     /** Adds a marker for each visible structure with a piece in {@code chunk} that lies on the map. */
     public static void markChunk(ServerLevel level, ItemStack map, MapItemSavedData data, ChunkPos chunk) {
-        if (!level.hasChunk(chunk.x, chunk.z)) {
+        if (!level.hasChunk(chunk.x(), chunk.z())) {
             return;
         }
         var registry = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
-        for (StructureStart start : level.structureManager().startsForStructure(chunk, s -> true)) {
+        for (StructureStart start : level.structureManager().startsForStructure(chunk.x(), chunk.z(), s -> true)) {
             if (!start.isValid()) {
                 continue;
             }

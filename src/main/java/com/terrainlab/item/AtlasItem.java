@@ -43,8 +43,7 @@ public class AtlasItem extends MapItem {
         }
 
         if (AtlasGenerationQueue.isPending(stack)) {
-            serverPlayer.displayClientMessage(
-                    Component.literal("This Atlas is still being surveyed..."), true);
+            serverPlayer.sendOverlayMessage(Component.literal("This Atlas is still being surveyed..."));
             return InteractionResult.PASS;
         }
 
@@ -54,8 +53,7 @@ public class AtlasItem extends MapItem {
         //                 + " caught it - queuing now. player="
         //                 + serverPlayer.getScoreboardName());
         AtlasGenerationQueue.ensureQueued(serverLevel, serverPlayer, stack);
-        serverPlayer.displayClientMessage(
-                Component.literal("Surveying the region for your Atlas..."), true);
+        serverPlayer.sendOverlayMessage(Component.literal("Surveying the region for your Atlas..."));
         return InteractionResult.PASS;
     }
 

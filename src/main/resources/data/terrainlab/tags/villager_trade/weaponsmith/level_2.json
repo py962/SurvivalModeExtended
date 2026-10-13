@@ -1,0 +1,28 @@
+{
+  "values": [
+    "terrainlab:weaponsmith/level_2/buys_oak_planks",
+    "terrainlab:weaponsmith/level_2/buys_bamboo_planks",
+    "terrainlab:weaponsmith/level_2/buys_birch_planks",
+    "terrainlab:weaponsmith/level_2/buys_acacia_planks",
+    "terrainlab:weaponsmith/level_2/buys_spruce_planks",
+    "terrainlab:weaponsmith/level_2/buys_dark_oak_planks",
+    "terrainlab:weaponsmith/level_2/sells_oak_planks",
+    "terrainlab:weaponsmith/level_2/sells_bamboo_planks",
+    "terrainlab:weaponsmith/level_2/sells_birch_planks",
+    "terrainlab:weaponsmith/level_2/sells_acacia_planks",
+    "terrainlab:weaponsmith/level_2/sells_spruce_planks",
+    "terrainlab:weaponsmith/level_2/sells_dark_oak_planks",
+    "terrainlab:weaponsmith/level_2/buys_oak_shield",
+    "terrainlab:weaponsmith/level_2/buys_bamboo_shield",
+    "terrainlab:weaponsmith/level_2/buys_birch_shield",
+    "terrainlab:weaponsmith/level_2/buys_acacia_shield",
+    "terrainlab:weaponsmith/level_2/buys_spruce_shield",
+    "terrainlab:weaponsmith/level_2/buys_dark_oak_shield",
+    "terrainlab:weaponsmith/level_2/sells_oak_shield",
+    "terrainlab:weaponsmith/level_2/sells_bamboo_shield",
+    "terrainlab:weaponsmith/level_2/sells_birch_shield",
+    "terrainlab:weaponsmith/level_2/sells_acacia_shield",
+    "terrainlab:weaponsmith/level_2/sells_spruce_shield",
+    "terrainlab:weaponsmith/level_2/sells_dark_oak_shield"
+  ]
+}

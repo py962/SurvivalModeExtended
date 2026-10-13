@@ -18,7 +18,7 @@ public final class VillagerTrappedService {
     }
 
     public static void update(Villager villager, ServerLevel level) {
-        long currentDay = level.getDayTime() / VillageConstants.DAY_LENGTH_TICKS;
+        long currentDay = level.getOverworldClockTime() / VillageConstants.DAY_LENGTH_TICKS;
         long lastDay = villager.getData(ModAttachments.VILLAGER_WANDER_LAST_DAY.get());
         BlockPos pos = villager.blockPosition();
 

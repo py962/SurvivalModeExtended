@@ -161,9 +161,7 @@ public class AncientCodexMenu extends AbstractContainerMenu {
         }
         if (player.experienceLevel < XP_COST) {
             // TerrainLab.LOGGER.info("Not enough XP: {} < {}", player.experienceLevel, XP_COST);
-            player.displayClientMessage(
-                    net.minecraft.network.chat.Component.translatable("ancient_codex.not_enough_xp"),
-                    true);
+            player.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("ancient_codex.not_enough_xp"));
             blockEntity.resetGlyphs();
             sendResult(player, false, mask);
             return;

@@ -11,10 +11,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.ConduitRenderer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
@@ -33,14 +35,14 @@ import org.jspecify.annotations.Nullable;
 
 public class CelestialConduitRenderer implements BlockEntityRenderer<CelestialConduitBlockEntity, CelestialConduitRenderState> {
 
-    private final MaterialSet materials;
+    private final SpriteGetter materials;
     private final ModelPart eye;
     private final ModelPart wind;
     private final ModelPart shell;
     private final ModelPart cage;
 
     public CelestialConduitRenderer(BlockEntityRendererProvider.Context context) {
-        this.materials = context.materials();
+        this.materials = context.sprites();
         this.eye = context.bakeLayer(ModelLayers.CONDUIT_EYE);
         this.wind = context.bakeLayer(ModelLayers.CONDUIT_WIND);
         this.shell = context.bakeLayer(ModelLayers.CONDUIT_SHELL);
@@ -76,8 +78,8 @@ public class CelestialConduitRenderer implements BlockEntityRenderer<CelestialCo
         if (!state.isActive) {
             poseStack.pushPose();
             poseStack.translate(0.5F, 0.5F, 0.5F);
-            poseStack.mulPose(new Quaternionf().rotationY(state.activeRotation * (float) (Math.PI / 180.0)));
-            collector.submitModelPart(
+            poseStack.rotate(new Quaternionf().rotationY(state.activeRotation * (float) (Math.PI / 180.0)));
+            submitPart(collector, 
                     this.shell,
                     poseStack,
                     ConduitRenderer.SHELL_TEXTURE.renderType(RenderTypes::entitySolid),
@@ -98,11 +100,11 @@ public class CelestialConduitRenderer implements BlockEntityRenderer<CelestialCo
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.3F + f1 * 0.2F, 0.5F);
         Vector3f axis = new Vector3f(0.5F, 1.0F, 0.5F).normalize();
-        poseStack.mulPose(new Quaternionf().rotationAxis(f * (float) (Math.PI / 180.0), axis));
-        collector.submitModelPart(
+        poseStack.rotate(new Quaternionf().rotationAxis(f * (float) (Math.PI / 180.0), axis));
+        submitPart(collector, 
                 this.cage,
                 poseStack,
-                ConduitRenderer.ACTIVE_SHELL_TEXTURE.renderType(RenderTypes::entityCutoutNoCull),
+                ConduitRenderer.ACTIVE_SHELL_TEXTURE.renderType(RenderTypes::entityCutout),
                 state.lightCoords,
                 OverlayTexture.NO_OVERLAY,
                 this.materials.get(ConduitRenderer.ACTIVE_SHELL_TEXTURE),
@@ -114,37 +116,37 @@ public class CelestialConduitRenderer implements BlockEntityRenderer<CelestialCo
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         if (state.animationPhase == 1) {
-            poseStack.mulPose(new Quaternionf().rotationX((float) (Math.PI / 2)));
+            poseStack.rotate(new Quaternionf().rotationX((float) (Math.PI / 2)));
         } else if (state.animationPhase == 2) {
-            poseStack.mulPose(new Quaternionf().rotationZ((float) (Math.PI / 2)));
+            poseStack.rotate(new Quaternionf().rotationZ((float) (Math.PI / 2)));
         }
 
-        Material windMaterial = state.animationPhase == 1 ? ConduitRenderer.VERTICAL_WIND_TEXTURE : ConduitRenderer.WIND_TEXTURE;
-        var windRenderType = windMaterial.renderType(RenderTypes::entityCutoutNoCull);
+        SpriteId windMaterial = state.animationPhase == 1 ? ConduitRenderer.VERTICAL_WIND_TEXTURE : ConduitRenderer.WIND_TEXTURE;
+        var windRenderType = windMaterial.renderType(RenderTypes::entityCutout);
         var windSprite = this.materials.get(windMaterial);
-        collector.submitModelPart(this.wind, poseStack, windRenderType, state.lightCoords, OverlayTexture.NO_OVERLAY,
+        submitPart(collector, this.wind, poseStack, windRenderType, state.lightCoords, OverlayTexture.NO_OVERLAY,
                 windSprite, tint, state.breakProgress);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
         poseStack.scale(0.875F, 0.875F, 0.875F);
-        poseStack.mulPose(new Quaternionf().rotationXYZ((float) Math.PI, 0.0F, (float) Math.PI));
-        collector.submitModelPart(this.wind, poseStack, windRenderType, state.lightCoords, OverlayTexture.NO_OVERLAY,
+        poseStack.rotate(new Quaternionf().rotationXYZ((float) Math.PI, 0.0F, (float) Math.PI));
+        submitPart(collector, this.wind, poseStack, windRenderType, state.lightCoords, OverlayTexture.NO_OVERLAY,
                 windSprite, tint, state.breakProgress);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.3F + f1 * 0.2F, 0.5F);
         poseStack.scale(0.5F, 0.5F, 0.5F);
-        poseStack.mulPose(cameraState.orientation);
-        poseStack.mulPose(new Quaternionf().rotationZ((float) Math.PI).rotateY((float) Math.PI));
+        poseStack.rotate(cameraState.orientation);
+        poseStack.rotate(new Quaternionf().rotationZ((float) Math.PI).rotateY((float) Math.PI));
         poseStack.scale(1.3333334F, 1.3333334F, 1.3333334F);
-        Material eyeMaterial = state.isFullPower ? ConduitRenderer.OPEN_EYE_TEXTURE : ConduitRenderer.CLOSED_EYE_TEXTURE;
-        collector.submitModelPart(
+        SpriteId eyeMaterial = state.isFullPower ? ConduitRenderer.OPEN_EYE_TEXTURE : ConduitRenderer.CLOSED_EYE_TEXTURE;
+        submitPart(collector, 
                 this.eye,
                 poseStack,
-                eyeMaterial.renderType(RenderTypes::entityCutoutNoCull),
+                eyeMaterial.renderType(RenderTypes::entityCutout),
                 state.lightCoords,
                 OverlayTexture.NO_OVERLAY,
                 this.materials.get(eyeMaterial),
@@ -152,6 +154,16 @@ public class CelestialConduitRenderer implements BlockEntityRenderer<CelestialCo
                 state.breakProgress
         );
         poseStack.popPose();
+    }
+
+    /** 1.21.11's submitModelPart took the crumbling overlay inline; 26.x submits it separately. */
+    private static void submitPart(SubmitNodeCollector collector, ModelPart part, PoseStack poseStack, RenderType renderType,
+                                   int lightCoords, int overlayCoords, TextureAtlasSprite sprite, int tint,
+                                   ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        collector.submitModelPart(part, poseStack, renderType, lightCoords, overlayCoords, sprite, tint);
+        if (breakProgress != null) {
+            collector.order(1).submitCrumblingOverlay(part, poseStack, renderType, lightCoords, overlayCoords, tint, breakProgress);
+        }
     }
 
     @Override

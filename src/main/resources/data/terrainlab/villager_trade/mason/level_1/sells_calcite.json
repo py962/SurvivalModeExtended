@@ -1,0 +1,21 @@
+{
+  "wants": {
+    "id": "minecraft:emerald"
+  },
+  "gives": {
+    "id": "minecraft:calcite",
+    "count": 14
+  },
+  "max_uses": 16,
+  "xp": 1,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:jungle"
+      }
+    }
+  }
+}

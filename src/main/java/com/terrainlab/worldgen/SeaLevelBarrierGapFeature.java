@@ -1,7 +1,9 @@
 package com.terrainlab.worldgen;
 
+import com.mojang.serialization.MapCodec;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
@@ -9,8 +11,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import java.util.Map;
  * Placed at the lakes step in every Overworld biome via the sea_level_barrier_gap
  * biome modifier.
  */
-public class SeaLevelBarrierGapFeature extends Feature<NoneFeatureConfiguration> {
+public final class SeaLevelBarrierGapFeature implements Feature {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String LOG_PREFIX = "[TerrainLab/SeaLevelBarrierGap]";
@@ -64,8 +64,14 @@ public class SeaLevelBarrierGapFeature extends Feature<NoneFeatureConfiguration>
 
     private static final int[][] NEIGHBOR_OFFSETS = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
-    public SeaLevelBarrierGapFeature(Codec<NoneFeatureConfiguration> codec) {
-        super(codec);
+    public static final MapCodec<SeaLevelBarrierGapFeature> CODEC = MapCodec.unit(SeaLevelBarrierGapFeature::new);
+
+    public SeaLevelBarrierGapFeature() {
+    }
+
+    @Override
+    public MapCodec<SeaLevelBarrierGapFeature> codec() {
+        return CODEC;
     }
 
     /** One recorded wall column, after pass A has measured it. */
@@ -73,11 +79,10 @@ public class SeaLevelBarrierGapFeature extends Feature<NoneFeatureConfiguration>
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
-        ChunkPos chunkPos = new ChunkPos(context.origin());
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
+        ChunkPos chunkPos = ChunkPos.containing(origin);
 
-        Map<Integer, int[]> recorded = AquiferBarrierRecorder.takeChunk(level.getLevel().dimension(), chunkPos.x, chunkPos.z);
+        Map<Integer, int[]> recorded = AquiferBarrierRecorder.takeChunk(level.getLevel().dimension(), chunkPos.x(), chunkPos.z());
         if (recorded.isEmpty()) {
             return false;
         }

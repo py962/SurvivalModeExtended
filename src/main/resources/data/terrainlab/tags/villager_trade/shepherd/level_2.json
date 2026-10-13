@@ -1,0 +1,26 @@
+{
+  "values": [
+    "terrainlab:shepherd/level_2/buys_brown_wool",
+    "terrainlab:shepherd/level_2/buys_black_wool",
+    "terrainlab:shepherd/level_2/buys_gray_wool",
+    "terrainlab:shepherd/level_2/sells_brown_wool",
+    "terrainlab:shepherd/level_2/sells_black_wool",
+    "terrainlab:shepherd/level_2/sells_gray_wool",
+    "terrainlab:shepherd/level_2/buys_pink_carpet",
+    "terrainlab:shepherd/level_2/buys_brown_carpet",
+    "terrainlab:shepherd/level_2/buys_blue_carpet",
+    "terrainlab:shepherd/level_2/buys_lime_carpet",
+    "terrainlab:shepherd/level_2/buys_purple_carpet",
+    "terrainlab:shepherd/level_2/buys_magenta_carpet",
+    "terrainlab:shepherd/level_2/buys_red_carpet",
+    "terrainlab:shepherd/level_2/buys_white_carpet",
+    "terrainlab:shepherd/level_2/sells_pink_carpet",
+    "terrainlab:shepherd/level_2/sells_brown_carpet",
+    "terrainlab:shepherd/level_2/sells_blue_carpet",
+    "terrainlab:shepherd/level_2/sells_lime_carpet",
+    "terrainlab:shepherd/level_2/sells_purple_carpet",
+    "terrainlab:shepherd/level_2/sells_magenta_carpet",
+    "terrainlab:shepherd/level_2/sells_red_carpet",
+    "terrainlab:shepherd/level_2/sells_white_carpet"
+  ]
+}

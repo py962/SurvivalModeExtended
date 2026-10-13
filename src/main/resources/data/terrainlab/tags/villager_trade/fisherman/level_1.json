@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:fisherman/level_1/buys_kelp",
+    "terrainlab:fisherman/level_1/sells_kelp",
+    "terrainlab:fisherman/level_1/buys_cod_bucket",
+    "terrainlab:fisherman/level_1/sells_cod_bucket"
+  ]
+}

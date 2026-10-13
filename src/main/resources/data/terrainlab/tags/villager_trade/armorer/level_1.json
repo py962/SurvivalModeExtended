@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:armorer/level_1/buys_copper_ingot",
+    "terrainlab:armorer/level_1/sells_copper_ingot",
+    "terrainlab:armorer/level_1/buys_coal",
+    "terrainlab:armorer/level_1/sells_coal"
+  ]
+}

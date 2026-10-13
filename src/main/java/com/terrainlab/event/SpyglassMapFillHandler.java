@@ -116,8 +116,8 @@ public class SpyglassMapFillHandler {
         Set<ChunkPos> result = new HashSet<>();
         for (int dx = -maxChunkRadius; dx <= maxChunkRadius; dx++) {
             for (int dz = -maxChunkRadius; dz <= maxChunkRadius; dz++) {
-                int cx = center.x + dx;
-                int cz = center.z + dz;
+                int cx = center.x() + dx;
+                int cz = center.z() + dz;
                 if (!player.level().hasChunk(cx, cz)) continue;
 
                 double wx = cx * 16 + 8;

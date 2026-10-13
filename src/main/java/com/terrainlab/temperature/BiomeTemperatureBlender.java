@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.level.levelgen.NoiseRouter;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import net.minecraft.world.level.levelgen.RandomState;
 
 import java.util.Set;
@@ -145,10 +145,8 @@ public final class BiomeTemperatureBlender {
         }
 
         RandomState randomState = serverLevel.getChunkSource().randomState();
-        NoiseRouter router = randomState.router();
-        DensityFunction.SinglePointContext ctx =
-                new DensityFunction.SinglePointContext(pos.getX(), pos.getY(), pos.getZ());
-        double rawTemp = router.temperature().compute(ctx);
+        Climate.Sampler sampler = randomState.createClimateSampler(SamplerContext.EMPTY_UNCACHED);
+        double rawTemp = sampler.temperature().sampleValue(pos.getX(), pos.getY(), pos.getZ());
 
         double celsius = rawTemp * 25.0 + 10.0;
 

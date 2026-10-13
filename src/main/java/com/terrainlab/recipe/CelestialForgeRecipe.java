@@ -71,11 +71,26 @@ public class CelestialForgeRecipe implements Recipe<CelestialForgeRecipeInput> {
     }
 
     @Override
-    public ItemStack assemble(CelestialForgeRecipeInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CelestialForgeRecipeInput input) {
         ItemStack pearl = new ItemStack(ModItems.pearlFor(variant), 2);
         pearl.set(ModDataComponents.CELESTIAL_PAIR_ID.get(), UUID.randomUUID());
         pearl.set(ModDataComponents.CELESTIAL_VARIANT.get(), variant);
         return pearl;
+    }
+
+    /** Convenience overload kept from the pre-26.x signature; the registries are no longer needed. */
+    public ItemStack assemble(CelestialForgeRecipeInput input, HolderLookup.Provider registries) {
+        return assemble(input);
+    }
+
+    @Override
+    public boolean showNotification() {
+        return true;
+    }
+
+    @Override
+    public String group() {
+        return "";
     }
 
     @Override
@@ -102,8 +117,9 @@ public class CelestialForgeRecipe implements Recipe<CelestialForgeRecipeInput> {
         return this.placementInfo;
     }
 
-    public static class Serializer implements RecipeSerializer<CelestialForgeRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+    public static final class Serializer {
+        private Serializer() {
+        }
 
         public static final MapCodec<CelestialForgeRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 CelestialVariant.CODEC.fieldOf("variant").forGetter(CelestialForgeRecipe::variant),
@@ -119,14 +135,6 @@ public class CelestialForgeRecipe implements Recipe<CelestialForgeRecipeInput> {
                 ByteBufCodecs.VAR_INT, CelestialForgeRecipe::thrownCount,
                 CelestialForgeRecipe::new);
 
-        @Override
-        public MapCodec<CelestialForgeRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CelestialForgeRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
+        public static final RecipeSerializer<CelestialForgeRecipe> INSTANCE = new RecipeSerializer<>(CODEC, STREAM_CODEC);
     }
 }

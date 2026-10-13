@@ -134,22 +134,9 @@ public class TerrainLab {
         NeoForge.EVENT_BUS.register(com.terrainlab.event.PlayerMilestoneHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.StructureStatsCommand.class);
 
-        // Custom trade tables replacing every vanilla profession's trade pool.
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.FarmerTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.LeatherworkerTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.ShepherdTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.ButcherTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.FishermanTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.MasonTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.CartographerTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.ClericTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.LibrarianTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.ToolsmithTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.ArmorerTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.FletcherTrades.class);
-        NeoForge.EVENT_BUS.register(com.terrainlab.trade.WeaponsmithTrades.class);
-        // WanderingTraderTrades is a static data holder with no @SubscribeEvent methods,
-        // so it must not be registered here (register() would throw).
+        // Villager and wandering trader trades are data-driven: data/minecraft/trade_set overrides
+        // point at the terrainlab villager_trade tags (see data/terrainlab/villager_trade).
+        com.terrainlab.registry.ModLootConditions.register(modEventBus);
 
         // Client-only registrations; guarded so client classes never load on a dedicated server.
         if (FMLEnvironment.getDist().isClient()) {
@@ -258,7 +245,7 @@ public class TerrainLab {
         // vanilla's grass rule. Extending a vanilla entity's rule may not set a placement type or
         // heightmap (only REPLACE can), so this overload keeps vanilla's.
         event.register(
-                net.minecraft.world.entity.EntityType.PIG,
+                net.minecraft.world.entity.EntityTypes.PIG,
                 (type, level, reason, pos, random) ->
                         level.getBlockState(pos.below()).is(net.minecraft.world.level.block.Blocks.PODZOL)
                                 && (net.minecraft.world.entity.EntitySpawnReason.ignoresLightRequirements(reason)

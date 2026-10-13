@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:shepherd/level_1/buys_white_wool",
+    "terrainlab:shepherd/level_1/sells_white_wool",
+    "terrainlab:shepherd/level_1/buys_shears",
+    "terrainlab:shepherd/level_1/sells_shears"
+  ]
+}

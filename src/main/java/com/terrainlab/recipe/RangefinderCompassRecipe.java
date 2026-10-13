@@ -6,7 +6,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.LodestoneTracker;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -27,8 +26,12 @@ import net.minecraft.world.level.Level;
  */
 public class RangefinderCompassRecipe extends CustomRecipe {
 
-    public RangefinderCompassRecipe(CraftingBookCategory category) {
-        super(category);
+    public static final RangefinderCompassRecipe INSTANCE = new RangefinderCompassRecipe();
+    public static final com.mojang.serialization.MapCodec<RangefinderCompassRecipe> MAP_CODEC = com.mojang.serialization.MapCodec.unit(INSTANCE);
+    public static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, RangefinderCompassRecipe> STREAM_CODEC =
+            net.minecraft.network.codec.StreamCodec.unit(INSTANCE);
+
+    public RangefinderCompassRecipe() {
     }
 
     @Override
@@ -62,7 +65,7 @@ public class RangefinderCompassRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput input) {
         ItemStack compassStack = input.getItem(1, 1);
 
         ItemStack result = new ItemStack(ModItems.RANGEFINDER_COMPASS.get());

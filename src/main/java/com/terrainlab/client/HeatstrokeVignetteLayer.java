@@ -4,7 +4,7 @@ import com.terrainlab.TerrainLab;
 import com.terrainlab.registry.ModMobEffects;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.neoforged.neoforge.client.gui.GuiLayer;
 import net.minecraft.util.Mth;
@@ -36,7 +36,7 @@ public class HeatstrokeVignetteLayer implements GuiLayer {
     private static final float RADIUS_THROB_AMOUNT = 0.05F; // OUTER_RADIUS swell per beat
 
     @Override
-    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null) return;

@@ -29,7 +29,7 @@ public final class PlayerRestingSystem {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         if (player.level().isClientSide()) return;
 
-        long dayTime = player.level().getDayTime();
+        long dayTime = player.level().getOverworldClockTime();
         player.setData(ModAttachments.PLAYER_SLEEP_START_DAYTIME.get(), dayTime);
 
         // TerrainLab.LOGGER.info("[REST] sleep started: dayTime snapshot={}", dayTime);
@@ -48,7 +48,7 @@ public final class PlayerRestingSystem {
             return;
         }
 
-        long currentDayTime = player.level().getDayTime();
+        long currentDayTime = player.level().getOverworldClockTime();
         long elapsed = currentDayTime - startDayTime;
 
         if (elapsed <= 0) {

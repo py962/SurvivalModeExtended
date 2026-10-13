@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 5
+  },
+  "gives": {
+    "id": "minecraft:dark_oak_sapling"
+  },
+  "max_uses": 1,
+  "xp": 0,
+  "reputation_discount": 0.05
+}

@@ -95,7 +95,7 @@ public final class GuideStructureAvoidance {
                 continue;
             }
             for (long startChunk : entry.getValue()) {
-                BoundingBox hit = nearPiece(level, entry.getKey(), new ChunkPos(startChunk), zone, canReadStarts);
+                BoundingBox hit = nearPiece(level, entry.getKey(), ChunkPos.unpack(startChunk), zone, canReadStarts);
                 if (hit != null) {
                     return hit;
                 }
@@ -116,8 +116,8 @@ public final class GuideStructureAvoidance {
 
     private static @Nullable BoundingBox nearPiece(LevelAccessor level, Structure structure, ChunkPos startChunk,
                                                    BoundingBox zone, boolean canReadStarts) {
-        StructureStart start = canReadStarts && level.hasChunk(startChunk.x, startChunk.z)
-                ? level.getChunk(startChunk.x, startChunk.z).getStartForStructure(structure)
+        StructureStart start = canReadStarts && level.hasChunk(startChunk.x(), startChunk.z())
+                ? level.getChunk(startChunk.x(), startChunk.z()).getStartForStructure(structure)
                 : null;
         if (start == null || !start.isValid()) {
             // Start chunk unreadable: the structure overlaps a nearby chunk, so treat it as near.

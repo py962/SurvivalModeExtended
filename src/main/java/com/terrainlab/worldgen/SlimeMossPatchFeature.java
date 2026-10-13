@@ -1,23 +1,28 @@
 package com.terrainlab.worldgen;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /** Small disk of slime blocks capped with moss blocks, replacing stone, clay, dirt or mud. */
-public class SlimeMossPatchFeature extends Feature<NoneFeatureConfiguration> {
+public final class SlimeMossPatchFeature implements Feature {
 
     // Disk of radius 1-2 one block below the origin: target blocks become slime, with moss on top where open.
     private static final int MIN_RADIUS = 1;
     private static final int MAX_RADIUS = 2;
 
-    public SlimeMossPatchFeature(Codec<NoneFeatureConfiguration> codec) {
-        super(codec);
+    public static final MapCodec<SlimeMossPatchFeature> CODEC = MapCodec.unit(SlimeMossPatchFeature::new);
+
+    public SlimeMossPatchFeature() {
+    }
+
+    @Override
+    public MapCodec<SlimeMossPatchFeature> codec() {
+        return CODEC;
     }
 
     private static boolean isTargetBlock(net.minecraft.world.level.block.state.BlockState state) {
@@ -28,10 +33,7 @@ public class SlimeMossPatchFeature extends Feature<NoneFeatureConfiguration> {
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
-        BlockPos origin = context.origin();
-        RandomSource random = context.random();
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
 
         int radius = MIN_RADIUS + random.nextInt(MAX_RADIUS - MIN_RADIUS + 1);
         boolean placedAny = false;

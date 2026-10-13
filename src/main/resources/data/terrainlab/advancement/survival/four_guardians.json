@@ -4,57 +4,49 @@
     "iron_golem": {
       "trigger": "minecraft:summoned_entity",
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "minecraft:iron_golem"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "minecraft:iron_golem"
           }
-        ]
+        }
       }
     },
     "snow_golem": {
       "trigger": "minecraft:summoned_entity",
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "minecraft:snow_golem"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "minecraft:snow_golem"
           }
-        ]
+        }
       }
     },
     "copper_golem": {
       "trigger": "minecraft:summoned_entity",
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "minecraft:copper_golem"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "minecraft:copper_golem"
           }
-        ]
+        }
       }
     },
     "granite_golem": {
       "trigger": "minecraft:summoned_entity",
       "conditions": {
-        "entity": [
-          {
-            "condition": "minecraft:entity_properties",
-            "entity": "this",
-            "predicate": {
-              "type": "terrainlab:granite_golem"
-            }
+        "entity": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "terrainlab:granite_golem"
           }
-        ]
+        }
       }
     }
   },

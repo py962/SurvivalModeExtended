@@ -1,7 +1,8 @@
 package com.terrainlab.mixin;
 
+import com.mojang.serialization.DataResult;
 import com.terrainlab.util.BundleOverstackingState;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.BundleContents;
 import org.apache.commons.lang3.math.Fraction;
@@ -24,67 +25,61 @@ import java.util.List;
 public class BundleContentsWeightMixin {
 
     @Shadow
-    private List<ItemStack> items;
-
-    @Shadow
     private Fraction weight;
 
+    // 26.x: BundleContents#asMutable() goes through this private constructor with the vanilla weight.
     @Inject(
-            method = "<init>",
+            method = "<init>(Ljava/util/List;Lorg/apache/commons/lang3/math/Fraction;I)V",
             at = @At("RETURN")
     )
     private void terrainlab$recalculateOverstackingWeight(
-            BundleContents contents,
+            List<ItemStack> items,
+            Fraction initialWeight,
+            int selectedItem,
             CallbackInfo ci
     ) {
         if (!BundleOverstackingState.isActive()) {
             return;
         }
 
-        Fraction overstackingWeight = Fraction.ZERO;
-
-        for (ItemStack stack : this.items) {
-            overstackingWeight = overstackingWeight.add(
-                    terrainlab$overstackWeight(stack).multiplyBy(Fraction.getFraction(stack.getCount(), 1))
-            );
-        }
-
-        this.weight = overstackingWeight;
+        this.weight = BundleOverstackingState.overstackContentsWeight(items);
     }
 
     @Redirect(
             method = {
-                    "getMaxAmountToAdd",
                     "tryInsert",
-                    "removeOne"
+                    "tryTransfer"
             },
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/component/BundleContents;getWeight(Lnet/minecraft/world/item/ItemStack;)Lorg/apache/commons/lang3/math/Fraction;"
+                    target = "Lnet/minecraft/world/item/component/BundleContents;getWeight(Lnet/minecraft/world/item/ItemInstance;)Lcom/mojang/serialization/DataResult;"
             )
     )
-    private Fraction terrainlab$overstackingItemWeight(ItemStack stack) {
+    private DataResult<Fraction> terrainlab$overstackingItemWeight(ItemInstance stack) {
+        return terrainlab$itemWeight(stack);
+    }
+
+    // Static callers: removeOne/setItem go through getStackedWeight(ItemStack); slot edits through getWeightWithAddedItems.
+    @Redirect(
+            method = {
+                    "getStackedWeight(Lnet/minecraft/world/item/ItemStack;)Lorg/apache/commons/lang3/math/Fraction;",
+                    "getWeightWithAddedItems"
+            },
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/item/component/BundleContents;getWeight(Lnet/minecraft/world/item/ItemInstance;)Lcom/mojang/serialization/DataResult;"
+            )
+    )
+    private static DataResult<Fraction> terrainlab$overstackingItemWeightStatic(ItemInstance stack) {
+        return terrainlab$itemWeight(stack);
+    }
+
+    @Unique
+    private static DataResult<Fraction> terrainlab$itemWeight(ItemInstance stack) {
         if (BundleOverstackingState.isActive()) {
-            return terrainlab$overstackWeight(stack);
+            return DataResult.success(BundleOverstackingState.overstackWeight(stack));
         }
 
         return BundleContentsAccessorMixin.terrainlab$getWeight(stack);
-    }
-
-    /**
-     * Weight of one item in an Overstacking bundle: 1/64 regardless of its stack size. A nested
-     * bundle weighs 1/16 plus its contents, as in vanilla, so nesting cannot give unlimited
-     * storage; an inner Overstacking bundle is weighed by its overstacked contents.
-     */
-    @Unique
-    private static Fraction terrainlab$overstackWeight(ItemStack stack) {
-        BundleContents inner = stack.get(DataComponents.BUNDLE_CONTENTS);
-        if (inner == null) {
-            return Fraction.getFraction(1, 64);
-        }
-        Fraction innerWeight = BundleOverstackingState.hasOverstacking(stack)
-                ? new BundleContents.Mutable(inner).weight()
-                : inner.weight();
-        return Fraction.getFraction(1, 16).add(innerWeight);
     }
 }

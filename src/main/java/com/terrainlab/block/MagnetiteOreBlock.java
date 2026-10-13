@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.InteractionHand;
@@ -30,16 +29,11 @@ import org.joml.Vector3f;
  * XP matches redstone ore.
  */
 public class MagnetiteOreBlock extends Block {
-    public static final MapCodec<MagnetiteOreBlock> CODEC = simpleCodec(MagnetiteOreBlock::new);
     public static final BooleanProperty LIT = RedstoneTorchBlock.LIT;
 
     // 0xFF8000 orange.
     private static final DustParticleOptions MAGNETITE_DUST_PARTICLE =
             new DustParticleOptions(16744448, 1.0F);
-    @Override
-    public MapCodec<MagnetiteOreBlock> codec() {
-        return CODEC;
-    }
 
     public MagnetiteOreBlock(Properties properties) {
         super(properties);
@@ -117,7 +111,7 @@ public class MagnetiteOreBlock extends Block {
 
     private static void spawnParticles(Level level, BlockPos pos) {
         double d0 = 0.5625;
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
 
         for (Direction direction : Direction.values()) {
             BlockPos neighbor = pos.relative(direction);

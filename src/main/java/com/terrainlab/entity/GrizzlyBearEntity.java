@@ -49,7 +49,7 @@ public class GrizzlyBearEntity extends PolarBear {
     }
 
     void onFedSalmon() {
-        ChunkPos chunk = new ChunkPos(this.blockPosition());
+        ChunkPos chunk = ChunkPos.containing(this.blockPosition());
         this.setHomeTo(chunk.getMiddleBlockPosition(this.getBlockY()), ANCHOR_RADIUS);
         this.setPersistenceRequired();
     }
@@ -59,7 +59,7 @@ public class GrizzlyBearEntity extends PolarBear {
     }
 
     ChunkPos getAnchorChunk() {
-        return this.hasHome() ? new ChunkPos(this.getHomePosition()) : null;
+        return this.hasHome() ? ChunkPos.containing(this.getHomePosition()) : null;
     }
 
     /** Walks to a nearby dropped salmon and eats it, anchoring the bear. */

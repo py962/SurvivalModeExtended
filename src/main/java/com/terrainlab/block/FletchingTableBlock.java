@@ -1,6 +1,5 @@
 package com.terrainlab.block;
 
-import com.mojang.serialization.MapCodec;
 import com.terrainlab.blockentity.FletchingTableBlockEntity;
 import com.terrainlab.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
@@ -22,16 +21,11 @@ import javax.annotation.Nullable;
 /** Fletching table block backed by {@link FletchingTableBlockEntity}. */
 public class FletchingTableBlock extends BaseEntityBlock {
 
-    public static final MapCodec<FletchingTableBlock> CODEC = simpleCodec(FletchingTableBlock::new);
 
     public FletchingTableBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
 
-    @Override
-    public MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

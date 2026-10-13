@@ -36,8 +36,8 @@ public final class CelestialPairing {
         }
 
         if (amuletItem.variant() != conduitVariant) {
-            player.displayClientMessage(Component.translatable(
-                    "message.terrainlab.celestial.pair.wrong_variant", variantName(amuletItem.variant())), true);
+            player.sendOverlayMessage(Component.translatable(
+                    "message.terrainlab.celestial.pair.wrong_variant", variantName(amuletItem.variant())));
             return;
         }
 
@@ -50,14 +50,14 @@ public final class CelestialPairing {
         }
 
         if (conduitPairId.equals(amulet.get(ModDataComponents.CELESTIAL_PAIR_ID.get()))) {
-            player.displayClientMessage(Component.translatable("message.terrainlab.celestial.pair.already"), true);
+            player.sendOverlayMessage(Component.translatable("message.terrainlab.celestial.pair.already"));
             return;
         }
 
         // Only the amulet changes; the conduit keeps its id, so its other amulets stay paired.
         amulet.set(ModDataComponents.CELESTIAL_PAIR_ID.get(), conduitPairId);
-        player.displayClientMessage(Component.translatable(
-                "message.terrainlab.celestial.pair.paired", variantName(conduitVariant)), true);
+        player.sendOverlayMessage(Component.translatable(
+                "message.terrainlab.celestial.pair.paired", variantName(conduitVariant)));
     }
 
     /**

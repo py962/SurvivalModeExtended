@@ -182,9 +182,7 @@ public class BuriedHideoutStructure extends Structure {
         int cz = context.chunkPos().getMiddleBlockZ();
 
         // 1. Biome, before any terrain noise is sampled.
-        if (!context.validBiome().test(context.chunkGenerator().getBiomeSource().getNoiseBiome(
-                QuartPos.fromBlock(cx), QuartPos.fromBlock(BIOME_CHECK_Y), QuartPos.fromBlock(cz),
-                context.randomState().sampler()))) {
+        if (!context.validBiome().test(context.biomeResolver().getNoiseBiome(QuartPos.fromBlock(cx), QuartPos.fromBlock(BIOME_CHECK_Y), QuartPos.fromBlock(cz)))) {
             count(NOT_BIOME);
             return Optional.empty();
         }
@@ -200,8 +198,7 @@ public class BuriedHideoutStructure extends Structure {
         // 2. Top down: find the highest badlands ground within SEARCH_RADIUS, on a coarse grid and then a
         // finer look round the best reading. Only points whose own biome is badlands count.
         java.util.function.BiPredicate<Integer, Integer> badlands = (x, z) -> context.validBiome().test(
-                context.chunkGenerator().getBiomeSource().getNoiseBiome(QuartPos.fromBlock(x),
-                        QuartPos.fromBlock(BIOME_CHECK_Y), QuartPos.fromBlock(z), context.randomState().sampler()));
+                context.biomeResolver().getNoiseBiome(QuartPos.fromBlock(x), QuartPos.fromBlock(BIOME_CHECK_Y), QuartPos.fromBlock(z)));
         int[] best = {cx, cz, Integer.MIN_VALUE};
         scanForHighPoint(terrain, badlands, cx, cz, SEARCH_RADIUS, SEARCH_STEP, best);
         scanForHighPoint(terrain, badlands, best[0], best[1], REFINE_RADIUS, REFINE_STEP, best);
@@ -625,7 +622,7 @@ public class BuriedHideoutStructure extends Structure {
 
         /** Whether (x, z) lies within the given number of chunks of the structure's start chunk. */
         boolean withinReach(int x, int z, int chunks) {
-            return Math.abs((x >> 4) - startChunk.x) <= chunks && Math.abs((z >> 4) - startChunk.z) <= chunks;
+            return Math.abs((x >> 4) - startChunk.x()) <= chunks && Math.abs((z >> 4) - startChunk.z()) <= chunks;
         }
 
         /** First air above the highest motion-blocking block, as OCEAN_FLOOR_WG. */

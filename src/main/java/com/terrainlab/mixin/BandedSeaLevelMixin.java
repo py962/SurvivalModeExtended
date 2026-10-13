@@ -57,7 +57,8 @@ public abstract class BandedSeaLevelMixin implements NoiseBasedChunkGeneratorRan
             ChunkAccess chunkAccess,
             StructureManager structureManager,
             Blender blender,
-            RandomState randomState
+            RandomState randomState,
+            net.minecraft.world.level.levelgen.NoiseSettings noiseSettings
     ) {
         if (!this.terrainlab$isOverworldSettings()) {
             return supplier.get();

@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:cleric/level_2/buys_spider_eye",
+    "terrainlab:cleric/level_2/sells_spider_eye",
+    "terrainlab:cleric/level_2/buys_redstone",
+    "terrainlab:cleric/level_2/sells_redstone"
+  ]
+}

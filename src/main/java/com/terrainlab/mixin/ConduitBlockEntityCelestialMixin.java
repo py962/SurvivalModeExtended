@@ -41,7 +41,7 @@ public abstract class ConduitBlockEntityCelestialMixin extends BlockEntity {
         int frameCount = ((ConduitBlockEntityCelestialMixin) (Object) be).effectBlocks.size();
         BreathConduitHooks.onServerCheck(serverLevel, pos, be.isActive(), frameCount, be.components());
         if (be.isActive()) {
-            com.terrainlab.advancement.ModAdvancements.awardNearby(serverLevel, pos.getCenter(), 16.0, "conduit_breath");
+            com.terrainlab.advancement.ModAdvancements.awardNearby(serverLevel, net.minecraft.world.phys.Vec3.atCenterOf(pos), 16.0, "conduit_breath");
         }
     }
 

@@ -21,10 +21,10 @@ public abstract class BorrowingSleepScreenCloseMixin {
     private void terrainlab$closeSleepScreenOnCameraDiverge(ClientboundSetCameraPacket packet, CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
 
-        if (mc.screen instanceof InBedChatScreen
+        if (mc.gui.screen() instanceof InBedChatScreen
                 && mc.player != null
                 && mc.getCameraEntity() != mc.player) {
-            mc.setScreen(null);
+            mc.gui.setScreen(null);
         }
     }
 }

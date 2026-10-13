@@ -55,7 +55,7 @@ public final class OminousBannerConversionHandler {
 
     /** The mod banner replacing a vanilla ominous banner, or null if the stack is something else. */
     private static ItemStack convert(Level level, ItemStack stack) {
-        if (!stack.is(Items.WHITE_BANNER)) {
+        if (!stack.is(Items.BANNER.white())) {
             return null;
         }
         BannerPatternLayers patterns = stack.get(DataComponents.BANNER_PATTERNS);

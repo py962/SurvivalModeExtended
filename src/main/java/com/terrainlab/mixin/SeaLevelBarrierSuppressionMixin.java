@@ -9,8 +9,10 @@ import net.minecraft.server.level.ColumnPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Aquifer;
-import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.level.levelgen.NoiseRouter;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.densityfunction.DensitySampler;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -73,7 +75,9 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             require = 1
     )
     private void terrainlab$onComputeSubstanceHead(
-            DensityFunction.FunctionContext context,
+            int blockX,
+            int blockY,
+            int blockZ,
             double density,
             CallbackInfoReturnable<BlockState> cir
     ) {
@@ -81,8 +85,8 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             return;
         }
 
-        int x = context.blockX();
-        int z = context.blockZ();
+        int x = blockX;
+        int z = blockZ;
 
         if (!isInGap(x, z)) {
             return;
@@ -98,8 +102,13 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             return; // not cached yet during the first chunks of a world load
         }
 
-        DensityFunction continentalness = randomState.router().continents();
-        DensityFunction erosion = randomState.router().erosion();
+        NoiseRouter router = SeaLevelRandomStateHolder.getNoiseRouter();
+        if (router == null) {
+            return; // not cached yet during the first chunks of a world load
+        }
+
+        DensitySampler continentalness = randomState.getSampler(router.continents());
+        DensitySampler erosion = randomState.getSampler(router.erosion());
 
         int here = terrainlab$cachedBandedLevel(continentalness, erosion, x, z);
         int east = terrainlab$cachedBandedLevel(continentalness, erosion, x + 1, z);
@@ -116,7 +125,7 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             return;
         }
 
-        int y = context.blockY();
+        int y = blockY;
 
         if (y < lower || y > upper) {
             return; // outside the transition band
@@ -131,17 +140,16 @@ public abstract class SeaLevelBarrierSuppressionMixin {
 
     /** Same computation as InlandRiverFloodFeature.bandedLevelAt, so both agree on transition positions. */
     @Unique
-    private static int bandedLevelAt(DensityFunction continentalness, DensityFunction erosion, int x, int z) {
-        DensityFunction.SinglePointContext context = new DensityFunction.SinglePointContext(x, 0, z);
-        double continentalnessSample = continentalness.compute(context);
-        double erosionSample = erosion.compute(context);
+    private static int bandedLevelAt(DensitySampler continentalness, DensitySampler erosion, int x, int z) {
+        double continentalnessSample = continentalness.sampleValue(SamplerContext.EMPTY_UNCACHED, x, 0, z);
+        double erosionSample = erosion.sampleValue(SamplerContext.EMPTY_UNCACHED, x, 0, z);
         double combinedScore = continentalnessSample - erosionSample;
         return SeaLevelBandingService.bandedLevel(continentalnessSample, combinedScore);
     }
 
     /** Cached {@link #bandedLevelAt}. */
     @Unique
-    private int terrainlab$cachedBandedLevel(DensityFunction continentalness, DensityFunction erosion, int x, int z) {
+    private int terrainlab$cachedBandedLevel(DensitySampler continentalness, DensitySampler erosion, int x, int z) {
         long key = ColumnPos.asLong(x, z);
         if (terrainlab$levelCache.containsKey(key)) {
             return terrainlab$levelCache.get(key);
@@ -163,7 +171,9 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             require = 1
     )
     private void terrainlab$enforceBandingDecision(
-            DensityFunction.FunctionContext context,
+            int blockX,
+            int blockY,
+            int blockZ,
             double density,
             CallbackInfoReturnable<BlockState> cir
     ) {
@@ -181,12 +191,17 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             return; // not cached yet during the first chunks of a world load
         }
 
-        DensityFunction continentalness = randomState.router().continents();
-        DensityFunction erosion = randomState.router().erosion();
+        NoiseRouter router = SeaLevelRandomStateHolder.getNoiseRouter();
+        if (router == null) {
+            return; // not cached yet during the first chunks of a world load
+        }
 
-        int x = context.blockX();
-        int y = context.blockY();
-        int z = context.blockZ();
+        DensitySampler continentalness = randomState.getSampler(router.continents());
+        DensitySampler erosion = randomState.getSampler(router.erosion());
+
+        int x = blockX;
+        int y = blockY;
+        int z = blockZ;
 
         int here = terrainlab$cachedBandedLevel(continentalness, erosion, x, z);
         int east = terrainlab$cachedBandedLevel(continentalness, erosion, x + 1, z);
@@ -233,7 +248,9 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             require = 1
     )
     private void terrainlab$observeVanillaBarrier(
-            DensityFunction.FunctionContext context,
+            int blockX,
+            int blockY,
+            int blockZ,
             double density,
             CallbackInfoReturnable<BlockState> cir
     ) {
@@ -245,13 +262,13 @@ public abstract class SeaLevelBarrierSuppressionMixin {
             return; // non-null under density <= 0 is fluid or air, never a barrier
         }
 
-        int y = context.blockY();
+        int y = blockY;
         if (y < SeaLevelBandingService.BARRIER_MIN_Y || y > SeaLevelBandingService.BARRIER_MAX_Y) {
             return; // ordinary deep aquifer barrier, not a sea-level junction
         }
 
-        int x = context.blockX();
-        int z = context.blockZ();
+        int x = blockX;
+        int z = blockZ;
 
         AquiferBarrierRecorder.recordBarrier(x, y, z);
 

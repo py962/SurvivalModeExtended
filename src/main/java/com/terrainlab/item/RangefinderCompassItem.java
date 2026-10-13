@@ -50,7 +50,7 @@ public class RangefinderCompassItem extends CompassItem {
             stack.consume(1, player);
             linked.set(DataComponents.LODESTONE_TRACKER, tracker);
             if (!player.getInventory().add(linked)) {
-                player.drop(linked, false);
+                player.drop(linked, false, net.minecraft.util.Prediction.PREDICTED);
             }
         }
         return InteractionResult.SUCCESS;

@@ -52,7 +52,11 @@ public abstract class BorrowingSleepMixin implements BorrowingAccess {
 
     @ModifyReturnValue(method = "startSleepInBed", at = @At("RETURN"))
     private Either<Player.BedSleepingProblem, Unit> terrainlab$startBorrowing(
-            Either<Player.BedSleepingProblem, Unit> original, BlockPos pos) {
+            Either<Player.BedSleepingProblem, Unit> original,
+            net.minecraft.world.level.block.AbstractBedBlock bedBlock,
+            net.minecraft.world.level.block.state.BlockState bedBlockState,
+            net.minecraft.world.attribute.BedRule rule,
+            BlockPos pos) {
 
         ServerPlayer self = (ServerPlayer) (Object) this;
 

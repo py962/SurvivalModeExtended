@@ -35,7 +35,7 @@ public class NonHungerFoodComponentsHandler {
     }
 
     private static void setAlwaysEdible(ModifyDefaultComponentsEvent event, Item item, int nutrition, float saturationModifier) {
-        event.modify(item, builder -> builder.set(
+        event.modify(item, (builder, context, it) -> builder.set(
                 DataComponents.FOOD,
                 new FoodProperties.Builder()
                         .nutrition(nutrition)

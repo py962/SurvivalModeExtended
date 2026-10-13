@@ -1,0 +1,10 @@
+{
+  "values": [
+    "terrainlab:wandering_trader/buying/buys_hay_block",
+    "terrainlab:wandering_trader/buying/buys_potion_water",
+    "terrainlab:wandering_trader/buying/buys_baked_potato",
+    "terrainlab:wandering_trader/buying/buys_milk_bucket",
+    "terrainlab:wandering_trader/buying/buys_water_bucket",
+    "terrainlab:wandering_trader/buying/buys_fermented_spider_eye"
+  ]
+}

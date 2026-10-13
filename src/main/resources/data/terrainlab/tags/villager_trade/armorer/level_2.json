@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:armorer/level_2/buys_gold_ingot",
+    "terrainlab:armorer/level_2/sells_gold_ingot",
+    "terrainlab:armorer/level_2/buys_armadillo_scute",
+    "terrainlab:armorer/level_2/sells_armadillo_scute"
+  ]
+}

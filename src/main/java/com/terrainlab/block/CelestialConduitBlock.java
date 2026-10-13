@@ -1,7 +1,6 @@
 
 package com.terrainlab.block;
 
-import com.mojang.serialization.MapCodec;
 import com.terrainlab.blockentity.CelestialConduitBlockEntity;
 import com.terrainlab.celestial.CelestialPairing;
 import com.terrainlab.celestial.CelestialVariant;
@@ -32,9 +31,6 @@ import java.util.UUID;
 
 public class CelestialConduitBlock extends BaseEntityBlock {
 
-    public static final MapCodec<CelestialConduitBlock> CODEC =
-            simpleCodec(properties ->
-                    new CelestialConduitBlock(CelestialVariant.LIFE, properties));
 
     /**
      * Drives the block's light level: dim while inactive, bright when active.
@@ -64,10 +60,6 @@ public class CelestialConduitBlock extends BaseEntityBlock {
         builder.add(ACTIVE);
     }
 
-    @Override
-    public MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

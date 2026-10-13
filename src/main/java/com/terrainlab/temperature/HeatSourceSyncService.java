@@ -18,17 +18,17 @@ public final class HeatSourceSyncService {
     }
 
     public static void broadcastUpdate(ServerLevel level, HeatSourceData data) {
-        PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(data.sourcePos()), toSyncPacket(data));
+        PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(data.sourcePos()), toSyncPacket(data));
     }
 
     public static void broadcastRemoval(ServerLevel level, BlockPos sourcePos) {
-        PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(sourcePos),
+        PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(sourcePos),
                 new com.terrainlab.network.HeatSourceRemovePacket(sourcePos));
     }
 
     /** Sends one chunk's indexed sources to a player who has just been sent that chunk. */
     public static void sendChunkTo(ServerPlayer player, HeatSourceIndex index, ChunkPos chunkPos) {
-        for (HeatSourceData data : index.inChunk(chunkPos.x, chunkPos.z)) {
+        for (HeatSourceData data : index.inChunk(chunkPos.x(), chunkPos.z())) {
             PacketDistributor.sendToPlayer(player, toSyncPacket(data));
         }
     }

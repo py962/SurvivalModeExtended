@@ -64,7 +64,7 @@ public final class AquiferBarrierRecorder {
             return;
         }
 
-        long chunkKey = ChunkPos.asLong(x >> 4, z >> 4);
+        long chunkKey = ChunkPos.pack(x >> 4, z >> 4);
         int columnKey = ((x & 15) << 4) | (z & 15);
 
         Map<Long, Map<Integer, int[]>> chunks = BARRIER_COLUMNS.computeIfAbsent(dimension, key -> new ConcurrentHashMap<>());
@@ -89,7 +89,7 @@ public final class AquiferBarrierRecorder {
         if (chunks == null) {
             return Map.of();
         }
-        Map<Integer, int[]> columns = chunks.remove(ChunkPos.asLong(chunkX, chunkZ));
+        Map<Integer, int[]> columns = chunks.remove(ChunkPos.pack(chunkX, chunkZ));
         return columns == null ? Map.of() : columns;
     }
 
@@ -101,7 +101,7 @@ public final class AquiferBarrierRecorder {
         }
         Map<Long, Map<Integer, int[]>> chunks = BARRIER_COLUMNS.get(level.dimension());
         if (chunks != null) {
-            chunks.remove(event.getChunk().getPos().toLong());
+            chunks.remove(event.getChunk().getPos().pack());
         }
     }
 

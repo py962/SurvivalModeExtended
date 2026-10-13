@@ -1,7 +1,7 @@
 package com.terrainlab.screen;
 
 import com.terrainlab.menu.FletchingTableMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -15,9 +15,7 @@ public class FletchingTableScreen extends AbstractContainerScreen<FletchingTable
             Identifier.fromNamespaceAndPath("terrainlab", "textures/gui/fletching_table.png");
 
     public FletchingTableScreen(FletchingTableMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 166;
+        super(menu, playerInventory, title, 176, 166);
     }
 
     @Override
@@ -28,20 +26,15 @@ public class FletchingTableScreen extends AbstractContainerScreen<FletchingTable
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
                 leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
-        renderTooltip(graphics, mouseX, mouseY);
-    }
-
-    @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.drawString(font, title, titleLabelX, titleLabelY, 0xFF404040, false);
-        graphics.drawString(font, "INVENTORY", 8, imageHeight - 94, 0xFF404040, false);
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        graphics.text(font, title, titleLabelX, titleLabelY, 0xFF404040, false);
+        graphics.text(font, "INVENTORY", 8, imageHeight - 94, 0xFF404040, false);
     }
 }

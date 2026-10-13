@@ -76,8 +76,7 @@ public class ModStructureHandler {
 
         Structure desertPyramid = desertPyramidOpt.get().value();
 
-        List<StructureStart> starts = structureManager.startsForStructure(
-                chunkPos,
+        List<StructureStart> starts = structureManager.startsForStructure(chunkPos.x(), chunkPos.z(),
                 structure -> structure == desertPyramid
         );
 

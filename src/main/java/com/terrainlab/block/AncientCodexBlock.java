@@ -24,7 +24,7 @@ public class AncientCodexBlock extends Block implements EntityBlock {
 
     @Override
     public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
+        return PushReaction.IMMOVEABLE;
     }
 
     @Nullable

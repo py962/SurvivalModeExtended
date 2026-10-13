@@ -71,8 +71,7 @@ public class ModOceanMonumentRoomHandler {
         }
         Structure monument = monumentOpt.get().value();
 
-        List<StructureStart> starts = structureManager.startsForStructure(
-                chunkPos, s -> s == monument);
+        List<StructureStart> starts = structureManager.startsForStructure(chunkPos.x(), chunkPos.z(), s -> s == monument);
         if (starts.isEmpty()) return;
 
         // TerrainLab.LOGGER.info("[HIDDEN_MONUMENT_ROOM] monument start found at chunk {} - {} start(s)", chunkPos, starts.size());
@@ -109,7 +108,7 @@ public class ModOceanMonumentRoomHandler {
                             || z == 0 || z == DEPTH - 1;
                     if (isShell) {
                         level.setBlock(origin.offset(x, y, z),
-                                Blocks.WEATHERED_COPPER.defaultBlockState(), 3);
+                                Blocks.COPPER_BLOCK.weathering().weathered().defaultBlockState(), 3);
                     }
                 }
             }

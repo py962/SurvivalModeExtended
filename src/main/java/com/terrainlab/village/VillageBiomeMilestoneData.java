@@ -20,7 +20,7 @@ public class VillageBiomeMilestoneData extends SavedData {
     private final Set<String> awardedVillagerTypes = new HashSet<>();
 
     public static final SavedDataType<VillageBiomeMilestoneData> TYPE = new SavedDataType<>(
-            "terrainlab_village_biome_milestones",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "village_biome_milestones"),
             VillageBiomeMilestoneData::new,
             level -> RecordCodecBuilder.create(instance -> instance.group(
                     RecordCodecBuilder.point(level),

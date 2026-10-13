@@ -28,6 +28,7 @@ import net.neoforged.neoforge.event.level.ChunkWatchEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 
 /**
  * Maintains the level-scoped HEAT_SOURCE_INDEX attachment: lit campfires, magma
@@ -56,7 +57,7 @@ public final class HeatSourceIndexHandler {
 
     /** Drops a broken heat source and invalidates enclosures around the broken block. */
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+    public static void onBlockBreak(BreakBlockEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) {
             return;
         }
@@ -195,8 +196,8 @@ public final class HeatSourceIndexHandler {
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
         LevelAccessor level = event.getLevel();
-        int chunkX = event.getChunk().getPos().x;
-        int chunkZ = event.getChunk().getPos().z;
+        int chunkX = event.getChunk().getPos().x();
+        int chunkZ = event.getChunk().getPos().z();
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.getData(ModAttachments.HEAT_SOURCE_INDEX.get()).removeChunk(chunkX, chunkZ);
         } else if (level.isClientSide()) {

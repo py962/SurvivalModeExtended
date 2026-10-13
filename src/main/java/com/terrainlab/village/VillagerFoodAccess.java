@@ -2,10 +2,11 @@ package com.terrainlab.village;
 
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.npc.villager.Villager;
-import net.minecraft.world.item.Item;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.food.VillagerFood;
+import net.minecraft.world.item.ItemStack;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 /**
  * Reads a villager's food store. Vanilla keeps eaten food in the private {@code foodLevel}
@@ -20,14 +21,18 @@ public final class VillagerFoodAccess {
 
     /**
      * Total food in vanilla food points: eaten {@code foodLevel} plus inventory food valued with
-     * {@link Villager#FOOD_POINTS}. The inventory is the real store; {@code foodLevel} is
+     * the VILLAGER_FOOD component. The inventory is the real store; {@code foodLevel} is
      * usually 0 because villagers only eat right before breeding.
      */
     public static int getFoodPoints(Villager villager) {
         int points = getFoodLevel(villager);
         SimpleContainer inventory = villager.getInventory();
-        for (Map.Entry<Item, Integer> food : Villager.FOOD_POINTS.entrySet()) {
-            points += inventory.countItem(food.getKey()) * food.getValue();
+        // 26.x: food values come from the VILLAGER_FOOD component (mirrors Villager#countFoodPointsInInventory).
+        for (ItemStack stack : inventory.getItems()) {
+            VillagerFood food = stack.get(DataComponents.VILLAGER_FOOD);
+            if (food != null) {
+                points += stack.getCount() * food.nutrition();
+            }
         }
         return points;
     }

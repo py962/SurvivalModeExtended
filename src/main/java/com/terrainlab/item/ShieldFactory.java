@@ -1,6 +1,7 @@
 package com.terrainlab.item;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -33,7 +34,9 @@ public final class ShieldFactory {
                 .enchantable(ShieldStats.ENCHANTMENT_VALUE)
                 // Any planks repair it, as with the vanilla shield.
                 .repairable(ItemTags.PLANKS)
-                .component(DataComponents.BLOCKS_ATTACKS, buildBlocksAttacks(stats))
+                // The bypass tag needs a registry lookup, so the component is resolved late (as vanilla's shield does).
+                .delayedComponent(DataComponents.BLOCKS_ATTACKS,
+                        context -> buildBlocksAttacks(stats, context.getOrThrow(DamageTypeTags.BYPASSES_SHIELD)))
                 .component(DataComponents.BREAK_SOUND, SoundEvents.SHIELD_BREAK);
     }
 
@@ -41,7 +44,7 @@ public final class ShieldFactory {
      * Full negation within the stat-driven blocking angle, flat durability loss per block, and
      * vanilla shield sounds and bypass tag.
      */
-    private static BlocksAttacks buildBlocksAttacks(ShieldStats stats) {
+    private static BlocksAttacks buildBlocksAttacks(ShieldStats stats, HolderSet<DamageType> bypassesShield) {
         BlocksAttacks.DamageReduction fullBlock = new BlocksAttacks.DamageReduction(
                 stats.blockingAngleDegrees(), // horizontalBlockingAngle
                 Optional.empty(),      // type: all non-bypassed damage types
@@ -59,7 +62,7 @@ public final class ShieldFactory {
         // Typed locals: inline Optional arguments fail joint generic inference. Empty sounds mean silent.
         Optional<Holder<SoundEvent>> blockSound = Optional.of(SoundEvents.SHIELD_BLOCK);
         Optional<Holder<SoundEvent>> disabledSound = Optional.of(SoundEvents.SHIELD_BREAK);
-        Optional<TagKey<DamageType>> bypassedBy = Optional.of(DamageTypeTags.BYPASSES_SHIELD);
+        Optional<HolderSet<DamageType>> bypassedBy = Optional.of(bypassesShield);
 
         return new BlocksAttacks(
                 stats.blockDelaySeconds(),

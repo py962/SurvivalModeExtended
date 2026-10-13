@@ -38,7 +38,7 @@ public class CocoaBeansFoodHandler {
                 .sound(SoundEvents.GENERIC_EAT)
                 .build();
 
-        event.modify(Items.COCOA_BEANS, builder -> builder
+        event.modify(Items.COCOA_BEANS, (builder, context, it) -> builder
                 .set(DataComponents.FOOD, food)
                 .set(DataComponents.CONSUMABLE, consumable));
 

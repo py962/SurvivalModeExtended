@@ -1,0 +1,14 @@
+{
+  "values": [
+    "terrainlab:fletcher/level_3/buys_tripwire_hook",
+    "terrainlab:fletcher/level_3/sells_tripwire_hook",
+    "terrainlab:fletcher/level_3/buys_vulture_feather",
+    "terrainlab:fletcher/level_3/buys_parrot_feather",
+    "terrainlab:fletcher/level_3/buys_goose_feather",
+    "terrainlab:fletcher/level_3/buys_owl_feather",
+    "terrainlab:fletcher/level_3/sells_vulture_feather",
+    "terrainlab:fletcher/level_3/sells_parrot_feather",
+    "terrainlab:fletcher/level_3/sells_goose_feather",
+    "terrainlab:fletcher/level_3/sells_owl_feather"
+  ]
+}

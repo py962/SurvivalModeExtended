@@ -1,9 +1,13 @@
 package com.terrainlab.season;
 
 import com.terrainlab.TerrainLab;
+import net.minecraft.core.Holder;
+import net.minecraft.world.clock.ClockInstance;
+import net.minecraft.world.clock.ClockManager;
+import net.minecraft.world.clock.WorldClock;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.level.Level;
 
-import java.util.function.LongSupplier;
 
 /**
  * Seasonal day length by warping time-of-day ("solar time") for sun-dependent systems, without touching
@@ -201,7 +205,7 @@ public final class SolarTime {
     /** Solar time of day, 0..23999. */
     public static long solarTimeOfDay(Level level) {
         return Math.floorMod(
-                solarTicks(level, level.getDayTime()),
+                solarTicks(level, level.getOverworldClockTime()),
                 24000L
         );
     }
@@ -209,7 +213,7 @@ public final class SolarTime {
     /** Day by the warped sun. */
     public static boolean isSolarDay(Level level) {
         if (!warps(level)) {
-            return Math.floorMod(level.getDayTime(), 24000L) < 12000L;
+            return Math.floorMod(level.getOverworldClockTime(), 24000L) < 12000L;
         }
 
         return solarTimeOfDay(level) < 12000L;
@@ -229,7 +233,7 @@ public final class SolarTime {
     public static double nightFraction(Level level) {
         long s = warps(level)
                 ? solarTimeOfDay(level)
-                : Math.floorMod(level.getDayTime(), 24000L);
+                : Math.floorMod(level.getOverworldClockTime(), 24000L);
         long half = TEMPERATURE_TRANSITION_TICKS / 2L;
 
         double linear;
@@ -251,16 +255,16 @@ public final class SolarTime {
     /** Day counter that rolls over at solar time 0, so a whole night shares one number. */
     public static long solarDayNumber(Level level) {
         if (!warps(level)) {
-            return Math.floorDiv(level.getDayTime(), 24000L);
+            return Math.floorDiv(level.getOverworldClockTime(), 24000L);
         }
-        return Math.floorDiv(solarTicks(level, level.getDayTime()), 24000L);
+        return Math.floorDiv(solarTicks(level, level.getOverworldClockTime()), 24000L);
     }
 
     /** The first stretch of the night after solar sunset. */
     public static boolean isSolarDusk(Level level, long length) {
         long s = warps(level)
                 ? solarTimeOfDay(level)
-                : Math.floorMod(level.getDayTime(), 24000L);
+                : Math.floorMod(level.getOverworldClockTime(), 24000L);
         return s >= 12000L && s < 12000L + length;
     }
 
@@ -275,7 +279,7 @@ public final class SolarTime {
     /** Vanilla's unwarped sleep window. */
     public static boolean isVanillaSleepTime(Level level) {
         long t = Math.floorMod(
-                level.getDayTime(),
+                level.getOverworldClockTime(),
                 24000L
         );
 
@@ -283,16 +287,44 @@ public final class SolarTime {
                 && t < VANILLA_SLEEP_END;
     }
 
-    /** Clock handed to warped timelines. */
-    public record SolarClock(Level level, LongSupplier raw)
-            implements LongSupplier {
+    /**
+     * Clock manager handed to warped timelines (26.x replacement for the old LongSupplier day-time clock):
+     * the overworld clock reads as solar time, every other clock is passed through.
+     */
+    public record SolarClockManager(Level level, ClockManager raw) implements ClockManager {
 
         @Override
-        public long getAsLong() {
-            long rawTime = raw.getAsLong();
-            long solarTime = solarTicks(level, rawTime);
+        public ClockInstance getInstance(Holder<WorldClock> definition) {
+            ClockInstance rawInstance = raw.getInstance(definition);
+            if (!definition.is(WorldClocks.OVERWORLD)) {
+                return rawInstance;
+            }
+            return new ClockInstance() {
+                @Override
+                public long totalTicks() {
+                    return solarTicks(level, rawInstance.totalTicks());
+                }
 
-            return solarTime;
+                @Override
+                public float partialTick() {
+                    return rawInstance.partialTick();
+                }
+
+                @Override
+                public float rate() {
+                    return rawInstance.rate();
+                }
+
+                @Override
+                public boolean isPaused() {
+                    return rawInstance.isPaused();
+                }
+            };
+        }
+
+        @Override
+        public void setRate(Holder<WorldClock> definition, float rate) {
+            raw.setRate(definition, rate);
         }
     }
 }

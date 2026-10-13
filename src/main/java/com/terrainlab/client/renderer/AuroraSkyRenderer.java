@@ -2,21 +2,23 @@ package com.terrainlab.client.renderer;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.client.ClientAuroraState;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DepthTestFunction;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import net.minecraft.client.renderer.BindGroupLayouts;
+import com.mojang.renderpearl.api.pipeline.BlendFactor;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
@@ -24,8 +26,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 
 /**
  * Draws aurora ribbons after the sky pass, fading in and out with the server-synced
@@ -74,15 +76,17 @@ public class AuroraSkyRenderer {
     /** Normal alpha blending, so black ribbons darken the sky (the additive pipeline cannot). */
     private static RenderPipeline getDarkAuroraPipeline() {
         if (darkAuroraPipeline == null) {
-            darkAuroraPipeline = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            darkAuroraPipeline = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
+                    .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+                    .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
                     .withLocation("terrainlab/pipeline/aurora_dark")
                     .withVertexShader("core/position_color")
                     .withFragmentShader("core/position_color")
-                    .withBlend(BlendFunction.TRANSLUCENT)
+                    .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
                     .withCull(false)
-                    .withDepthWrite(false)
-                    .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
+                    // No depth-stencil state: no depth test and no depth write.
+                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
+                    .withPrimitiveTopology(PrimitiveTopology.TRIANGLE_STRIP)
                     .build();
         }
         return darkAuroraPipeline;
@@ -93,20 +97,22 @@ public class AuroraSkyRenderer {
 
     private static RenderPipeline getAuroraPipeline() {
         if (auroraPipeline == null) {
-            auroraPipeline = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            auroraPipeline = RenderPipeline.builder(RenderPipelines.GLOBALS_SNIPPET)
+                    .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+                    .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
                     .withLocation("terrainlab/pipeline/aurora")
                     .withVertexShader("core/position_color")
                     .withFragmentShader("core/position_color")
-                    .withBlend(new BlendFunction(
-                            com.mojang.blaze3d.platform.SourceFactor.SRC_ALPHA,
-                            com.mojang.blaze3d.platform.DestFactor.ONE,
-                            com.mojang.blaze3d.platform.SourceFactor.ONE,
-                            com.mojang.blaze3d.platform.DestFactor.ZERO
-                    ))
+                    .withColorTargetState(new ColorTargetState(new BlendFunction(
+                            BlendFactor.SRC_ALPHA,
+                            BlendFactor.ONE,
+                            BlendFactor.ONE,
+                            BlendFactor.ZERO
+                    )))
                     .withCull(false)
-                    .withDepthWrite(false)
-                    .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
+                    // No depth-stencil state: no depth test and no depth write.
+                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
+                    .withPrimitiveTopology(PrimitiveTopology.TRIANGLE_STRIP)
                     .build();
         }
         return auroraPipeline;
@@ -174,7 +180,7 @@ public class AuroraSkyRenderer {
 
         MeshData meshData = null;
         try (ByteBufferBuilder byteBuffer = ByteBufferBuilder.exactlySized(bufferSize)) {
-            BufferBuilder builder = new BufferBuilder(byteBuffer, VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+            BufferBuilder builder = new BufferBuilder(byteBuffer, PrimitiveTopology.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 
             for (int ribbon = 0; ribbon < RIBBON_COUNT; ribbon++) {
                 if (ribbon > 0) {
@@ -196,7 +202,7 @@ public class AuroraSkyRenderer {
             }
 
             Minecraft mc = Minecraft.getInstance();
-            var renderTarget = mc.getMainRenderTarget();
+            var renderTarget = mc.gameRenderer.mainRenderTarget();
             if (renderTarget == null) {
                 TerrainLab.LOGGER.warn("[AURORA_CLIENT] renderAurora: main render target is null, aborting frame");
                 meshData.close();
@@ -212,7 +218,7 @@ public class AuroraSkyRenderer {
             }
 
             GpuBufferSlice transformSlice = RenderSystem.getDynamicUniforms().writeTransform(
-                    RenderSystem.getModelViewMatrix(),
+                    RenderSystem.getModelViewMatrixCopy(),
                     new Vector4f(1.0f, 1.0f, 1.0f, 1.0f),
                     new Vector3f(0, 0, 0),
                     new Matrix4f()
@@ -222,15 +228,15 @@ public class AuroraSkyRenderer {
                     .createRenderPass(
                             () -> "TerrainAurora",
                             colorView,
-                            OptionalInt.empty(),
+                            Optional.empty(),
                             depthView,
                             OptionalDouble.empty()
                     )) {
-                renderPass.setPipeline(dark ? getDarkAuroraPipeline() : getAuroraPipeline());
+                renderPass.setPipeline(RenderSystem.getCompiledPipeline(dark ? getDarkAuroraPipeline() : getAuroraPipeline()));
                 RenderSystem.bindDefaultUniforms(renderPass);
                 renderPass.setUniform("DynamicTransforms", transformSlice);
-                renderPass.setVertexBuffer(0, vertexBuffer);
-                renderPass.draw(0, totalVertices);
+                renderPass.setVertexBuffer(0, vertexBuffer.slice());
+                renderPass.draw(totalVertices, 1, 0, 0);
             }
         } finally {
             if (meshData != null) {

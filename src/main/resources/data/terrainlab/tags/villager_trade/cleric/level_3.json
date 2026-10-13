@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:cleric/level_3/buys_gunpowder",
+    "terrainlab:cleric/level_3/sells_gunpowder",
+    "terrainlab:cleric/level_3/buys_rabbit_foot",
+    "terrainlab:cleric/level_3/sells_rabbit_foot"
+  ]
+}

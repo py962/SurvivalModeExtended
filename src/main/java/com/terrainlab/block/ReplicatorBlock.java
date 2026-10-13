@@ -18,23 +18,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import com.mojang.serialization.MapCodec;
 
 import javax.annotation.Nullable;
 
 /** Replicator bench block; a redstone rising edge starts one batch in {@link ReplicatorBlockEntity}. */
 public class ReplicatorBlock extends BaseEntityBlock {
 
-    public static final MapCodec<ReplicatorBlock> CODEC = simpleCodec(ReplicatorBlock::new);
 
     public ReplicatorBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
 
-    @Override
-    public MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

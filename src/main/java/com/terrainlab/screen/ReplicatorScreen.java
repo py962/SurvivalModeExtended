@@ -2,7 +2,7 @@ package com.terrainlab.screen;
 
 import com.terrainlab.menu.ReplicatorMenu;
 import com.terrainlab.network.ReplicatorPulsePacket;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -70,9 +70,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
     private int clientTicks = 0;
 
     public ReplicatorScreen(ReplicatorMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 166;
+        super(menu, playerInventory, title, 176, 166);
     }
 
     @Override
@@ -92,7 +90,8 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(g, mouseX, mouseY, partialTick);
         int x = leftPos, y = topPos;
         g.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0, 0, imageWidth, imageHeight, 256, 256);
 
@@ -143,7 +142,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
      * path (from its start) is drawn at {@code power}; the rest is drawn
      * unpowered (power 0 dust).
      */
-    private void drawPath(GuiGraphics g, int[][] path, int power, float litFraction) {
+    private void drawPath(GuiGraphicsExtractor g, int[][] path, int power, float litFraction) {
         int total = pathLength(path);
         int lit = Math.round(total * Mth.clamp(litFraction, 0f, 1f));
         int walked = 0;
@@ -179,24 +178,23 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
     }
 
     /** Draws a vanilla 16x16 block texture scaled to size x size. */
-    private static void drawBlockIcon(GuiGraphics g, int x, int y, Identifier texture, int size) {
+    private static void drawBlockIcon(GuiGraphicsExtractor g, int x, int y, Identifier texture, int size) {
         g.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0f, 0f, size, size, 16, 16, 16, 16);
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         if (isOverButton(mouseX, mouseY)) {
             graphics.setTooltipForNextFrame(font,
                     Component.translatable("container.terrainlab.replicator.pulse"), mouseX, mouseY);
         }
-        renderTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.drawString(font, title, titleLabelX, titleLabelY, 0xFF404040, false);
-        graphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xFF404040, false);
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        graphics.text(font, title, titleLabelX, titleLabelY, 0xFF404040, false);
+        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xFF404040, false);
     }
 
     private boolean isOverButton(double mouseX, double mouseY) {

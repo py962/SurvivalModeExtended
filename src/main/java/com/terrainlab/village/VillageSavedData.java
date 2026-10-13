@@ -32,7 +32,7 @@ public class VillageSavedData extends SavedData {
     }
 
     public static final SavedDataType<VillageSavedData> TYPE = new SavedDataType<>(
-            "terrainlab_villages",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "villages"),
             VillageSavedData::new,
             level -> RecordCodecBuilder.create(instance -> instance.group(
                     RecordCodecBuilder.point(level),

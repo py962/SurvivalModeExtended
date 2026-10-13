@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:mason/level_4/buys_granite",
+    "terrainlab:mason/level_4/sells_granite",
+    "terrainlab:mason/level_4/buys_dripstone_block",
+    "terrainlab:mason/level_4/sells_dripstone_block"
+  ]
+}

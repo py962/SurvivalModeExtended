@@ -105,7 +105,7 @@ public class ModBlocks {
                                     .mapColor(MapColor.STONE)
                                     .strength(-1.0F, 3600000.0F)
                                     .noLootTable()
-                                    .pushReaction(PushReaction.BLOCK)));
+                                    .pushReaction(PushReaction.IMMOVEABLE)));
 
     public static final DeferredBlock<Block> MAGNETITE_ORE =
             BLOCKS.register("magnetite_ore", id ->
@@ -213,7 +213,7 @@ public class ModBlocks {
                                     .lightLevel(state -> 11)
                                     .sound(SoundType.GLASS)
                                     .noLootTable()
-                                    .pushReaction(PushReaction.BLOCK)));
+                                    .pushReaction(PushReaction.IMMOVEABLE)));
 
     // Sandstorm sand layers. Properties mirror vanilla's snow layer (replaceable, never solid so the
     // motion-blocking heightmap looks through them, shovel for drops).
@@ -237,9 +237,9 @@ public class ModBlocks {
                 .strength(0.2F)
                 .requiresCorrectToolForDrops()
                 .sound(SoundType.SAND)
-                .isViewBlocking((state, level, pos) ->
+                .isViewBlocking((state, level, pos, nearPlaneBox) ->
                         state.getValue(com.terrainlab.block.SandLayerBlock.LAYERS) >= 8)
-                .pushReaction(PushReaction.DESTROY);
+                .pushReaction(PushReaction.POPPED);
     }
 
     public static void register(IEventBus eventBus) {

@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.minecraft.world.entity.EntityTypes;
 
 /** Blocks natural monster spawns other than piglins inside bastion housing-unit pieces. */
 @Mixin(NaturalSpawner.class)
@@ -40,7 +41,7 @@ public abstract class BastionHousingSpawnMixin {
             CallbackInfoReturnable<Boolean> cir) {
 
         if (category != MobCategory.MONSTER) return;
-        if (spawnerData.type() == EntityType.PIGLIN) return;
+        if (spawnerData.type() == EntityTypes.PIGLIN) return;
 
         Structure bastion = level.registryAccess()
                 .lookupOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)

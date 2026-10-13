@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:toolsmith/level_2/buys_lava_bucket",
+    "terrainlab:toolsmith/level_2/sells_lava_bucket",
+    "terrainlab:toolsmith/level_2/buys_diamond",
+    "terrainlab:toolsmith/level_2/sells_diamond"
+  ]
+}

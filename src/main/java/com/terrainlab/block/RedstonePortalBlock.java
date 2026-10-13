@@ -68,7 +68,7 @@ public class RedstonePortalBlock extends Block implements Portal {
 
     @Override
     public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
+        return PushReaction.IMMOVEABLE;
     }
 
     @Override

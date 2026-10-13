@@ -15,7 +15,7 @@ import java.util.Random;
 public class SeasonSavedData extends SavedData {
 
     public static final SavedDataType<SeasonSavedData> TYPE = new SavedDataType<>(
-            "terrainlab_season_offset",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "season_offset"),
             SeasonSavedData::new,
             level -> RecordCodecBuilder.create(instance -> instance.group(
                     RecordCodecBuilder.point(level),

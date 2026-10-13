@@ -10,7 +10,7 @@ import com.terrainlab.weather.WeatherConstants;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gamerules.GameRules;
-import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.level.saveddata.WeatherData;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.CommandEvent;
@@ -70,7 +70,7 @@ public final class SeasonalWeatherCycleHandler {
         if (manualWeatherPending) {
             manualWeatherPending = false;
 
-            ServerLevelData data = level.getServer().getWorldData().overworldData();
+            WeatherData data = level.getWeatherData();
             int remaining = level.isRaining()
                     ? data.getRainTime()
                     : data.getClearWeatherTime();
@@ -175,7 +175,7 @@ public final class SeasonalWeatherCycleHandler {
                 WeatherConstants.THUNDERSTORM_PERCENT
         );
 
-        level.setWeatherParameters(0, duration, true, thunder);
+        level.getServer().setWeatherParameters(0, duration, true, thunder);
     }
 
     private static void forceClear(
@@ -185,6 +185,6 @@ public final class SeasonalWeatherCycleHandler {
             int maxTicks
     ) {
         int duration = minTicks + random.nextInt(maxTicks - minTicks + 1);
-        level.setWeatherParameters(duration, 0, false, false);
+        level.getServer().setWeatherParameters(duration, 0, false, false);
     }
 }

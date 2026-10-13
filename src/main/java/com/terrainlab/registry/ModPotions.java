@@ -94,7 +94,7 @@ public class ModPotions {
                     new MobEffectInstance(ModMobEffects.EXPLOSIVE, 1, 1)));
 
     // Blindness and Nausea are deliberately not potions: they come from suspicious stews, and the
-    // Fletcher's tipped arrows carry them directly (see FletcherTrades).
+    // Fletcher's tipped arrows carry them directly (see data/terrainlab/villager_trade/fletcher).
 
     public static void register(IEventBus modEventBus) {
         POTIONS.register(modEventBus);

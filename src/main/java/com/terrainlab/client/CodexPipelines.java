@@ -1,7 +1,8 @@
 package com.terrainlab.client;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
@@ -17,6 +18,6 @@ public final class CodexPipelines {
      */
     public static final RenderPipeline GUI_GLOW = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("terrainlab", "pipeline/gui_glow"))
-            .withBlend(BlendFunction.LIGHTNING)
+            .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
             .build();
 }

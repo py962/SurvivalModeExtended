@@ -6,7 +6,6 @@ import com.terrainlab.registry.ModDataComponents;
 import com.terrainlab.registry.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -23,8 +22,12 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
  */
 public class CelestialConduitCraftRecipe extends CustomRecipe {
 
-    public CelestialConduitCraftRecipe(CraftingBookCategory category) {
-        super(category);
+    public static final CelestialConduitCraftRecipe INSTANCE = new CelestialConduitCraftRecipe();
+    public static final com.mojang.serialization.MapCodec<CelestialConduitCraftRecipe> MAP_CODEC = com.mojang.serialization.MapCodec.unit(INSTANCE);
+    public static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, CelestialConduitCraftRecipe> STREAM_CODEC =
+            net.minecraft.network.codec.StreamCodec.unit(INSTANCE);
+
+    public CelestialConduitCraftRecipe() {
     }
 
     @Override
@@ -48,7 +51,7 @@ public class CelestialConduitCraftRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput input) {
         ItemStack center = input.getItem(1, 1);
         CelestialVariant variant = variantOf(center);
         if (variant == null) return ItemStack.EMPTY;

@@ -21,6 +21,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -473,9 +474,9 @@ public final class CelestialEffects {
             BlockState state = level.getBlockState(target);
 
             if (state.getBlock() instanceof BonemealableBlock bonemealable
-                    && bonemealable.isValidBonemealTarget(level, target, state)
-                    && bonemealable.isBonemealSuccess(level, RANDOM, target, state)) {
-                bonemealable.performBonemeal(level, RANDOM, target, state);
+                    && bonemealable.isValidBonemealTarget(level, target, state, BonemealSource.INTERACTION)
+                    && bonemealable.isBonemealSuccess(level, RANDOM, target, state, BonemealSource.INTERACTION)) {
+                bonemealable.performBonemeal(level, RANDOM, target, state, BonemealSource.INTERACTION);
             }
         }
     }

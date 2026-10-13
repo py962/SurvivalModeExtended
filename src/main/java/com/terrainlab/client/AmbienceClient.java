@@ -189,7 +189,7 @@ public final class AmbienceClient {
 
         boolean audible = overworld && !submerged;
         if (audible) {
-            float day = daylight(level.getDayTime());
+            float day = daylight(level.getOverworldClockTime());
             setWindTarget(level, player, exposure);
             setOceanTargets(level, exposure);
             setBedTargets(day, exposure);

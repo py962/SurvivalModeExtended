@@ -13,7 +13,7 @@ import java.util.*;
 public class CodexSavedData extends SavedData {
 
     public static final SavedDataType<CodexSavedData> TYPE = new SavedDataType<>(
-            "terrainlab_codex_mappings",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "codex_mappings"),
             CodexSavedData::new,
             level -> RecordCodecBuilder.create(instance -> instance.group(
                     RecordCodecBuilder.point(level),

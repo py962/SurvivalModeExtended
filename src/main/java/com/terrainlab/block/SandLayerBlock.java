@@ -1,6 +1,5 @@
 package com.terrainlab.block;
 
-import com.mojang.serialization.MapCodec;
 import com.terrainlab.weather.Sandstorm;
 import com.terrainlab.weather.WeatherConstants;
 import net.minecraft.core.BlockPos;
@@ -36,7 +35,6 @@ import org.jspecify.annotations.Nullable;
  */
 public class SandLayerBlock extends Block {
 
-    public static final MapCodec<SandLayerBlock> CODEC = simpleCodec(SandLayerBlock::new);
     public static final int MAX_HEIGHT = 8;
     public static final IntegerProperty LAYERS = BlockStateProperties.LAYERS;
     private static final VoxelShape[] SHAPES = Block.boxes(8, layers -> Block.column(16.0, 0.0, layers * 2));
@@ -46,10 +44,6 @@ public class SandLayerBlock extends Block {
         this.registerDefaultState(this.stateDefinition.any().setValue(LAYERS, 1));
     }
 
-    @Override
-    public MapCodec<SandLayerBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected boolean isPathfindable(BlockState state, PathComputationType type) {
@@ -89,10 +83,10 @@ public class SandLayerBlock extends Block {
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState below = level.getBlockState(pos.below());
-        if (below.is(BlockTags.SNOW_LAYER_CANNOT_SURVIVE_ON)) {
+        if (below.is(BlockTags.CANNOT_SUPPORT_SNOW_LAYER)) {
             return false;
         }
-        return below.is(BlockTags.SNOW_LAYER_CAN_SURVIVE_ON)
+        return below.is(BlockTags.SUPPORT_OVERRIDE_SNOW_LAYER)
                 || Block.isFaceFull(below.getCollisionShape(level, pos.below()), Direction.UP)
                 || below.is(this) && below.getValue(LAYERS) == MAX_HEIGHT;
     }

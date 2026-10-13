@@ -4,7 +4,7 @@ import com.terrainlab.client.CodexPipelines;
 import com.terrainlab.menu.AncientCodexMenu;
 import com.terrainlab.network.GlyphSelectionPacket;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -74,9 +74,7 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
     private double lastFrameTime = -1;
 
     public AncientCodexScreen(AncientCodexMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
-        this.imageWidth = 256;
-        this.imageHeight = 222;
+        super(menu, playerInventory, title, 256, 222);
     }
 
     /** Called from CodexResultPacket on the client thread. */
@@ -99,7 +97,8 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos, topPos,
                 0.0F, 0.0F, imageWidth, imageHeight, 256, 222);
 
@@ -120,7 +119,7 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
         }
     }
 
-    private void renderGlyph(GuiGraphics g, int i, float t, float resultAge) {
+    private void renderGlyph(GuiGraphicsExtractor g, int i, float t, float resultAge) {
         float hover = hoverT[i];
         float sel = selectT[i];
         boolean inResult = (resultMask & (1 << i)) != 0;
@@ -205,7 +204,7 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
     }
 
     /** Sparks travelling from the glyph's tile towards the centre along the etched connector. */
-    private void renderEnergyLine(GuiGraphics g, float x, float y, int i, float t, float sel) {
+    private void renderEnergyLine(GuiGraphicsExtractor g, float x, float y, int i, float t, float sel) {
         float tx = leftPos + OUTPUT_CX, ty = topPos + OUTPUT_CY;
         float len = Mth.sqrt((tx - x) * (tx - x) + (ty - y) * (ty - y));
         // Start just outside the glyph tile, stop at the centre box's edge.
@@ -219,16 +218,15 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         if (resultStart >= 0) {
             renderResultAnimation(graphics, (float) (now() - resultStart));
         }
-        renderTooltip(graphics, mouseX, mouseY);
     }
 
     /** Success: glyphs lift off, curve into the output slot trailing sparks, then a burst. */
-    private void renderResultAnimation(GuiGraphics g, float age) {
+    private void renderResultAnimation(GuiGraphicsExtractor g, float age) {
         if (!resultSuccess) {
             if (age > FAIL_TIME) {
                 resultStart = -1;
@@ -301,7 +299,7 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
     }
 
     /** Additive soft glow centred on (x, y), {@code size} GUI pixels across. */
-    private static void drawGlow(GuiGraphics g, float x, float y, float size, int rgb, float alpha) {
+    private static void drawGlow(GuiGraphicsExtractor g, float x, float y, float size, int rgb, float alpha) {
         if (alpha <= 0.005f) {
             return;
         }
@@ -314,7 +312,7 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
     }
 
     /** Additive 7x7 spark centred on (x, y). */
-    private static void drawSpark(GuiGraphics g, float x, float y, float scale, int rgb, float alpha) {
+    private static void drawSpark(GuiGraphicsExtractor g, float x, float y, float scale, int rgb, float alpha) {
         if (alpha <= 0.005f) {
             return;
         }
@@ -382,7 +380,7 @@ public class AncientCodexScreen extends AbstractContainerScreen<AncientCodexMenu
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         // No labels: the title would overlap the artwork.
     }
 }

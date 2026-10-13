@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -46,6 +47,7 @@ public abstract class StructureGenerationVetoMixin {
             RegistryAccess registryAccess,
             ChunkGenerator chunkGenerator,
             BiomeSource biomeSource,
+            Climate.Sampler climateSampler,
             RandomState randomState,
             StructureTemplateManager structureTemplateManager,
             long seed,

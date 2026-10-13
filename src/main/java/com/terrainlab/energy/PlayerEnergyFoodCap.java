@@ -14,7 +14,7 @@ public final class PlayerEnergyFoodCap {
 
     /** Records a use and returns true, or returns false if today's cap is already reached. */
     public static boolean tryConsumeUse(ServerPlayer player) {
-        long currentDay = player.level().getDayTime() / 24000L;
+        long currentDay = player.level().getOverworldClockTime() / 24000L;
         long lastDay = player.getData(ModAttachments.PLAYER_ENERGY_FOOD_LAST_DAY.get());
         int usesToday = player.getData(ModAttachments.PLAYER_ENERGY_FOOD_USES_TODAY.get());
 

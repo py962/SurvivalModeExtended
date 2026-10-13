@@ -1,5 +1,6 @@
 package com.terrainlab.worldgen;
 
+import net.minecraft.world.level.levelgen.NoiseRouter;
 import net.minecraft.world.level.levelgen.RandomState;
 import org.jspecify.annotations.Nullable;
 
@@ -12,6 +13,10 @@ public final class SeaLevelRandomStateHolder {
 
     private static volatile @Nullable RandomState cachedRandomState;
 
+    // 26.x: RandomState no longer exposes its NoiseRouter, so the (unseeded) router from the generator settings
+    // is mirrored here too; sample it through RandomState.getSampler. Set by BandedFluidPicker.fromRandomState.
+    private static volatile @Nullable NoiseRouter cachedNoiseRouter;
+
     private SeaLevelRandomStateHolder() {
     }
 
@@ -21,5 +26,13 @@ public final class SeaLevelRandomStateHolder {
 
     public static @Nullable RandomState get() {
         return cachedRandomState;
+    }
+
+    public static void setNoiseRouter(NoiseRouter noiseRouter) {
+        cachedNoiseRouter = noiseRouter;
+    }
+
+    public static @Nullable NoiseRouter getNoiseRouter() {
+        return cachedNoiseRouter;
     }
 }

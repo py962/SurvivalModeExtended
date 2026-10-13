@@ -1,0 +1,6 @@
+{
+  "type": "terrainlab:magnetite_ore",
+  "floor_search_range": 8,
+  "placement_probability_per_valid_position": 0.2,
+  "placement_radius_around_floor": 4
+}

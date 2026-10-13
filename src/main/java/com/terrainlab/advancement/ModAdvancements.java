@@ -1,7 +1,7 @@
 package com.terrainlab.advancement;
 
 import com.terrainlab.TerrainLab;
-import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.advancements.triggers.CriterionTrigger;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

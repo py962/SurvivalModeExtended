@@ -1,7 +1,8 @@
 package com.terrainlab.worldgen;
 
+import com.mojang.serialization.MapCodec;
+import net.minecraft.util.RandomSource;
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -14,12 +15,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.level.levelgen.NoiseRouter;
+import net.minecraft.world.level.levelgen.densityfunction.DensitySampler;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
  * through solid blocks along sea-level band boundaries on a regular lattice. Currently disabled via
  * {@code ENABLED}.
  */
-public class InlandRiverFloodFeature extends Feature<NoneFeatureConfiguration> {
+public final class InlandRiverFloodFeature implements Feature {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String LOG_PREFIX = "[TerrainLab/InlandRiverFlood]";
@@ -47,20 +48,24 @@ public class InlandRiverFloodFeature extends Feature<NoneFeatureConfiguration> {
     /** Kill switch; when re-enabling, also restore the feature in inland_river.json's feature list. */
     private static final boolean ENABLED = false;
 
-    public InlandRiverFloodFeature(Codec<NoneFeatureConfiguration> codec) {
-        super(codec);
+    public static final MapCodec<InlandRiverFloodFeature> CODEC = MapCodec.unit(InlandRiverFloodFeature::new);
+
+    public InlandRiverFloodFeature() {
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
+    public MapCodec<InlandRiverFloodFeature> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
         if (!ENABLED) {
             return false;
         }
 
-        WorldGenLevel level = context.level();
-        BlockPos origin = context.origin();
-        ChunkPos chunkPos = new ChunkPos(origin);
-        ChunkGenerator generator = context.chunkGenerator();
+        ChunkPos chunkPos = ChunkPos.containing(origin);
+        ChunkGenerator generator = chunkGenerator;
 
         // if (VERBOSE_LOGGING) LOGGER.trace("{} place() called for chunk {}", LOG_PREFIX, chunkPos);
 
@@ -71,8 +76,10 @@ public class InlandRiverFloodFeature extends Feature<NoneFeatureConfiguration> {
             return false;
         }
 
-        DensityFunction continentalness = randomState.router().continents();
-        DensityFunction erosion = randomState.router().erosion();
+        // resolveRandomState only succeeds for NoiseBasedChunkGenerator.
+        NoiseRouter router = ((NoiseBasedChunkGenerator) generator).generatorSettings().value().noiseRouter();
+        DensitySampler continentalness = randomState.getSampler(router.continents());
+        DensitySampler erosion = randomState.getSampler(router.erosion());
 
         boolean placedAny = false;
         int blocksPlaced = 0;
@@ -112,7 +119,7 @@ public class InlandRiverFloodFeature extends Feature<NoneFeatureConfiguration> {
                             BlockState existing = level.getBlockState(pos);
                             if (existing.is(Blocks.WATER)) {
                                 gapBlocksAlreadyWater++;
-                            } else if (existing.blocksMotion()) {
+                            } else if (existing.isSolid()) {
                                 // Only solid blocks: the gaps are for underground band walls, not open air.
                                 level.setBlock(pos, Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL);
                                 gapBlocksForced++;
@@ -164,10 +171,9 @@ public class InlandRiverFloodFeature extends Feature<NoneFeatureConfiguration> {
     }
 
     /** Banded sea level at a column, from raw continentalness and the continentalness-minus-erosion score. */
-    private static int bandedLevelAt(DensityFunction continentalness, DensityFunction erosion, int x, int z) {
-        DensityFunction.SinglePointContext context = new DensityFunction.SinglePointContext(x, 0, z);
-        double continentalnessSample = continentalness.compute(context);
-        double erosionSample = erosion.compute(context);
+    private static int bandedLevelAt(DensitySampler continentalness, DensitySampler erosion, int x, int z) {
+        double continentalnessSample = continentalness.sampleValue(SamplerContext.EMPTY_UNCACHED, x, 0, z);
+        double erosionSample = erosion.sampleValue(SamplerContext.EMPTY_UNCACHED, x, 0, z);
         double combinedScore = continentalnessSample - erosionSample;
         return SeaLevelBandingService.bandedLevel(continentalnessSample, combinedScore);
     }

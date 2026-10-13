@@ -197,7 +197,7 @@ public class ModGraniteGolemHandler {
             // Same advancement trigger vanilla fires for iron/snow/copper golems.
             for (net.minecraft.server.level.ServerPlayer player : level.getEntitiesOfClass(
                     net.minecraft.server.level.ServerPlayer.class, golem.getBoundingBox().inflate(5.0))) {
-                net.minecraft.advancements.CriteriaTriggers.SUMMONED_ENTITY.trigger(player, golem);
+                net.minecraft.advancements.triggers.CriteriaTriggers.SUMMONED_ENTITY.trigger(player, golem);
             }
             // TerrainLab.LOGGER.info("Granite golem spawned at {}", centre);
         } else {

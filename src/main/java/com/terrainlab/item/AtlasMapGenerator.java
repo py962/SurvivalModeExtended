@@ -127,11 +127,10 @@ public final class AtlasMapGenerator {
             return AtlasColors.OCEAN;
         }
 
-        Holder<Biome> biome = generator.getBiomeSource().getNoiseBiome(
+        Holder<Biome> biome = generator.getBiomeSource().createUncachedResolver(randomState).getNoiseBiome(
                 QuartPos.fromBlock(wx),
                 QuartPos.fromBlock(surfaceY),
-                QuartPos.fromBlock(wz),
-                randomState.sampler()
+                QuartPos.fromBlock(wz)
         );
 
         Identifier biomeId = biome.unwrapKey()

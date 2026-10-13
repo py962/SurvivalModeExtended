@@ -1,0 +1,21 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 2
+  },
+  "gives": {
+    "id": "terrainlab:oak_shield"
+  },
+  "max_uses": 12,
+  "xp": 2,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:desert"
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -23,6 +23,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.*;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Enderman behaviours: placing chorus summons Endermen anchored to that spot, and short
@@ -275,8 +276,8 @@ public class ModEndermanHandler {
                             (int) spawnZ
                     );
 
-            EnderMan enderman =
-                    EntityType.ENDERMAN.create(
+            Enderman enderman =
+                    EntityTypes.ENDERMAN.create(
                             level,
                             EntitySpawnReason.EVENT
                     );
@@ -358,9 +359,9 @@ public class ModEndermanHandler {
             }
         }
 
-        List<EnderMan> nearby =
+        List<Enderman> nearby =
                 level.getEntitiesOfClass(
-                        EnderMan.class,
+                        Enderman.class,
                         new AABB(
                                 lastPos.getX() - SEARCH_RADIUS,
                                 lastPos.getY() - SEARCH_RADIUS,
@@ -371,10 +372,10 @@ public class ModEndermanHandler {
                         )
                 );
 
-        EnderMan chosen = null;
+        Enderman chosen = null;
         double closestDistance = Double.MAX_VALUE;
 
-        for (EnderMan enderman : nearby) {
+        for (Enderman enderman : nearby) {
 
             UUID uuid =
                     enderman.getUUID();
@@ -454,7 +455,7 @@ public class ModEndermanHandler {
     private static BlockState pickBlockForEnderman(
             ServerLevel level,
             BlockPos near,
-            EnderMan enderman) {
+            Enderman enderman) {
 
         BlockState carried =
                 enderman.getCarriedBlock();
@@ -497,6 +498,7 @@ public class ModEndermanHandler {
 
             enderman.swing(
                     InteractionHand.MAIN_HAND,
+                    net.minecraft.world.item.component.SwingAnimation.DEFAULT,
                     true
             );
 
@@ -517,6 +519,7 @@ public class ModEndermanHandler {
 
         enderman.swing(
                 InteractionHand.MAIN_HAND,
+                net.minecraft.world.item.component.SwingAnimation.DEFAULT,
                 true
         );
 
@@ -572,7 +575,7 @@ public class ModEndermanHandler {
                     );
 
             // Enderman unloaded or dead: count the step and hand off to the next one.
-            if (!(entity instanceof EnderMan enderman)) {
+            if (!(entity instanceof Enderman enderman)) {
 
                 iterator.remove();
 
@@ -805,6 +808,7 @@ public class ModEndermanHandler {
 
                 enderman.swing(
                         InteractionHand.MAIN_HAND,
+                        net.minecraft.world.item.component.SwingAnimation.DEFAULT,
                         true
                 );
 
@@ -819,7 +823,7 @@ public class ModEndermanHandler {
 
                 enderman.setCarriedBlock(null);
 
-                com.terrainlab.advancement.ModAdvancements.awardNearby(level, target.getCenter(), 32.0, "enderman_sequence");
+                com.terrainlab.advancement.ModAdvancements.awardNearby(level, net.minecraft.world.phys.Vec3.atCenterOf(target), 32.0, "enderman_sequence");
 
                 iterator.remove();
 
@@ -892,7 +896,7 @@ public class ModEndermanHandler {
 
         // Drop anchors whose Enderman is no longer loaded in any dimension.
         chorusAnchors.entrySet().removeIf(entry ->
-                !(findEntityInServer(event, entry.getKey()) instanceof EnderMan));
+                !(findEntityInServer(event, entry.getKey()) instanceof Enderman));
 
         for (ServerLevel level :
                 event.getServer().getAllLevels()) {
@@ -905,7 +909,7 @@ public class ModEndermanHandler {
                         level.getEntities()
                                 .get(entry.getKey());
 
-                if (!(entity instanceof EnderMan enderman)) {
+                if (!(entity instanceof Enderman enderman)) {
                     continue;
                 }
 
@@ -970,7 +974,7 @@ public class ModEndermanHandler {
      */
     private static boolean teleportNextTo(
             ServerLevel level,
-            EnderMan enderman,
+            Enderman enderman,
             BlockPos target) {
 
         int[][] sides = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
@@ -989,7 +993,8 @@ public class ModEndermanHandler {
                     x,
                     target.getY() + 1.0D,
                     z,
-                    true)) {
+                    true,
+                    floorState -> false)) {
                 continue;
             }
 

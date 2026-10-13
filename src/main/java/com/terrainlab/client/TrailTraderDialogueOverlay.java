@@ -1,7 +1,7 @@
 package com.terrainlab.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -42,7 +42,7 @@ public class TrailTraderDialogueOverlay {
             return;
         }
 
-        GuiGraphics graphics = event.getGuiGraphics();
+        GuiGraphicsExtractor graphics = event.getGuiGraphics();
         Component line = Component.translatable(key);
         List<FormattedCharSequence> wrapped = mc.font.split(line, MAX_TEXT_WIDTH);
         if (wrapped.isEmpty()) {
@@ -65,7 +65,7 @@ public class TrailTraderDialogueOverlay {
         for (FormattedCharSequence sequence : wrapped) {
             int lineWidth = mc.font.width(sequence);
             int textX = panelX + (panelWidth - lineWidth) / 2;
-            graphics.drawString(mc.font, sequence, textX, textY, TEXT_COLOR, true);
+            graphics.text(mc.font, sequence, textX, textY, TEXT_COLOR, true);
             textY += lineHeight;
         }
     }

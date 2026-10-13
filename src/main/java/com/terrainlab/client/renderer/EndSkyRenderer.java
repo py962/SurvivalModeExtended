@@ -1,15 +1,23 @@
 package com.terrainlab.client.renderer;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SkyRenderer;
-import net.minecraft.client.renderer.state.LevelRenderState;
-import net.minecraft.client.renderer.state.SkyRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.client.renderer.state.level.SkyRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.neoforged.neoforge.client.CustomSkyboxRenderer;
-import com.terrainlab.mixin.SkyRendererAccessor;
-import org.joml.Matrix4f;
+import com.terrainlab.mixin.SkyRendererInvoker;
+import org.joml.Matrix4fc;
+
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 public class EndSkyRenderer implements CustomSkyboxRenderer {
 
@@ -35,38 +43,49 @@ public class EndSkyRenderer implements CustomSkyboxRenderer {
 
     @Override
     public boolean renderSky(LevelRenderState levelState, SkyRenderState skyState,
-                             Matrix4f modelViewMatrix, Runnable setupFog) {
+                             Matrix4fc modelViewMatrix, GpuBufferSlice skyFog) {
         if (skyState.skybox != net.minecraft.world.level.dimension.DimensionType.Skybox.END) {
             return false;
         }
 
-        setupFog.run();
-
-        SkyRenderer skyRenderer = ((SkyRendererAccessor) Minecraft.getInstance().levelRenderer).getSkyRenderer();
+        Minecraft mc = Minecraft.getInstance();
+        SkyRenderer skyRenderer = mc.levelRenderer.skyRenderer();
         if (skyRenderer == null) return false;
+        SkyRendererInvoker sky = (SkyRendererInvoker) skyRenderer;
 
-        skyRenderer.renderEndSky();
+        // Mirrors SkyRenderer#render for the END skybox, with our own flashes.
+        RenderSystem.setShaderFog(skyFog);
+        RenderTarget target = mc.gameRenderer.mainRenderTarget();
+        GpuTextureView colorTexture = target.getColorTextureView();
+        GpuTextureView depthTexture = target.getDepthTextureView();
 
-        long gameTime = Minecraft.getInstance().level.getGameTime();
-        for (FlashState flash : flashes) {
-            flash.tick(gameTime);
-            float intensity = flash.getIntensity();
-            if (intensity > 1.0E-5F) {
-                PoseStack poseStack = new PoseStack();
-                float[] colour = COLOURS[flash.colourIndex];
-                renderColouredFlash(skyRenderer, poseStack, intensity,
-                        flash.xAngle, flash.yAngle, colour);
+        try (RenderPass renderPass = RenderSystem.getDevice()
+                .createCommandEncoder()
+                .createRenderPass(() -> "TerrainLab End sky", colorTexture, Optional.empty(), depthTexture, OptionalDouble.empty())) {
+            RenderSystem.bindDefaultUniforms(renderPass);
+            sky.terrainlab$renderEndSky(renderPass);
+
+            long gameTime = mc.level.getGameTime();
+            for (FlashState flash : flashes) {
+                flash.tick(gameTime);
+                float intensity = flash.getIntensity();
+                if (intensity > 1.0E-5F) {
+                    PoseStack poseStack = new PoseStack();
+                    float[] colour = COLOURS[flash.colourIndex];
+                    renderColouredFlash(sky, renderPass, poseStack, intensity,
+                            flash.xAngle, flash.yAngle, colour);
+                }
             }
         }
 
         return true;
     }
 
-    private void renderColouredFlash(SkyRenderer skyRenderer, PoseStack poseStack,
+    private void renderColouredFlash(SkyRendererInvoker sky, RenderPass renderPass, PoseStack poseStack,
                                      float intensity, float xAngle, float yAngle,
                                      float[] colour) {
         // renderEndFlash takes no colour, so only the intensity is scaled.
-        skyRenderer.renderEndFlash(poseStack, intensity * colour[0],
+        sky.terrainlab$renderEndFlash(renderPass, poseStack, intensity * colour[0],
                 xAngle, yAngle);
     }
 

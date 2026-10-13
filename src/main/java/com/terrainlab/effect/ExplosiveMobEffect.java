@@ -20,14 +20,14 @@ public class ExplosiveMobEffect extends MobEffect {
     }
 
     @Override
-    public boolean isInstantenous() {
+    public boolean isInstantaneous() {
         return true;
     }
 
     // Reached by drinking, splash, tipped arrows and lingering clouds (which re-trigger at their
     // reapplication delay). The blast is credited to the thrower/shooter so kills count as theirs.
     @Override
-    public void applyInstantenousEffect(ServerLevel level, Entity source, Entity indirectSource,
+    public void applyInstantaneousEffect(ServerLevel level, Entity source, Entity indirectSource,
                                         LivingEntity entity, int amplifier, double healthModifier) {
         DamageSource damage = indirectSource != null
                 ? level.damageSources().explosion(source, indirectSource)

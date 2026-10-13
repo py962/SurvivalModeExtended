@@ -39,7 +39,7 @@ public class RaiderGearLayer extends RenderLayer<IllagerRenderState, IllagerMode
         gearPart.loadPose(parentPart.storePose());
 
         collector.order(1).submitModel(this.gearModel, renderState, poseStack,
-                RenderTypes.entityCutoutNoCull(this.texture),
-                packedLight, OverlayTexture.NO_OVERLAY, -1, null);
+                RenderTypes.entityCutout(this.texture),
+                packedLight, OverlayTexture.NO_OVERLAY, -1);
     }
 }

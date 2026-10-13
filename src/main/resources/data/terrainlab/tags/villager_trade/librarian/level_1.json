@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:librarian/level_1/buys_book",
+    "terrainlab:librarian/level_1/sells_book",
+    "terrainlab:librarian/level_1/buys_candle",
+    "terrainlab:librarian/level_1/sells_candle"
+  ]
+}

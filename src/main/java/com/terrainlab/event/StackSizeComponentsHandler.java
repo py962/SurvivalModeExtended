@@ -3,7 +3,8 @@ package com.terrainlab.event;
 import com.terrainlab.TerrainLab;
 import com.terrainlab.registry.ModItems;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.BedItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -42,14 +43,14 @@ public final class StackSizeComponentsHandler {
     @SubscribeEvent
     public static void onModifyDefaultComponents(ModifyDefaultComponentsEvent event) {
         for (Item item : LARGE_STACK_ITEMS) {
-            event.modify(item, patch -> patch.set(DataComponents.MAX_STACK_SIZE, LARGE_TRADE_STACK));
+            event.modify(item, (patch, context, it) -> patch.set(DataComponents.MAX_STACK_SIZE, LARGE_TRADE_STACK));
         }
-        event.modifyMatching(item -> item instanceof BedItem,
-                patch -> patch.set(DataComponents.MAX_STACK_SIZE, LARGE_TRADE_STACK));
+        event.modifyMatching((item, components) -> item instanceof BlockItem blockItem && blockItem.getBlock() instanceof BedBlock,
+                (patch, context, it) -> patch.set(DataComponents.MAX_STACK_SIZE, LARGE_TRADE_STACK));
 
         for (Item item : SMALL_STACK_ITEMS) {
-            event.modify(item, patch -> patch.set(DataComponents.MAX_STACK_SIZE, SMALL_TRADE_STACK));
+            event.modify(item, (patch, context, it) -> patch.set(DataComponents.MAX_STACK_SIZE, SMALL_TRADE_STACK));
         }
-        event.modify(ModItems.LEATHER_FLASK.get(), patch -> patch.set(DataComponents.MAX_STACK_SIZE, SMALL_TRADE_STACK));
+        event.modify(ModItems.LEATHER_FLASK.get(), (patch, context, it) -> patch.set(DataComponents.MAX_STACK_SIZE, SMALL_TRADE_STACK));
     }
 }

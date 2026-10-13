@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:farmer/level_1/buys_wheat",
+    "terrainlab:farmer/level_1/sells_wheat",
+    "terrainlab:farmer/level_1/buys_carrot",
+    "terrainlab:farmer/level_1/sells_carrot"
+  ]
+}

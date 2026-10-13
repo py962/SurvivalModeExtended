@@ -1,0 +1,5 @@
+{
+  "amount": 20,
+  "random_sequence": "minecraft:trade_set/wandering_trader/common",
+  "trades": "#terrainlab:wandering_trader/common"
+}

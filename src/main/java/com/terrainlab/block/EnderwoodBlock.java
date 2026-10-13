@@ -8,8 +8,4 @@ public class EnderwoodBlock extends Block {
     public EnderwoodBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
-    @Override
-    public com.mojang.serialization.MapCodec<? extends Block> codec() {
-        return simpleCodec(EnderwoodBlock::new);
-    }
 }

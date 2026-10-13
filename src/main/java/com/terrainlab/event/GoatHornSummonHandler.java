@@ -21,7 +21,7 @@ import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.EitherHolder;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -74,9 +74,9 @@ public class GoatHornSummonHandler {
 
         InstrumentComponent component = stack.get(DataComponents.INSTRUMENT);
         if (component == null) return;
-        EitherHolder<Instrument> instrument = component.instrument();
+        Holder<Instrument> instrument = component.instrument();
 
-        String key = instrument.key().map(k -> k.identifier().getPath()).orElse(null);
+        String key = instrument.unwrapKey().map(k -> k.identifier().getPath()).orElse(null);
         Class<? extends Mob> targetType = key != null ? HORN_TO_ANIMAL.get(key) : null;
         if (targetType == null) return;
 

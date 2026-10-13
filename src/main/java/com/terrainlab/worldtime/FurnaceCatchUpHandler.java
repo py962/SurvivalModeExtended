@@ -45,8 +45,8 @@ public class FurnaceCatchUpHandler {
     public static void onSleepFinished(SleepFinishedTimeEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
 
-        long oldTime = level.getDayTime();
-        long newTime = event.getNewTime();
+        long oldTime = level.getOverworldClockTime();
+        long newTime = WorldClockUtil.resolveOverworldAdjustment(level, event.getAdjustment(), oldTime);
         long skipped = Math.min(MAX_QUEUED_CATCHUP_TICKS, Math.max(0, newTime - oldTime));
         if (skipped <= 0) return;
 
@@ -89,12 +89,12 @@ public class FurnaceCatchUpHandler {
         Set<Long> visitedChunks = new HashSet<>();
 
         for (ServerPlayer player : level.players()) {
-            ChunkPos center = new ChunkPos(player.blockPosition());
+            ChunkPos center = ChunkPos.containing(player.blockPosition());
             for (int dx = -SCAN_RADIUS_CHUNKS; dx <= SCAN_RADIUS_CHUNKS; dx++) {
                 for (int dz = -SCAN_RADIUS_CHUNKS; dz <= SCAN_RADIUS_CHUNKS; dz++) {
-                    int chunkX = center.x + dx;
-                    int chunkZ = center.z + dz;
-                    long key = ChunkPos.asLong(chunkX, chunkZ);
+                    int chunkX = center.x() + dx;
+                    int chunkZ = center.z() + dz;
+                    long key = ChunkPos.pack(chunkX, chunkZ);
                     if (!visitedChunks.add(key)) continue;
                     if (!level.hasChunk(chunkX, chunkZ)) continue;
 

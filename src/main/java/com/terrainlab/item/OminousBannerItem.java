@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.BannerPatterns;
 public class OminousBannerItem extends BannerItem {
 
     public OminousBannerItem(Item.Properties properties) {
-        super(Blocks.WHITE_BANNER, Blocks.WHITE_WALL_BANNER, properties);
+        super(Blocks.BANNER.white(), Blocks.WALL_BANNER.white(), properties);
     }
 
     /** Builds the decorated stack with vanilla's Ominous Banner pattern layers, hidden from the tooltip. */

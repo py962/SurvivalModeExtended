@@ -338,12 +338,9 @@ public final class AtlasGenerationQueue {
                         // + prepared.origin()
         // );
 
-        player.displayClientMessage(
-                Component.literal(
+        player.sendOverlayMessage(Component.literal(
                         "Your Atlas has finished mapping the region."
-                ),
-                true
-        );
+                ));
 
         return true;
     }
@@ -405,12 +402,9 @@ public final class AtlasGenerationQueue {
                         // + " mapId=" + mapId
         // );
 
-        player.displayClientMessage(
-                Component.literal(
+        player.sendOverlayMessage(Component.literal(
                         "Your Atlas has finished mapping the region."
-                ),
-                true
-        );
+                ));
     }
 
     private static ItemStack findPendingStack(

@@ -58,7 +58,7 @@ public class LeatherFlaskItem extends Item {
         single.set(ModDataComponents.FLASK_CHARGES.get(), charges);
         stack.shrink(1);
         if (!player.getInventory().add(single)) {
-            player.drop(single, false);
+            player.drop(single, false, net.minecraft.util.Prediction.PREDICTED);
         }
     }
 

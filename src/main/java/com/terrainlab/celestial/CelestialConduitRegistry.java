@@ -48,7 +48,7 @@ public class CelestialConduitRegistry extends SavedData {
     }
 
     public static final SavedDataType<CelestialConduitRegistry> TYPE = new SavedDataType<>(
-            "terrainlab_celestial_conduits",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "celestial_conduits"),
             CelestialConduitRegistry::new,
             level -> RecordCodecBuilder.create(instance ->
                     instance.group(

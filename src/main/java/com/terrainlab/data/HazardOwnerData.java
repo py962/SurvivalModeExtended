@@ -41,7 +41,7 @@ public class HazardOwnerData extends SavedData {
     }
 
     public static final SavedDataType<HazardOwnerData> TYPE = new SavedDataType<>(
-            "terrainlab_hazard_owners",
+            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID, "hazard_owners"),
             HazardOwnerData::new,
             level -> RecordCodecBuilder.create(instance -> instance.group(
                     RecordCodecBuilder.point(level),

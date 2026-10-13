@@ -82,12 +82,12 @@ public final class BeaconWeather {
         RandomSource random = level.getRandom();
         if (kind == Kind.THUNDER) {
             int duration = THUNDER_MIN + random.nextInt(THUNDER_MAX - THUNDER_MIN + 1);
-            level.setWeatherParameters(0, duration, true, true);
+            level.getServer().setWeatherParameters(0, duration, true, true);
             overrideUntil.put(level.dimension(), level.getGameTime() + duration);
             level.playSound(null, beaconPos, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 4.0F, 0.9F);
         } else {
             int duration = CLEAR_MIN + random.nextInt(CLEAR_MAX - CLEAR_MIN + 1);
-            level.setWeatherParameters(duration, 0, false, false);
+            level.getServer().setWeatherParameters(duration, 0, false, false);
             overrideUntil.put(level.dimension(), level.getGameTime() + duration);
             level.playSound(null, beaconPos, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 1.5F, 0.8F);
             level.playSound(null, beaconPos, SoundEvents.BLAZE_SHOOT, SoundSource.BLOCKS, 1.0F, 0.6F);

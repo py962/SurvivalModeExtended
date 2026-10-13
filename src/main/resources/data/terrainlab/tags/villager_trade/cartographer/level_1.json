@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:cartographer/level_1/buys_paper",
+    "terrainlab:cartographer/level_1/sells_paper",
+    "terrainlab:cartographer/level_1/buys_compass",
+    "terrainlab:cartographer/level_1/sells_compass"
+  ]
+}

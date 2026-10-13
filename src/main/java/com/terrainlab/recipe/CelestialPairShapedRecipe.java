@@ -8,7 +8,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
@@ -18,13 +21,22 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
  */
 public class CelestialPairShapedRecipe extends ShapedRecipe {
 
+    public static final MapCodec<CelestialPairShapedRecipe> MAP_CODEC =
+            ShapedRecipe.MAP_CODEC.xmap(CelestialPairShapedRecipe::new, recipe -> recipe);
+    public static final StreamCodec<RegistryFriendlyByteBuf, CelestialPairShapedRecipe> STREAM_CODEC =
+            ShapedRecipe.STREAM_CODEC.map(CelestialPairShapedRecipe::new, recipe -> recipe);
+    public static final RecipeSerializer<CelestialPairShapedRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
     public CelestialPairShapedRecipe(ShapedRecipe base) {
-        super(base.group(), base.category(), base.pattern, base.assemble(CraftingInput.EMPTY, null), base.showNotification());
+        super(new Recipe.CommonInfo(base.showNotification()),
+                new CraftingRecipe.CraftingBookInfo(base.category(), base.group()),
+                base.pattern,
+                ItemStackTemplate.fromNonEmptyStack(base.assemble(CraftingInput.EMPTY)));
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        ItemStack result = super.assemble(input, registries);
+    public ItemStack assemble(CraftingInput input) {
+        ItemStack result = super.assemble(input);
         for (ItemStack stack : input.items()) {
             if (stack.getItem() instanceof CelestialPearlItem) {
                 var pairId = stack.get(ModDataComponents.CELESTIAL_PAIR_ID.get());
@@ -38,24 +50,9 @@ public class CelestialPairShapedRecipe extends ShapedRecipe {
     }
 
     @Override
-    public RecipeSerializer<CelestialPairShapedRecipe> getSerializer() {
-        return ModRecipeSerializers.CELESTIAL_PAIR_SHAPED.get();
-    }
-
-    public static class Serializer implements RecipeSerializer<CelestialPairShapedRecipe> {
-        private static final MapCodec<CelestialPairShapedRecipe> CODEC =
-                ShapedRecipe.Serializer.CODEC.xmap(CelestialPairShapedRecipe::new, recipe -> recipe);
-        private static final StreamCodec<RegistryFriendlyByteBuf, CelestialPairShapedRecipe> STREAM_CODEC =
-                ShapedRecipe.Serializer.STREAM_CODEC.map(CelestialPairShapedRecipe::new, recipe -> recipe);
-
-        @Override
-        public MapCodec<CelestialPairShapedRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, CelestialPairShapedRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
+    @SuppressWarnings("unchecked")
+    public RecipeSerializer<ShapedRecipe> getSerializer() {
+        // ShapedRecipe.getSerializer() is typed to ShapedRecipe; the cast is safe by erasure.
+        return (RecipeSerializer<ShapedRecipe>) (RecipeSerializer<?>) ModRecipeSerializers.CELESTIAL_PAIR_SHAPED.get();
     }
 }

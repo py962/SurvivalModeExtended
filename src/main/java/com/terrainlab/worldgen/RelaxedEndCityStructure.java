@@ -30,7 +30,8 @@ public class RelaxedEndCityStructure extends EndCityStructure {
     public Optional<Structure.GenerationStub> findGenerationPoint(
             Structure.GenerationContext context) {
         Rotation rotation = Rotation.getRandom(context.random());
-        BlockPos blockpos = this.getLowestYIn5by5BoxOffset7Blocks(context, rotation);
+        // 26.x replaced getLowestYIn5by5BoxOffset7Blocks with getLowestYIn5by5Box(x, z); offset 7 into the chunk as before.
+        BlockPos blockpos = this.getLowestYIn5by5Box(context, context.chunkPos().getBlockX(7), context.chunkPos().getBlockZ(7), rotation);
         return blockpos.getY() < 40 ? Optional.empty()
                 : Optional.of(new Structure.GenerationStub(blockpos,
                 (builder) -> this.generatePieces(builder, blockpos, rotation, context)));

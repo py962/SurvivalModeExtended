@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:disk",
+  "half_height": 2,
+  "radius": {
+    "type": "minecraft:uniform",
+    "max_inclusive": 8,
+    "min_inclusive": 7
+  },
+  "state_provider": {
+    "id": "minecraft:packed_ice"
+  },
+  "target": {
+    "type": "minecraft:matching_blocks",
+    "blocks": [
+      "minecraft:stone",
+      "minecraft:deepslate",
+      "minecraft:gravel",
+      "minecraft:dirt",
+      "minecraft:tuff"
+    ]
+  }
+}

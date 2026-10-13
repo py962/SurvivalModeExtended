@@ -1,0 +1,20 @@
+{
+  "values": [
+    "terrainlab:leatherworker/level_3/buys_leather_horse_armor",
+    "terrainlab:leatherworker/level_3/sells_leather_horse_armor",
+    "terrainlab:leatherworker/level_3/buys_cactus",
+    "terrainlab:leatherworker/level_3/buys_fern",
+    "terrainlab:leatherworker/level_3/buys_oxeye_daisy",
+    "terrainlab:leatherworker/level_3/buys_dandelion",
+    "terrainlab:leatherworker/level_3/buys_orange_tulip",
+    "terrainlab:leatherworker/level_3/buys_blue_orchid",
+    "terrainlab:leatherworker/level_3/buys_lily_of_the_valley",
+    "terrainlab:leatherworker/level_3/sells_cactus",
+    "terrainlab:leatherworker/level_3/sells_fern",
+    "terrainlab:leatherworker/level_3/sells_oxeye_daisy",
+    "terrainlab:leatherworker/level_3/sells_dandelion",
+    "terrainlab:leatherworker/level_3/sells_orange_tulip",
+    "terrainlab:leatherworker/level_3/sells_blue_orchid",
+    "terrainlab:leatherworker/level_3/sells_lily_of_the_valley"
+  ]
+}

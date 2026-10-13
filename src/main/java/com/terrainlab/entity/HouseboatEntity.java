@@ -292,21 +292,19 @@ public class HouseboatEntity extends Boat {
     // Empty-hand click while already aboard sleeps; shift is reserved for descent/dismount.
     // Empty-hand click from outside mounts; any other click goes to vanilla.
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
         boolean alreadyRiding = this.getPassengers().contains(player);
         boolean emptyHand = player.getItemInHand(hand).isEmpty();
 
         if (alreadyRiding && emptyHand) {
             if (!level().isClientSide() && player instanceof ServerPlayer serverPlayer) {
                 if (isSleepingInBoat) {
-                    serverPlayer.displayClientMessage(
-                            Component.literal("Someone is already sleeping."), true);
+                    serverPlayer.sendOverlayMessage(Component.literal("Someone is already sleeping."));
                 } else {
                     if (isSuspendedFromGhast() || isStationary()) {
                         trySleepPlayer(serverPlayer);
                     } else {
-                        serverPlayer.displayClientMessage(
-                                Component.literal("The boat must be still to sleep."), true);
+                        serverPlayer.sendOverlayMessage(Component.literal("The boat must be still to sleep."));
                     }
                 }
             }
@@ -314,7 +312,7 @@ public class HouseboatEntity extends Boat {
         }
 
         if (!emptyHand) {
-            return super.interact(player, hand);
+            return super.interact(player, hand, location);
         }
 
         if (!level().isClientSide() && !player.startRiding(this)) {
@@ -335,16 +333,14 @@ public class HouseboatEntity extends Boat {
 
         if (level.dimension().equals(Level.NETHER) ||
                 level.dimension().equals(Level.END)) {
-            player.displayClientMessage(
-                    Component.literal("You cannot sleep in this dimension."), true);
+            player.sendOverlayMessage(Component.literal("You cannot sleep in this dimension."));
             return;
         }
 
-        long dayTime = level.getDayTime() % 24000;
+        long dayTime = level.getOverworldClockTime() % 24000;
         boolean isNight = dayTime >= 12000 && dayTime < 24000;
         if (!isNight && !level.isThundering()) {
-            player.displayClientMessage(
-                    Component.literal("You can only sleep at night."), true);
+            player.sendOverlayMessage(Component.literal("You can only sleep at night."));
             return;
         }
 
@@ -352,17 +348,16 @@ public class HouseboatEntity extends Boat {
         BlockPos headPos = boatPos.above().relative(Direction.NORTH);
 
         if (!isFreeForTempBed(footPos) || !isFreeForTempBed(headPos)) {
-            player.displayClientMessage(
-                    Component.literal("There is no room to sleep here."), true);
+            player.sendOverlayMessage(Component.literal("There is no room to sleep here."));
             return;
         }
 
-        BlockState footState = Blocks.RED_BED.defaultBlockState()
+        BlockState footState = Blocks.BED.red().defaultBlockState()
                 .setValue(BedBlock.FACING, Direction.NORTH)
                 .setValue(BedBlock.PART, BedPart.FOOT)
                 .setValue(BedBlock.OCCUPIED, false);
 
-        BlockState headState = Blocks.RED_BED.defaultBlockState()
+        BlockState headState = Blocks.BED.red().defaultBlockState()
                 .setValue(BedBlock.FACING, Direction.NORTH)
                 .setValue(BedBlock.PART, BedPart.HEAD)
                 .setValue(BedBlock.OCCUPIED, false);
@@ -376,7 +371,9 @@ public class HouseboatEntity extends Boat {
         player.snapTo(headPos.getX() + 0.5, headPos.getY(),
                 headPos.getZ() + 0.5, player.getYRot(), player.getXRot());
 
-        var result = player.startSleepInBed(headPos);
+        net.minecraft.world.level.block.AbstractBedBlock bedBlock =
+                (net.minecraft.world.level.block.AbstractBedBlock) headState.getBlock();
+        var result = player.startSleepInBed(bedBlock, headState, bedBlock.getBedRule(level, headPos), headPos);
 
         if (result.left().isPresent() &&
                 result.left().get() == Player.BedSleepingProblem.NOT_SAFE) {
@@ -390,9 +387,8 @@ public class HouseboatEntity extends Boat {
         if (result.left().isPresent()) {
             removeTempBed();
             sleepingPlayerUUID = null;
-            player.displayClientMessage(
-                    Component.literal("Cannot sleep here: " +
-                            result.left().get()), true);
+            player.sendOverlayMessage(Component.literal("Cannot sleep here: " +
+                            result.left().get()));
         } else {
             isSleepingInBoat = true;
             sleepingPlayerUUID = player.getUUID();
@@ -416,13 +412,13 @@ public class HouseboatEntity extends Boat {
 
     private void removeTempBed() {
         if (tempBedPos != null) {
-            if (level().getBlockState(tempBedPos).is(Blocks.RED_BED)) {
+            if (level().getBlockState(tempBedPos).is(Blocks.BED.red())) {
                 level().setBlock(tempBedPos, Blocks.AIR.defaultBlockState(), 3);
             }
             tempBedPos = null;
         }
         if (tempBedFootPos != null) {
-            if (level().getBlockState(tempBedFootPos).is(Blocks.RED_BED)) {
+            if (level().getBlockState(tempBedFootPos).is(Blocks.BED.red())) {
                 level().setBlock(tempBedFootPos, Blocks.AIR.defaultBlockState(), 3);
             }
             tempBedFootPos = null;

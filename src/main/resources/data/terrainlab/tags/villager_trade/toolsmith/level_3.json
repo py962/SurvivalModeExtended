@@ -1,0 +1,14 @@
+{
+  "values": [
+    "terrainlab:toolsmith/level_3/buys_bell",
+    "terrainlab:toolsmith/level_3/sells_bell",
+    "terrainlab:toolsmith/level_3/buys_diamond_hoe",
+    "terrainlab:toolsmith/level_3/sells_diamond_hoe_reach_fortune",
+    "terrainlab:toolsmith/level_3/sells_diamond_hoe_efficiency_silk_touch",
+    "terrainlab:toolsmith/level_3/sells_diamond_hoe_efficiency_fortune",
+    "terrainlab:toolsmith/level_3/sells_diamond_hoe_unbreaking_fortune",
+    "terrainlab:toolsmith/level_3/sells_diamond_hoe_silk_touch_unbreaking",
+    "terrainlab:toolsmith/level_3/sells_diamond_hoe_silk_touch_reach",
+    "terrainlab:toolsmith/level_3/sells_diamond_hoe_efficiency_unbreaking"
+  ]
+}

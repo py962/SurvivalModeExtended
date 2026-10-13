@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:librarian/level_3/buys_writable_book",
+    "terrainlab:librarian/level_3/sells_writable_book",
+    "terrainlab:librarian/level_3/buys_clock",
+    "terrainlab:librarian/level_3/sells_clock"
+  ]
+}

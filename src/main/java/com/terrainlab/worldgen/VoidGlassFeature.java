@@ -1,20 +1,20 @@
 package com.terrainlab.worldgen;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import com.terrainlab.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
  * Replaces exposed End stone surfaces at Y 30 or below with void glass, with a chance that grows
  * with distance from the origin and is biased towards lower Y.
  */
-public class VoidGlassFeature extends Feature<NoneFeatureConfiguration> {
+public final class VoidGlassFeature implements Feature {
 
     private static final double MIN_DISTANCE = 1500.0;  // blocks; MIN_PROBABILITY from here
     private static final double MAX_DISTANCE = 5000.0;  // blocks; MAX_PROBABILITY from here
@@ -26,15 +26,18 @@ public class VoidGlassFeature extends Feature<NoneFeatureConfiguration> {
     private static final int HIGH_Y = 50;   // minimum bias
     private static final int LOW_Y = 0;    // maximum bias
 
-    public VoidGlassFeature(Codec<NoneFeatureConfiguration> codec) {
-        super(codec);
+    public static final MapCodec<VoidGlassFeature> CODEC = MapCodec.unit(VoidGlassFeature::new);
+
+    public VoidGlassFeature() {
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
-        BlockPos origin = context.origin();
-        var random = context.random();
+    public MapCodec<VoidGlassFeature> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
 
         double distance = Math.sqrt(
                 origin.getX() * (double) origin.getX()
@@ -48,7 +51,7 @@ public class VoidGlassFeature extends Feature<NoneFeatureConfiguration> {
         double baseProbability = MIN_PROBABILITY + t * (MAX_PROBABILITY - MIN_PROBABILITY);
 
         // Only the origin chunk's own columns, so each column is rolled once per chunk.
-        ChunkPos chunkPos = new ChunkPos(origin);
+        ChunkPos chunkPos = ChunkPos.containing(origin);
         int minX = chunkPos.getMinBlockX();
         int minZ = chunkPos.getMinBlockZ();
 

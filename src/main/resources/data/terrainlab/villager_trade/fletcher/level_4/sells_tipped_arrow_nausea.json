@@ -1,0 +1,32 @@
+{
+  "wants": {
+    "id": "minecraft:emerald"
+  },
+  "gives": {
+    "id": "minecraft:tipped_arrow",
+    "count": 2,
+    "components": {
+      "minecraft:potion_contents": {
+        "custom_effects": [
+          {
+            "id": "minecraft:nausea",
+            "duration": 400
+          }
+        ],
+        "custom_name": "nausea"
+      }
+    }
+  },
+  "max_uses": 4,
+  "xp": 10,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:savanna"
+      }
+    }
+  }
+}

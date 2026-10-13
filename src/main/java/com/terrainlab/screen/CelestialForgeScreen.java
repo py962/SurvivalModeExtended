@@ -1,7 +1,7 @@
 package com.terrainlab.screen;
 
 import com.terrainlab.menu.CelestialForgeMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.resources.Identifier;
@@ -36,9 +36,7 @@ public class CelestialForgeScreen extends AbstractContainerScreen<CelestialForge
     private final CyclingSlotBackground gemIcon = new CyclingSlotBackground(0);
 
     public CelestialForgeScreen(CelestialForgeMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 166;
+        super(menu, inventory, title, 176, 166);
         this.inventoryLabelY = CelestialForgeMenu.INVENTORY_Y - 11;
     }
 
@@ -49,13 +47,8 @@ public class CelestialForgeScreen extends AbstractContainerScreen<CelestialForge
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(graphics, mouseX, mouseY);
-    }
-
-    @Override
-    protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(g, mouseX, mouseY, partialTick);
         int x = leftPos, y = topPos;
         g.fill(x, y, x + imageWidth, y + imageHeight, OUTLINE);
         g.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, PANEL);
@@ -67,7 +60,7 @@ public class CelestialForgeScreen extends AbstractContainerScreen<CelestialForge
         renderAurora(g, x + 7, y + 16, imageWidth - 14, 14);
 
         drawSlot(g, x + CelestialForgeMenu.GEM_X - 1, y + CelestialForgeMenu.GEM_Y - 1);
-        gemIcon.render(menu, g, partialTick, leftPos, topPos);
+        gemIcon.extractRenderState(menu, g, partialTick, leftPos, topPos);
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 drawSlot(g, x + 7 + col * 18, y + CelestialForgeMenu.INVENTORY_Y - 1 + row * 18);
@@ -79,19 +72,19 @@ public class CelestialForgeScreen extends AbstractContainerScreen<CelestialForge
     }
 
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        g.drawString(font, title, titleLabelX, titleLabelY, 0xFF404040, false);
-        g.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xFF404040, false);
+    protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
+        g.text(font, title, titleLabelX, titleLabelY, 0xFF404040, false);
+        g.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xFF404040, false);
     }
 
-    private static void drawSlot(GuiGraphics g, int x, int y) {
+    private static void drawSlot(GuiGraphicsExtractor g, int x, int y) {
         g.fill(x, y, x + 18, y + 18, LIGHT);
         g.fill(x, y, x + 17, y + 17, SLOT_DARK);
         g.fill(x + 1, y + 1, x + 17, y + 17, SLOT_BG);
     }
 
     /** A thin rippling aurora curtain (green to violet). */
-    private static void renderAurora(GuiGraphics g, int x0, int y0, int width, int height) {
+    private static void renderAurora(GuiGraphicsExtractor g, int x0, int y0, int width, int height) {
         g.fill(x0, y0, x0 + width, y0 + height, 0xFF0B1030);
         float t = (Util.getMillis() % 100000L) / 1000f;
         for (int i = 0; i < width; i++) {

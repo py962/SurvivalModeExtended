@@ -32,6 +32,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 
 import java.util.List;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Spawns a mounted outlaw patrol once per generated outlaws_hideout: six saddled, untamed
@@ -78,8 +79,7 @@ public class OutlawPatrolSpawnHandler {
 
         Structure outlawsHideout = outlawsHideoutOpt.get().value();
 
-        List<StructureStart> starts = structureManager.startsForStructure(
-                chunkPos, s -> s == outlawsHideout);
+        List<StructureStart> starts = structureManager.startsForStructure(chunkPos.x(), chunkPos.z(), s -> s == outlawsHideout);
         if (starts.isEmpty()) return;
 
         StructureStart start = starts.get(0);
@@ -162,9 +162,9 @@ public class OutlawPatrolSpawnHandler {
     private static boolean spawnRider(ServerLevel level, BlockPos pos, DifficultyInstance difficulty,
                                        RandomSource random, BlockPos hideoutCentre, int halfX, int halfZ,
                                        int distance, float angle, List<BlockPos> tunnelRoute) {
-        Horse horse = EntityType.HORSE.create(level, EntitySpawnReason.MOB_SUMMONED);
+        Horse horse = EntityTypes.HORSE.create(level, EntitySpawnReason.MOB_SUMMONED);
         if (horse == null) {
-            TerrainLab.LOGGER.warn("EntityType.HORSE.create() returned null - skipping one outlaw rider");
+            TerrainLab.LOGGER.warn("EntityTypes.HORSE.create() returned null - skipping one outlaw rider");
             return false;
         }
 

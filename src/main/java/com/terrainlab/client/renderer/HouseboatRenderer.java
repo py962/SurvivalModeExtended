@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.AbstractBoatRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.BoatRenderState;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -28,7 +27,7 @@ public class HouseboatRenderer extends AbstractBoatRenderer {
     private final Model.Simple waterPatchModel;
 
     public HouseboatRenderer(EntityRendererProvider.Context context) {
-        super(context);
+        super(context, TEXTURE);
         this.model = new HouseboatModel(
                 context.bakeLayer(com.terrainlab.registry.ModModelLayers.HOUSEBOAT));
         this.waterPatchModel = new Model.Simple(
@@ -42,18 +41,13 @@ public class HouseboatRenderer extends AbstractBoatRenderer {
     }
 
     @Override
-    protected RenderType renderType() {
-        return model.renderType(TEXTURE);
-    }
-
-    @Override
     protected void submitTypeAdditions(BoatRenderState state, PoseStack poseStack,
                                        SubmitNodeCollector collector, int lightCoords) {
         if (!state.isUnderWater) {
             collector.submitModel(waterPatchModel, Unit.INSTANCE, poseStack,
-                    waterPatchModel.renderType(TEXTURE),
+                    TEXTURE,
                     lightCoords, OverlayTexture.NO_OVERLAY,
-                    state.outlineColor, null);
+                    state.outlineColor);
         }
     }
 }

@@ -33,7 +33,7 @@ public class TerrainLabDebugEntry implements DebugScreenEntry {
 
         BlockPos pos = BlockPos.containing(player.getX(), player.getY(), player.getZ());
 
-        long dayTime = mc.level.getDayTime();
+        long dayTime = mc.level.getOverworldClockTime();
         long seasonalOffset = ClientSeasonState.getSeasonalOffset();
 
         long gameTime = mc.level.getGameTime(); // seasons run on game time, like every other caller

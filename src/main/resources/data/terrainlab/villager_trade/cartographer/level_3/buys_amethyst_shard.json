@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:amethyst_shard",
+    "count": 3
+  },
+  "gives": {
+    "id": "minecraft:emerald"
+  },
+  "max_uses": 8,
+  "xp": 5,
+  "reputation_discount": 0.05
+}

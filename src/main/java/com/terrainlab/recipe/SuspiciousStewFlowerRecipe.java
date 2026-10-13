@@ -21,8 +21,12 @@ import net.minecraft.world.effect.MobEffects;
  */
 public class SuspiciousStewFlowerRecipe extends CustomRecipe {
 
-    public SuspiciousStewFlowerRecipe(CraftingBookCategory category) {
-        super(category);
+    public static final SuspiciousStewFlowerRecipe INSTANCE = new SuspiciousStewFlowerRecipe();
+    public static final com.mojang.serialization.MapCodec<SuspiciousStewFlowerRecipe> MAP_CODEC = com.mojang.serialization.MapCodec.unit(INSTANCE);
+    public static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, SuspiciousStewFlowerRecipe> STREAM_CODEC =
+            net.minecraft.network.codec.StreamCodec.unit(INSTANCE);
+
+    public SuspiciousStewFlowerRecipe() {
     }
 
     @Override
@@ -45,7 +49,7 @@ public class SuspiciousStewFlowerRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+    public ItemStack assemble(CraftingInput input) {
         String flower = null;
         for (int i = 0; i < input.size(); i++) {
             ItemStack s = input.getItem(i);

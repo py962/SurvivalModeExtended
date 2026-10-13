@@ -113,8 +113,7 @@ public class ModLeashHandler {
             if (isBoatSuspendedFromGhast(boat2)) {
                 if (!player.isSecondaryUseActive()) {
                     event.setCanceled(true);
-                    player.displayClientMessage(
-                            Component.literal("Sneak + shears to disconnect."), true);
+                    player.sendOverlayMessage(Component.literal("Sneak + shears to disconnect."));
                     return;
                 }
             }
@@ -125,8 +124,7 @@ public class ModLeashHandler {
             if (isGhastTowingBoat(ghast2, level)) {
                 if (!player.isSecondaryUseActive()) {
                     event.setCanceled(true);
-                    player.displayClientMessage(
-                            Component.literal("Sneak + shears to disconnect."), true);
+                    player.sendOverlayMessage(Component.literal("Sneak + shears to disconnect."));
                     return;
                 }
             }
@@ -178,8 +176,7 @@ public class ModLeashHandler {
         if (!(event.getTarget() instanceof HouseboatEntity boat)) return;
         if (isBoatSuspendedFromGhast(boat)) {
             event.setCanceled(true);
-            event.getEntity().displayClientMessage(
-                    Component.literal("Cannot damage the houseboat while suspended."), true);
+            event.getEntity().sendOverlayMessage(Component.literal("Cannot damage the houseboat while suspended."));
         }
     }
 }

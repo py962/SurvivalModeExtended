@@ -30,7 +30,7 @@ public class SpectatorDebugTrace {
         tickCounter++;
         if (tickCounter % 20 != 0) return;
 
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
         Entity cameraEntity = mc.getCameraEntity();
 
         // TerrainLab.LOGGER.info(

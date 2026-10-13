@@ -1,0 +1,16 @@
+{
+  "wants": {
+    "id": "minecraft:diamond_pickaxe",
+    "components": {
+      "terrainlab:requires_enchantment": {},
+      "minecraft:enchantment_glint_override": true
+    }
+  },
+  "gives": {
+    "id": "minecraft:emerald",
+    "count": 14
+  },
+  "max_uses": 2,
+  "xp": 0,
+  "reputation_discount": 0.05
+}

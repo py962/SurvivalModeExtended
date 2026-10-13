@@ -13,7 +13,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
+import net.minecraft.world.level.dimension.end.EnderDragonFight;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -23,6 +23,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Mob-kill XP rebalance: flat boss rewards, an XP penalty for killing passive/neutral mobs and baby
@@ -47,8 +48,8 @@ public final class MobExperienceHandler {
      * several drop events of its death animation.
      */
     private static final Map<EntityType<?>, Integer> STRAIGHT_OVERRIDE = Map.of(
-            EntityType.ENDER_DRAGON, 500,
-            EntityType.WITHER, 500
+            EntityTypes.ENDER_DRAGON, 500,
+            EntityTypes.WITHER, 500
     );
 
     /**
@@ -57,19 +58,19 @@ public final class MobExperienceHandler {
      */
     private static final Set<EntityType<?>> PENALTY_BUCKET = Set.of(
             // Passive
-            EntityType.AXOLOTL, EntityType.CAMEL, EntityType.CAT, EntityType.CHICKEN,
-            EntityType.COD, EntityType.COW, EntityType.DONKEY, EntityType.FOX,
-            EntityType.FROG, EntityType.GLOW_SQUID, EntityType.HORSE, EntityType.MOOSHROOM,
-            EntityType.OCELOT, EntityType.PARROT, EntityType.PIG, EntityType.PUFFERFISH,
-            EntityType.RABBIT, EntityType.SALMON, EntityType.SHEEP, EntityType.SKELETON_HORSE,
-            EntityType.SNIFFER, EntityType.SQUID, EntityType.STRIDER, EntityType.TROPICAL_FISH,
-            EntityType.TURTLE, EntityType.ZOMBIE_HORSE, EntityType.ALLAY, EntityType.BAT,
-            EntityType.SNOW_GOLEM, EntityType.TADPOLE, EntityType.VILLAGER, EntityType.WANDERING_TRADER,
-            EntityType.COPPER_GOLEM,
+            EntityTypes.AXOLOTL, EntityTypes.CAMEL, EntityTypes.CAT, EntityTypes.CHICKEN,
+            EntityTypes.COD, EntityTypes.COW, EntityTypes.DONKEY, EntityTypes.FOX,
+            EntityTypes.FROG, EntityTypes.GLOW_SQUID, EntityTypes.HORSE, EntityTypes.MOOSHROOM,
+            EntityTypes.OCELOT, EntityTypes.PARROT, EntityTypes.PIG, EntityTypes.PUFFERFISH,
+            EntityTypes.RABBIT, EntityTypes.SALMON, EntityTypes.SHEEP, EntityTypes.SKELETON_HORSE,
+            EntityTypes.SNIFFER, EntityTypes.SQUID, EntityTypes.STRIDER, EntityTypes.TROPICAL_FISH,
+            EntityTypes.TURTLE, EntityTypes.ZOMBIE_HORSE, EntityTypes.ALLAY, EntityTypes.BAT,
+            EntityTypes.SNOW_GOLEM, EntityTypes.TADPOLE, EntityTypes.VILLAGER, EntityTypes.WANDERING_TRADER,
+            EntityTypes.COPPER_GOLEM,
             // Neutral
-            EntityType.IRON_GOLEM, EntityType.BEE, EntityType.DOLPHIN, EntityType.GOAT,
-            EntityType.LLAMA, EntityType.PANDA, EntityType.POLAR_BEAR, EntityType.TRADER_LLAMA,
-            EntityType.WOLF
+            EntityTypes.IRON_GOLEM, EntityTypes.BEE, EntityTypes.DOLPHIN, EntityTypes.GOAT,
+            EntityTypes.LLAMA, EntityTypes.PANDA, EntityTypes.POLAR_BEAR, EntityTypes.TRADER_LLAMA,
+            EntityTypes.WOLF
     );
 
     @SubscribeEvent
@@ -152,7 +153,7 @@ public final class MobExperienceHandler {
 
     /** Total XP vanilla awards across all of the dragon's death drops (matches EnderDragon.tickDeath). */
     private static int vanillaDragonTotal(EnderDragon dragon) {
-        EndDragonFight fight = dragon.getDragonFight();
+        EnderDragonFight fight = dragon.getDragonFight();
         return fight != null && !fight.hasPreviouslyKilledDragon() ? 12000 : 500;
     }
 

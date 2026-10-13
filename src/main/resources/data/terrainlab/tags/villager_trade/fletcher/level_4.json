@@ -1,0 +1,19 @@
+{
+  "values": [
+    "terrainlab:fletcher/level_4/buys_tipped_arrow",
+    "terrainlab:fletcher/level_4/sells_tipped_arrow_weakness",
+    "terrainlab:fletcher/level_4/sells_tipped_arrow_explosive",
+    "terrainlab:fletcher/level_4/sells_tipped_arrow_blindness",
+    "terrainlab:fletcher/level_4/sells_tipped_arrow_nausea",
+    "terrainlab:fletcher/level_4/sells_tipped_arrow_slowness",
+    "terrainlab:fletcher/level_4/sells_tipped_arrow_poison",
+    "terrainlab:fletcher/level_4/sells_tipped_arrow_harming",
+    "terrainlab:fletcher/level_4/buys_crossbow",
+    "terrainlab:fletcher/level_4/sells_crossbow_piercing_quick_charge",
+    "terrainlab:fletcher/level_4/sells_crossbow_quick_charge_unbreaking",
+    "terrainlab:fletcher/level_4/sells_crossbow_multishot_piercing",
+    "terrainlab:fletcher/level_4/sells_crossbow_piercing_unbreaking",
+    "terrainlab:fletcher/level_4/sells_crossbow_multishot_quick_charge",
+    "terrainlab:fletcher/level_4/sells_crossbow_multishot_unbreaking"
+  ]
+}

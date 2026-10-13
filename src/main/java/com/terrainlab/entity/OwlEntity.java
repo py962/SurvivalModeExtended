@@ -45,7 +45,7 @@ public class OwlEntity extends Parrot {
             );
 
     private static boolean isDayTime(Level level) {
-        long dayTime = level.getDayTime() % 24000L;
+        long dayTime = level.getOverworldClockTime() % 24000L;
         return dayTime >= 2000L && dayTime < 10000L;
     }
 
@@ -369,7 +369,7 @@ public class OwlEntity extends Parrot {
                 return false;
             }
 
-            long dayTime = this.owl.level().getDayTime();
+            long dayTime = this.owl.level().getOverworldClockTime();
 
             if (dayTime % 24000L < DAWN_START) {
                 return false;
@@ -403,7 +403,7 @@ public class OwlEntity extends Parrot {
         public void start() {
             if (this.owl.getOwner() instanceof Player player) {
                 this.lastGiftDay =
-                        this.owl.level().getDayTime() / 24000L;
+                        this.owl.level().getOverworldClockTime() / 24000L;
 
                 giveGift(player);
             }

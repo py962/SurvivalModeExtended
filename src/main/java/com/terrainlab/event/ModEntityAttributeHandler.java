@@ -5,6 +5,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.minecraft.world.entity.EntityTypes;
 
 /** Adjusts vanilla entity attributes: Snow Golem max health. */
 @EventBusSubscriber(modid = com.terrainlab.TerrainLab.MODID)
@@ -15,6 +16,6 @@ public class ModEntityAttributeHandler {
 
     @SubscribeEvent
     public static void onEntityAttributeModification(EntityAttributeModificationEvent event) {
-        event.add(EntityType.SNOW_GOLEM, Attributes.MAX_HEALTH, SNOW_GOLEM_MAX_HEALTH);
+        event.add(EntityTypes.SNOW_GOLEM, Attributes.MAX_HEALTH, SNOW_GOLEM_MAX_HEALTH);
     }
 }

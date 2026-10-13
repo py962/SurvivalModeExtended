@@ -1,0 +1,8 @@
+{
+  "values": [
+    "terrainlab:butcher/level_1/buys_bone",
+    "terrainlab:butcher/level_1/sells_bone",
+    "terrainlab:butcher/level_1/buys_chicken",
+    "terrainlab:butcher/level_1/sells_cooked_chicken"
+  ]
+}

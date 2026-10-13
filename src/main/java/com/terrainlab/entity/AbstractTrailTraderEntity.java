@@ -69,6 +69,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.LongAdder;
+import net.minecraft.world.entity.EntityTypes;
 
 /**
  * Shared base for the four Trail Trader guide variants (Ranger, Archeologist,
@@ -778,13 +779,10 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         Player player = this.getTradingPlayer();
 
         if (player != null) {
-            player.displayClientMessage(
-                    Component.translatableWithFallback(
+            player.sendOverlayMessage(Component.translatableWithFallback(
                             "message.terrainlab.trail_trader.wrong_relic",
                             "That's not the one I'm looking for."
-                    ),
-                    true
-            );
+                    ));
         }
 
         return false;
@@ -987,7 +985,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             ServerLevel level,
             TagKey<Structure> tag) {
 
-        if (!level.getServer().getWorldData().worldGenOptions().generateStructures()) {
+        if (!level.getServer().getWorldGenSettings().options().generateStructures()) {
             return "structures are turned off in this world";
         }
 
@@ -1087,7 +1085,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
     private static void giveOrDrop(Player player, ItemStack stack) {
         if (!player.getInventory().add(stack)) {
-            player.drop(stack, false);
+            player.drop(stack, false, net.minecraft.util.Prediction.SERVER_ONLY);
         }
     }
 
@@ -1113,14 +1111,11 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
         swapPurchasedStub(player, stubName, offer.getCostA().copy());
 
-        player.displayClientMessage(
-                Component.translatableWithFallback(
+        player.sendSystemMessage(Component.translatableWithFallback(
                         "message.terrainlab.trail_trader.no_destination",
                         "I can't find a %s anywhere in this world.",
                         destinationName
-                ),
-                false
-        );
+                ));
     }
 
     @Override
@@ -1290,8 +1285,8 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         Optional<Long> chunk = entry.getLong(RECALL_FORCED_CHUNK);
 
         if (chunk.isPresent()) {
-            ChunkPos pos = new ChunkPos(chunk.get());
-            level.setChunkForced(pos.x, pos.z, false);
+            ChunkPos pos = ChunkPos.unpack(chunk.get());
+            level.setChunkForced(pos.x(), pos.z(), false);
             entry.remove(RECALL_FORCED_CHUNK);
         }
 
@@ -1374,10 +1369,10 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                     continue;
                 }
 
-                ChunkPos chunk = new ChunkPos(BlockPos.of(lastPos.get()));
+                ChunkPos chunk = ChunkPos.containing(BlockPos.of(lastPos.get()));
 
-                level.setChunkForced(chunk.x, chunk.z, true);
-                entry.putLong(RECALL_FORCED_CHUNK, chunk.toLong());
+                level.setChunkForced(chunk.x(), chunk.z(), true);
+                entry.putLong(RECALL_FORCED_CHUNK, chunk.pack());
                 entry.putLong(RECALL_FORCED_AT, now);
             }
         }
@@ -1921,7 +1916,9 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
     /** Whether the biome at pos has this type in its spawn list (biome modifiers included). */
     public static boolean biomeListsType(LevelAccessor level, BlockPos pos, EntityType<?> type) {
-        return level.getBiome(pos).value().getMobSettings().getMobs(type.getCategory()).unwrap().stream()
+        return level.environmentAttributes()
+                .getValue(net.minecraft.world.attribute.EnvironmentAttributes.NATURAL_MOB_SPAWNS, pos)
+                .getMobsToSpawn(type.getCategory()).unwrap().stream()
                 .anyMatch(entry -> entry.value().type() == type);
     }
 
@@ -2270,14 +2267,14 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         }
 
         Donkey donkey =
-                EntityType.DONKEY.create(
+                EntityTypes.DONKEY.create(
                         serverLevel,
                         EntitySpawnReason.MOB_SUMMONED
                 );
 
         if (donkey == null) {
             com.terrainlab.TerrainLab.LOGGER.warn(
-                    "[TrailTraderDonkeyDebug] EntityType.DONKEY.create() "
+                    "[TrailTraderDonkeyDebug] EntityTypes.DONKEY.create() "
                             + "returned null - no donkey/lead will spawn "
                             + "for trader {}",
                     this.getUUID()
@@ -2524,7 +2521,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
         for (Entity entity : level.getAllEntities()) {
             if (entity instanceof Donkey d
-                    && d.getType() == EntityType.DONKEY
+                    && d.getType() == EntityTypes.DONKEY
                     && d.isAlive()) {
 
                 donkeys.add(d);

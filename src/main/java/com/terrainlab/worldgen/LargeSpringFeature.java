@@ -1,6 +1,7 @@
 package com.terrainlab.worldgen;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -8,29 +9,30 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.material.Fluids;
 
 /**
  * Large mountain spring: carves a 4-wide, 2-tall, 2-deep pocket into a solid wall and fills it with
  * water sources, leaving an open mouth in front so the water pours out and flows downhill.
  */
-public class LargeSpringFeature extends Feature<NoneFeatureConfiguration> {
+public final class LargeSpringFeature implements Feature {
 
     private static final int WIDTH = 4;
     private static final int HEIGHT = 2;
     private static final int EMBED_DEPTH = 2;
 
-    public LargeSpringFeature(Codec<NoneFeatureConfiguration> codec) {
-        super(codec);
+    public static final MapCodec<LargeSpringFeature> CODEC = MapCodec.unit(LargeSpringFeature::new);
+
+    public LargeSpringFeature() {
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
-        BlockPos origin = context.origin();
-        RandomSource random = context.random();
+    public MapCodec<LargeSpringFeature> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
 
         // Shuffle the horizontal directions so springs don't all face one way.
         Direction[] directions = Direction.Plane.HORIZONTAL.stream().toArray(Direction[]::new);
@@ -67,24 +69,24 @@ public class LargeSpringFeature extends Feature<NoneFeatureConfiguration> {
 
                 for (int d = 1; d <= EMBED_DEPTH; d++) {
                     BlockPos carved = mouth.relative(into, d);
-                    if (!level.getBlockState(carved).blocksMotion()) {
+                    if (!level.getBlockState(carved).isSolid()) {
                         return false;
                     }
                 }
 
                 BlockPos backing = mouth.relative(into, EMBED_DEPTH + 1);
-                if (!level.getBlockState(backing).blocksMotion()) {
+                if (!level.getBlockState(backing).isSolid()) {
                     return false;
                 }
             }
 
             // Solid floor under the mouth and every carved layer.
-            if (!level.getBlockState(columnFront.below()).blocksMotion()) {
+            if (!level.getBlockState(columnFront.below()).isSolid()) {
                 return false;
             }
             for (int d = 1; d <= EMBED_DEPTH; d++) {
                 BlockPos carvedBase = columnFront.relative(into, d);
-                if (!level.getBlockState(carvedBase.below()).blocksMotion()) {
+                if (!level.getBlockState(carvedBase.below()).isSolid()) {
                     return false;
                 }
             }
