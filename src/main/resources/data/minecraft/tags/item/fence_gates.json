@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "terrainlab:pine_fence_gate",
+    "terrainlab:azalea_fence_gate",
+    "terrainlab:enderwood_fence_gate"
+  ]
+}

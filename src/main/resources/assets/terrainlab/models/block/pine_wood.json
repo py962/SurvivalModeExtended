@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "terrainlab:block/pine_log",
+    "side": "terrainlab:block/pine_log"
+  }
+}

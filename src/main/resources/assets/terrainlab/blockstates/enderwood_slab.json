@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "terrainlab:block/enderwood_slab"
+    },
+    "type=double": {
+      "model": "terrainlab:block/enderwood"
+    },
+    "type=top": {
+      "model": "terrainlab:block/enderwood_slab_top"
+    }
+  }
+}

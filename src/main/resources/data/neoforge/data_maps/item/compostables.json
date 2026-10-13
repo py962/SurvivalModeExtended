@@ -1,0 +1,10 @@
+{
+  "values": {
+    "terrainlab:pine_leaves": {
+      "chance": 0.3
+    },
+    "terrainlab:pine_sapling": {
+      "chance": 0.3
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "terrainlab:pine_slab",
+    "terrainlab:azalea_slab",
+    "terrainlab:enderwood_slab"
+  ]
+}

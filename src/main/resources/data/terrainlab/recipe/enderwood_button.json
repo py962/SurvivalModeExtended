@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "group": "wooden_button",
+  "ingredients": [
+    "terrainlab:enderwood"
+  ],
+  "result": {
+    "count": 1,
+    "id": "terrainlab:enderwood_button"
+  }
+}
