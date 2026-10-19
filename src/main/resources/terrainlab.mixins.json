@@ -97,7 +97,9 @@
     "VillagerPairPricingMixin",
     "RaidOminousBannerMixin",
     "PiglinLuckBarterMixin",
-    "LlamaCaribouMateMixin"
+    "LlamaCaribouMateMixin",
+    "HealOrHarmStatFlashMixin",
+    "AbsorptionStatFlashMixin"
   ],
   "client": [
     "SkyRendererAccessor",
@@ -113,7 +115,8 @@
     "VillagerModelMoodMixin",
     "SpectralVisionGlowMixin",
     "VillagerHeatTintMixin",
-    "BoatHandsFreeMixin"
+    "BoatHandsFreeMixin",
+    "HudStatFlashMixin"
   ],
   "injectors": {
     "defaultRequire": 1

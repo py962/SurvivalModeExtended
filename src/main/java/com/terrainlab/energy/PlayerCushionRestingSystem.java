@@ -76,6 +76,7 @@ public final class PlayerCushionRestingSystem {
 
         player.getFoodData().setFoodLevel(hunger - 1);
         player.setData(ModAttachments.PLAYER_ENERGY, newEnergy);
+        com.terrainlab.player.StatFlash.send(player, com.terrainlab.player.StatFlash.ENERGY);
 
         // Start a new conversion interval.
         SITTING_TICKS.put(playerId, 0);

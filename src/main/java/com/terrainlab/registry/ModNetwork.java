@@ -124,6 +124,13 @@ public class ModNetwork {
                 com.terrainlab.network.CodexResultPacket::handle
         );
 
+        // Golden HUD flash on discrete health/hunger/energy gains (see StatFlash).
+        registrar.playToClient(
+                com.terrainlab.network.StatFlashPacket.TYPE,
+                com.terrainlab.network.StatFlashPacket.STREAM_CODEC,
+                com.terrainlab.network.StatFlashPacket::handle
+        );
+
         // Replicator: the GUI button counts as one redstone pulse.
         registrar.playToServer(
                 com.terrainlab.network.ReplicatorPulsePacket.TYPE,

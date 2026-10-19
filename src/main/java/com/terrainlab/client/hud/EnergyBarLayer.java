@@ -15,13 +15,17 @@ import static com.terrainlab.energy.PlayerEnergyConstants.*;
 /**
  * Energy HUD bar, drawn in place of the vanilla armor bar. Twelve segments of the
  * energy_bar.png strip span 0..MAX_ENERGY; filled segments draw at full opacity and the
- * rest dimmed, and segments above REST_CAP get a gold tint scaled by boost amount.
+ * rest dimmed, and segments above REST_CAP get a gold tint scaled by boost amount. Filled
+ * segments pulse gold on a discrete energy gain (ClientStatFlash).
  * Hidden in Creative and Spectator.
  */
 public class EnergyBarLayer implements GuiLayer {
 
     private static final Identifier TEXTURE =
             Identifier.fromNamespaceAndPath("terrainlab", "textures/gui/energy_bar.png");
+    // White mask of the same strip, tinted gold for the energy-gain flash (see ClientStatFlash).
+    private static final Identifier FLASH_TEXTURE =
+            Identifier.fromNamespaceAndPath("terrainlab", "textures/gui/energy_bar_flash.png");
 
     private static final int SEGMENT_COUNT = 12;
     private static final int FRAME_W = 16;
@@ -66,6 +70,9 @@ public class EnergyBarLayer implements GuiLayer {
             boostFraction = Math.max(0.0F, Math.min(1.0F, (energy - REST_CAP) / (MAX_ENERGY - REST_CAP)));
         }
 
+        float flash = com.terrainlab.client.ClientStatFlash.energy();
+        int flashColor = com.terrainlab.client.ClientStatFlash.goldColor(flash);
+
         int scaledFrameH = Math.round(FRAME_H * SCALE);
 
         // Armor bar anchor (guiWidth()/2 - 91), above the hotbar, shifted by SHIFT_*.
@@ -90,6 +97,13 @@ public class EnergyBarLayer implements GuiLayer {
             graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE,
                     x, 0, (float) frameU, 0f, FRAME_W, FRAME_H,
                     FRAME_W * SEGMENT_COUNT, FRAME_H, color);
+
+            // Golden pulse over the filled segments on a discrete energy gain.
+            if (flash > 0.0F && i < filledCount) {
+                graphics.blit(RenderPipelines.GUI_TEXTURED, FLASH_TEXTURE,
+                        x, 0, (float) frameU, 0f, FRAME_W, FRAME_H,
+                        FRAME_W * SEGMENT_COUNT, FRAME_H, flashColor);
+            }
         }
 
         graphics.pose().popMatrix();

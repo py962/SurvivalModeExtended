@@ -67,6 +67,10 @@ public class ModFoodEffectsHandler {
                                 player.heal(healthData.amount());
                             } else {
                                 PendingHealSystem.queueHeal(player, healthData.amount(), healthData.durationTicks());
+                                // Delayed healing flashes once now, not on each heal step.
+                                if (player.getHealth() < player.getMaxHealth()) {
+                                    com.terrainlab.player.StatFlash.send(player, com.terrainlab.player.StatFlash.HEALTH);
+                                }
                             }
                         } else {
                             LOGGER.warn("[TerrainLabFoodDebug] FINISH HEALTH category but healthData is NULL for item={} - no effect will be applied", item);

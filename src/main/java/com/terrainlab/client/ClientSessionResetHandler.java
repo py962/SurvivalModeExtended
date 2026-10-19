@@ -18,6 +18,7 @@ public final class ClientSessionResetHandler {
         ClientDeathPickingState.reset();
         ClientAuroraState.reset();
         ClientDeathOptionsState.reset();
+        ClientStatFlash.reset();
     }
 
     @SubscribeEvent
