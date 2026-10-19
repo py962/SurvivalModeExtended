@@ -11,6 +11,7 @@
     "EndermanBehaviourMixin",
     "EndermanTeleportMixin",
     "CreeperBehaviourMixin",
+    "CreeperSwellGoalMixin",
     "EndermanTakeMixin",
     "HappyGhastMixin",
     "AbstractBoatAccessor",

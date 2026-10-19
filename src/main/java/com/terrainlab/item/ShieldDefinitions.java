@@ -17,85 +17,91 @@ public final class ShieldDefinitions {
             "oak_shield",
             "Oak Shield",
             () -> net.minecraft.world.item.Items.OAK_PLANKS,
-            2, 0, 2, 2, 0, 0, 1, 2
+            2, 0, 2, 2, 0, 0, 0, 2
         ),
         new ShieldStats(
             "bamboo_shield",
             "Bamboo Shield",
             () -> net.minecraft.world.item.Items.BAMBOO_PLANKS,
-            1, 0, 1, 4, 0, 0, 1, 1
+            2, 0, 1, 4, 0, 0, 0, 1
         ),
         new ShieldStats(
             "birch_shield",
             "Birch Shield",
             () -> net.minecraft.world.item.Items.BIRCH_PLANKS,
-            2, 0, 3, 2, 0, 0, 1, 2
+            2, 0, 1, 3, 0, 0, 0, 2
         ),
         new ShieldStats(
             "cherry_shield",
             "Cherry Shield",
             () -> net.minecraft.world.item.Items.CHERRY_PLANKS,
-            3, 0, 2, 2, 0, 0, 1, 2
+            2, 0, 1, 2, 0, 0, 0, 3
         ),
         new ShieldStats(
             "acacia_shield",
             "Acacia Shield",
             () -> net.minecraft.world.item.Items.ACACIA_PLANKS,
-            2, 1, 2, 2, 0, 0, 1, 2
+            3, 0, 1, 2, 0, 0, 0, 2
         ),
-        new ShieldStats(
-            "azalea_shield",
-            "Azalea Shield",
-            () -> com.terrainlab.registry.ModItems.AZALEA_PLANKS.get(),
-            2, 0, 1, 2, 2, 3, 1, 2
-        ),
+            new ShieldStats(
+                    "poplar_shield",
+                    "Poplar Shield",
+                    () -> net.minecraft.world.item.Items.POPLAR_PLANKS,
+                    2, 0, 3, 1, 0, 0, 0, 2
+            ),
         new ShieldStats(
             "spruce_shield",
             "Spruce Shield",
             () -> net.minecraft.world.item.Items.SPRUCE_PLANKS,
-            2, 2, 2, 2, 0, 0, 1, 4
+            2, 0, 2, 1, 0, 0, 0, 3
         ),
         new ShieldStats(
             "pine_shield",
             "Pine Shield",
             () -> com.terrainlab.registry.ModItems.PINE_PLANKS.get(),
-            3, 2, 3, 2, 0, 0, 1, 2
+            3, 0, 1, 1, 0, 0, 0, 3
         ),
         new ShieldStats(
             "dark_oak_shield",
             "Dark Oak Shield",
             () -> net.minecraft.world.item.Items.DARK_OAK_PLANKS,
-            4, 3, 2, 1, 0, 0, 2, 3
+            3, 2, 3, 1, 2, 0, 0, 4
         ),
         new ShieldStats(
             "pale_oak_shield",
             "Pale Oak Shield",
             () -> net.minecraft.world.item.Items.PALE_OAK_PLANKS,
-            2, 4, 3, 1, 0, 0, 2, 3
+            4, 4, 3, 1, 0, 0, 0, 3
         ),
+            new ShieldStats(
+                    "azalea_shield",
+                    "Azalea Shield",
+                    () -> com.terrainlab.registry.ModItems.AZALEA_PLANKS.get(),
+                    2, 2, 1, 2, 2, 4, 0, 2
+            ),
         new ShieldStats(
             "jungle_shield",
             "Jungle Shield",
             () -> net.minecraft.world.item.Items.JUNGLE_PLANKS,
-            2, 0, 1, 3, 4, 2, 1, 2
+            3, 4, 2, 2, 2, 0, 0, 2
         ),
         new ShieldStats(
             "mangrove_shield",
             "Mangrove Shield",
             () -> net.minecraft.world.item.Items.MANGROVE_PLANKS,
-            2, 0, 2, 2, 2, 4, 1, 2
+            2, 0, 2, 3, 4, 2, 0, 2
         ),
         new ShieldStats(
             "warped_shield",
             "Warped Shield",
             () -> net.minecraft.world.item.Items.WARPED_PLANKS,
-            2, 2, 4, 2, 2, 2, 3, 2
+            3, 3, 4, 1, 0, 0, 4, 3
         ),
         new ShieldStats(
             "crimson_shield",
             "Crimson Shield",
             () -> net.minecraft.world.item.Items.CRIMSON_PLANKS,
-            2, 2, 3, 2, 2, 2, 4, 2
+            2, 0, 2, 2, 3, 3, 4, 2
         ),
         new ShieldStats(
             "enderwood_shield",

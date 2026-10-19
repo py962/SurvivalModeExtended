@@ -7,26 +7,38 @@
       "spawns": [
         {
           "type": "minecraft:blaze",
-          "maxCount": 3,
-          "minCount": 2,
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 2,
+            "max_inclusive": 3
+          },
           "weight": 10
         },
         {
           "type": "minecraft:zombified_piglin",
-          "maxCount": 4,
-          "minCount": 4,
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 4,
+            "max_inclusive": 4
+          },
           "weight": 5
         },
         {
           "type": "minecraft:wither_skeleton",
-          "maxCount": 5,
-          "minCount": 5,
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 5,
+            "max_inclusive": 5
+          },
           "weight": 8
         },
         {
           "type": "minecraft:magma_cube",
-          "maxCount": 2,
-          "minCount": 2,
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 2,
+            "max_inclusive": 2
+          },
           "weight": 3
         }
       ]

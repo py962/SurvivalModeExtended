@@ -1,0 +1,15 @@
+
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "II",
+    "II"
+  ],
+  "key": {
+    "I": "minecraft:item_frame"
+  },
+  "result": {
+    "id": "terrainlab:large_item_frame",
+    "count": 1
+  }
+}

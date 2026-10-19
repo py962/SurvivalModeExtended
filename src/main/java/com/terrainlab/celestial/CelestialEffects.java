@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.entity.animal.Animal;
 
 import java.util.HashMap;
 import java.util.List;
@@ -146,6 +147,7 @@ public final class CelestialEffects {
                 accelerateGrowth(level, center, radius);
                 randomBonemeal(level, center, radius);
                 accelerateBabyGrowth(level, center, radius);
+                accelerateBreedingCooldowns(level, center, radius);
 
                 if (CelestialDebug.VERBOSE) {
                     CelestialDebug.log(
@@ -511,6 +513,51 @@ public final class CelestialEffects {
         )) {
             // A very large age-up matures the animal completely.
             baby.ageUp(1_000_000, true);
+        }
+    }
+
+    /**
+     * Reduces animal breeding cooldowns five times faster within
+     * the Life conduit radius.
+     *
+     * Vanilla breeding cooldown: 6000 ticks (5 minutes).
+     * Effective cooldown in the conduit: approximately 1200 ticks (1 minute).
+     *
+     * Only adult animals currently on breeding cooldown are affected.
+     */
+    private static void accelerateBreedingCooldowns(
+            ServerLevel level,
+            BlockPos center,
+            int radius
+    ) {
+        if (radius <= 0) {
+            return;
+        }
+
+        double centerX = center.getX() + 0.5D;
+        double centerY = center.getY() + 0.5D;
+        double centerZ = center.getZ() + 0.5D;
+        double radiusSquared = (double) radius * radius;
+
+        AABB area = new AABB(center).inflate(radius);
+
+        for (Animal animal : level.getEntitiesOfClass(
+                Animal.class,
+                area,
+                entity -> entity.isAlive()
+                        && !entity.isBaby()
+                        && entity.getAge() > 0
+                        && entity.distanceToSqr(
+                        centerX,
+                        centerY,
+                        centerZ
+                ) <= radiusSquared
+        )) {
+            // The conduit is checked every 40 ticks.
+            // Vanilla already reduces age naturally; subtract another
+            // 160 ticks to achieve 200 ticks of cooldown reduction per
+            // 40 ticks, making the cooldown five times faster overall.
+            animal.setAge(Math.max(0, animal.getAge() - 160));
         }
     }
 

@@ -128,16 +128,16 @@ public final class BiomeTemperatureTable {
 
         // Caves, Nether and End: non-seasonal.
         put("terrainlab:ice_caves", nonSeasonal(-25));
-
+        put("minecraft:sulfur_caves", nonSeasonal(55));
         put("minecraft:dripstone_caves", nonSeasonal(0));
         put("minecraft:lush_caves", nonSeasonal(20));
         put("minecraft:deep_dark", nonSeasonal(0));
 
-        put("minecraft:nether_wastes", nonSeasonal(40));
-        put("minecraft:crimson_forest", nonSeasonal(35));
-        put("minecraft:warped_forest", nonSeasonal(35));
-        put("minecraft:soul_sand_valley", nonSeasonal(35));
-        put("minecraft:basalt_deltas", nonSeasonal(50));
+        put("minecraft:nether_wastes", nonSeasonal(50));
+        put("minecraft:crimson_forest", nonSeasonal(45));
+        put("minecraft:warped_forest", nonSeasonal(45));
+        put("minecraft:soul_sand_valley", nonSeasonal(45));
+        put("minecraft:basalt_deltas", nonSeasonal(55));
 
         put("minecraft:the_end", nonSeasonal(-10));
         put("minecraft:end_barrens", nonSeasonal(-12));

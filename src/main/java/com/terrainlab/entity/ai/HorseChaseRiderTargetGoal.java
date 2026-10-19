@@ -20,7 +20,7 @@ public class HorseChaseRiderTargetGoal extends Goal {
     /** Ticks between re-paths toward the moving target. */
     private static final int REPATH_INTERVAL_TICKS = 10;
 
-    private static final double SPEED_MODIFIER = 1.3D;
+    private static final double SPEED_MODIFIER = 5.0D;
 
     private final Horse horse;
     private LivingEntity target;

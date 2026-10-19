@@ -116,7 +116,7 @@
         "type": "minecraft:camel",
         "maxCount": 1,
         "minCount": 1,
-        "weight": 1
+        "weight": 5
       }
     ],
     "misc": [],

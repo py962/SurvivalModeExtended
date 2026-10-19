@@ -12,9 +12,12 @@
       "spawns": [
         {
           "type": "terrainlab:outlaw_raider",
-          "weight": 100,
-          "minCount": 2,
-          "maxCount": 4
+          "count": {
+            "type": "minecraft:uniform",
+            "max_inclusive": 4,
+            "min_inclusive": 2
+          },
+          "weight": 10
         }
       ]
     }

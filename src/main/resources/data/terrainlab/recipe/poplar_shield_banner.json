@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_special_shielddecoration",
+  "banner": "#minecraft:banners",
+  "target": "terrainlab:poplar_shield",
+  "result": {
+    "id": "terrainlab:poplar_shield"
+  }
+}

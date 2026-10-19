@@ -20,6 +20,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import com.terrainlab.item.TieredArrowItem;
 import com.terrainlab.entity.TieredArrowEntity;
+import com.terrainlab.item.OversizedMapFrameItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -413,6 +414,21 @@ public class ModItems {
                                     net.minecraft.core.registries.Registries.ITEM, id))
                             .stacksTo(1)));
 
+    // Oversized map frames: one shared map displayed across a 2x2 or 3x3 arrangement.
+    public static final DeferredItem<OversizedMapFrameItem> LARGE_ITEM_FRAME =
+            ITEMS.register("large_item_frame", id ->
+                    new OversizedMapFrameItem(2, new Item.Properties()
+                            .setId(net.minecraft.resources.ResourceKey.create(
+                                    net.minecraft.core.registries.Registries.ITEM, id))
+                            .stacksTo(16)));
+
+    public static final DeferredItem<OversizedMapFrameItem> EXTRA_LARGE_ITEM_FRAME =
+            ITEMS.register("extra_large_item_frame", id ->
+                    new OversizedMapFrameItem(3, new Item.Properties()
+                            .setId(net.minecraft.resources.ResourceKey.create(
+                                    net.minecraft.core.registries.Registries.ITEM, id))
+                            .stacksTo(16)));
+
     // Wood shields. Combat behaviour comes from the blocks_attacks component built by
     // ShieldFactory from ShieldDefinitions; ShieldCombatEvents handles the stats the component
     // cannot express and resolves stats via SHIELD_ITEMS.
@@ -459,6 +475,13 @@ public class ModItems {
                                     net.minecraft.resources.ResourceKey.create(
                                             net.minecraft.core.registries.Registries.ITEM, id)),
                             com.terrainlab.item.ShieldDefinitions.byId("azalea_shield"))));
+    public static final DeferredItem<Item> POPLAR_SHIELD =
+            ITEMS.register("poplar_shield", id ->
+                    new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
+                            new Item.Properties().setId(
+                                    net.minecraft.resources.ResourceKey.create(
+                                            net.minecraft.core.registries.Registries.ITEM, id)),
+                            com.terrainlab.item.ShieldDefinitions.byId("poplar_shield"))));
     public static final DeferredItem<Item> SPRUCE_SHIELD =
             ITEMS.register("spruce_shield", id ->
                     new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
@@ -534,6 +557,7 @@ public class ModItems {
         SHIELD_ITEMS.put("azalea_shield", AZALEA_SHIELD);
         SHIELD_ITEMS.put("spruce_shield", SPRUCE_SHIELD);
         SHIELD_ITEMS.put("pine_shield", PINE_SHIELD);
+        SHIELD_ITEMS.put("poplar_shield", POPLAR_SHIELD);
         SHIELD_ITEMS.put("dark_oak_shield", DARK_OAK_SHIELD);
         SHIELD_ITEMS.put("pale_oak_shield", PALE_OAK_SHIELD);
         SHIELD_ITEMS.put("jungle_shield", JUNGLE_SHIELD);

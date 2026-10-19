@@ -7,11 +7,21 @@
     "monster": {
       "bounding_box": "full",
       "spawns": [
-        { "type": "minecraft:piglin", "weight": 1, "minCount": 20, "maxCount": 30 }
+        {
+          "type": "minecraft:piglin",
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 20,
+            "max_inclusive": 30
+          },
+          "weight": 1
+        }
       ]
     }
   },
-  "start_height": { "absolute": 40 },
+  "start_height": {
+    "absolute": 40
+  },
   "start_pool": "terrainlab:bastion_starts_housing",
   "step": "surface_structures",
   "use_expansion_hack": false

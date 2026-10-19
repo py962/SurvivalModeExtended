@@ -7,9 +7,12 @@
   "spawners": [
     {
       "type": "terrainlab:priest",
-      "weight": 10,
-      "minCount": 1,
-      "maxCount": 1
+      "count": {
+        "type": "minecraft:uniform",
+        "max_inclusive": 1,
+        "min_inclusive": 1
+      },
+      "weight": 10
     }
   ]
 }

@@ -1,12 +1,10 @@
 {
-  "neoforge:conditions": [
-    { "type": "neoforge:never" }
-  ],
+
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
     "#": "minecraft:nautilus_shell",
-    "X": "minecraft:heart_of_the_sea"
+    "X": "minecraft:barrier"
   },
   "pattern": [
     "###",

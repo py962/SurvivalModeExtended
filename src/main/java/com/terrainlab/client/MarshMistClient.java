@@ -1,4 +1,5 @@
-package com.terrainlab.client;
+
+        package com.terrainlab.client;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.registry.ModBiomeSets;
@@ -18,69 +19,86 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 
-/**
- * Light morning and evening mist over Marsh and Frozen Marsh. Strength is the share of nearby
- * sampled terrain that is marsh (so it fades in over about 30 blocks) times a time-of-day curve
- * on the warped (solar) clock: it gathers before sunrise and burns off by mid-morning, and
- * gathers again from late afternoon until shortly after dusk. Indoors only a trace remains.
- * <p>
- * Vanilla fog can only fade with distance from the camera, so the mist is made to read as lying
- * low: it is thickest when looking down at the ground, thins towards the horizon and above it, and
- * clears as the eyes rise above the marsh floor (up a tree, on a hill, in the saddle of a tall mount).
- */
 @EventBusSubscriber(modid = TerrainLab.MODID, value = Dist.CLIENT)
 public final class MarshMistClient {
 
-    // Pale grey-green, scaled by vanilla's light level so dusk mist is not glowing.
-    private static final float[] MIST_COLOUR = {0.76F, 0.80F, 0.78F};
+    // Pale grey-green, scaled by vanilla's light level.
+    private static final float[] MIST_COLOUR = {
+            0.76F, 0.80F, 0.78F
+    };
 
-    // Fog distances at full mist. Vanilla's environmental end is usually the render distance.
-    private static final float MIST_START = 1.0F;
-    private static final float MIST_END = 32.0F;
+    // Fog distances at full mist.
+    private static final float MIST_START = 40.0F;
+    private static final float MIST_END = 50.0F;
 
-    // Share of the mist left when looking level or upwards, and the pitch (degrees below the
-    // horizon) at which it is at full strength.
-    private static final float LEVEL_GAZE_SHARE = 0.2F;
+    // Gaze is strongest when looking horizontally.
+    // Mist fades to zero when looking 40 degrees up or down.
     private static final float FULL_MIST_PITCH = 40.0F;
 
-    // Eye height above the marsh floor (water counts as floor) over which the mist clears.
+    // Eye height above terrain over which the mist clears.
     private static final float CLEAR_FROM_HEIGHT = 2.5F;
     private static final float CLEAR_AT_HEIGHT = 10.0F;
 
-    // Solar-time windows (0 = sunrise, 12000 = sunset): {fade-in start, full, full end, fade-out end}.
-    private static final long[] MORNING = {22800L, 23600L, 800L, 2800L};
-    private static final long[] EVENING = {10200L, 11600L, 13000L, 14200L};
+    // Solar-time windows:
+    // {fade-in start, full strength, fade-out start, fade-out end}.
+    private static final long[] MORNING = {
+            22800L, 23600L, 800L, 2800L
+    };
+
+    private static final long[] EVENING = {
+            10200L, 11600L, 13000L, 14200L
+    };
 
     private static final int SAMPLE_INTERVAL = 10;
-    private static final int SAMPLE_RADIUS = 2;      // 5x5 grid
+    private static final int SAMPLE_RADIUS = 2;
     private static final int SAMPLE_SPACING = 8;
 
-    private static float biomeTarget;
-    private static float biomeFraction;
+    private static float biomeTarget = 0.0F;
+    private static float biomeFraction = 0.0F;
     private static float exposure = 1.0F;
-    private static float timeFactor;
+    private static float timeFactor = 0.0F;
     private static float heightFactor = 1.0F;
-    private static float gazeFactor = LEVEL_GAZE_SHARE;
+    private static float gazeFactor = 1.0F;
+
     private static long lastGazeNanos;
 
     private MarshMistClient() {
     }
 
-    /** 0..1 mist strength at the camera, before the direction of gaze is taken into account. */
+    /**
+     * Mist strength at the camera, before gaze direction is applied.
+     */
     public static float strength() {
-        return biomeFraction * timeFactor * Mth.lerp(exposure, 0.25F, 1.0F) * heightFactor;
+        return biomeFraction
+                * timeFactor
+                * Mth.lerp(exposure, 0.25F, 1.0F)
+                * heightFactor;
     }
 
     /**
-     * Gaze share for this frame: LEVEL_GAZE_SHARE looking level or up, 1 at FULL_MIST_PITCH below the
-     * horizon. Eased over about a quarter of a second so a quick glance does not flicker the fog.
+     * Mist is strongest when looking horizontally.
+     * Looking up or down reduces the mist symmetrically.
+     * The transition is eased to avoid flickering.
      */
     private static float gaze(float pitchDegrees) {
-        float target = Mth.lerp(smoothstep(pitchDegrees / FULL_MIST_PITCH), LEVEL_GAZE_SHARE, 1.0F);
+        float target = 1.0F - smoothstep(
+                Math.abs(pitchDegrees) / FULL_MIST_PITCH
+        );
+
         long now = System.nanoTime();
-        float dt = lastGazeNanos == 0L ? 1.0F : Math.min((now - lastGazeNanos) / 1.0E9F, 1.0F);
+
+        float dt = lastGazeNanos == 0L
+                ? 1.0F
+                : Math.min(
+                (now - lastGazeNanos) / 1.0E9F,
+                1.0F
+        );
+
         lastGazeNanos = now;
-        gazeFactor += (target - gazeFactor) * Math.min(1.0F, dt * 8.0F);
+
+        gazeFactor += (target - gazeFactor)
+                * Math.min(1.0F, dt * 8.0F);
+
         return gazeFactor;
     }
 
@@ -101,13 +119,17 @@ public final class MarshMistClient {
             exposure = 1.0F;
             timeFactor = 0.0F;
             heightFactor = 1.0F;
+            gazeFactor = 1.0F;
+            lastGazeNanos = 0L;
             return;
         }
+
         if (minecraft.isPaused()) {
             return;
         }
 
         boolean overworld = level.dimension() == Level.OVERWORLD;
+
         if (!overworld) {
             biomeTarget = 0.0F;
         } else if (level.getGameTime() % SAMPLE_INTERVAL == 0) {
@@ -115,7 +137,9 @@ public final class MarshMistClient {
         }
 
         BlockPos eye = BlockPos.containing(player.getEyePosition());
+
         float exposureTarget;
+
         if (level.canSeeSky(eye)) {
             exposureTarget = 1.0F;
         } else {
@@ -123,42 +147,77 @@ public final class MarshMistClient {
             exposureTarget = 0.6F * sky * sky;
         }
 
-        // Eye height above the marsh floor; leaves are ignored, so a tree canopy is not the floor.
-        int floor = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, eye.getX(), eye.getZ());
-        float above = (float) player.getEyeY() - floor;
-        float heightTarget = 1.0F - smoothstep((above - CLEAR_FROM_HEIGHT) / (CLEAR_AT_HEIGHT - CLEAR_FROM_HEIGHT));
+        // Determine eye height above terrain, ignoring leaves.
+        int floor = level.getHeight(
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                eye.getX(),
+                eye.getZ()
+        );
 
-        // Roughly 2-3 s to settle; the time curve is already smooth.
+        float above = (float) player.getEyeY() - floor;
+
+        float heightTarget = 1.0F - smoothstep(
+                (above - CLEAR_FROM_HEIGHT)
+                        / (CLEAR_AT_HEIGHT - CLEAR_FROM_HEIGHT)
+        );
+
+        // Smooth biome, height and exposure changes.
         biomeFraction += (biomeTarget - biomeFraction) * 0.05F;
         heightFactor += (heightTarget - heightFactor) * 0.1F;
         exposure += (exposureTarget - exposure) * 0.1F;
-        timeFactor = overworld ? timeOfDayFactor(SolarTime.solarTimeOfDay(level)) : 0.0F;
+
+        // FIX: approach the actual solar-time factor.
+        // Do not multiply the existing value by the target:
+        // timeFactor starts at zero, so multiplication would
+        // leave it permanently at zero.
+        float timeTarget = overworld
+                ? timeOfDayFactor(SolarTime.solarTimeOfDay(level))
+                : 0.0F;
+
+        timeFactor += (timeTarget - timeFactor) * 0.05F;
     }
 
     private static float sampleMarsh(ClientLevel level, BlockPos centre) {
         int marsh = 0;
         int total = 0;
+
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
         for (int dx = -SAMPLE_RADIUS; dx <= SAMPLE_RADIUS; dx++) {
             for (int dz = -SAMPLE_RADIUS; dz <= SAMPLE_RADIUS; dz++) {
-                pos.set(centre.getX() + dx * SAMPLE_SPACING, centre.getY(), centre.getZ() + dz * SAMPLE_SPACING);
+                pos.set(
+                        centre.getX() + dx * SAMPLE_SPACING,
+                        centre.getY(),
+                        centre.getZ() + dz * SAMPLE_SPACING
+                );
+
                 total++;
+
                 var biome = level.getBiome(pos);
-                if (biome.is(ModBiomeSets.MARSH) || biome.is(ModBiomeSets.FROZEN_MARSH)) {
+
+                if (biome.is(ModBiomeSets.MARSH)
+                        || biome.is(ModBiomeSets.FROZEN_MARSH)) {
                     marsh++;
                 }
             }
         }
+
         return marsh / (float) total;
     }
 
-    /** Larger of the morning and evening curves at this solar time. */
+    /**
+     * Returns the stronger of the morning and evening mist curves.
+     */
     static float timeOfDayFactor(long solarTime) {
-        return Math.max(window(solarTime, MORNING), window(solarTime, EVENING));
+        return Math.max(
+                window(solarTime, MORNING),
+                window(solarTime, EVENING)
+        );
     }
 
-    /** Smooth trapezoid over a window that may wrap past 24000. */
+    /**
+     * Smooth trapezoid over a window that may wrap past 24000.
+     */
     private static float window(long t, long[] w) {
         long base = w[0];
         long rise = Math.floorMod(w[1] - base, 24000L);
@@ -167,6 +226,7 @@ public final class MarshMistClient {
         long u = Math.floorMod(t - base, 24000L);
 
         float linear;
+
         if (u < rise) {
             linear = u / (float) rise;
         } else if (u < fullEnd) {
@@ -176,7 +236,8 @@ public final class MarshMistClient {
         } else {
             return 0.0F;
         }
-        return linear * linear * (3.0F - 2.0F * linear); // smoothstep
+
+        return linear * linear * (3.0F - 2.0F * linear);
     }
 
     @SubscribeEvent
@@ -184,18 +245,35 @@ public final class MarshMistClient {
         if (event.getType() != FogType.ATMOSPHERIC) {
             return;
         }
-        // Camera#xRot is the pitch in degrees, positive when looking down.
+
         float k = strength() * gaze(event.getCamera().xRot());
+
         if (k <= 0.001F) {
             return;
         }
 
         var fog = event.getFogData();
-        // Never loosen fog something else (rain, sandstorm, blindness) has already tightened.
-        fog.environmentalEnd = Math.min(fog.environmentalEnd, Mth.lerp(k, fog.environmentalEnd, MIST_END));
-        fog.environmentalStart = Math.min(fog.environmentalStart, Mth.lerp(k, fog.environmentalStart, MIST_START));
-        // Clouds soften a little; the sky stays visible through a light mist.
-        fog.cloudEnd = Math.min(fog.cloudEnd, Mth.lerp(k * 0.5F, fog.cloudEnd, MIST_END * 2.0F));
+
+        // Never loosen fog already tightened by another effect.
+        fog.environmentalEnd = Math.min(
+                fog.environmentalEnd,
+                Mth.lerp(k, fog.environmentalEnd, MIST_END)
+        );
+
+        fog.environmentalStart = Math.min(
+                fog.environmentalStart,
+                Mth.lerp(k, fog.environmentalStart, MIST_START)
+        );
+
+        // Clouds soften slightly while remaining visible.
+        fog.cloudEnd = Math.min(
+                fog.cloudEnd,
+                Mth.lerp(
+                        k * 0.5F,
+                        fog.cloudEnd,
+                        MIST_END * 2.0F
+                )
+        );
     }
 
     @SubscribeEvent
@@ -203,7 +281,9 @@ public final class MarshMistClient {
         if (event.getCamera().getFluidInCamera() != FogType.NONE) {
             return;
         }
+
         float k = strength() * gazeFactor * 0.6F;
+
         if (k <= 0.001F) {
             return;
         }
@@ -212,11 +292,29 @@ public final class MarshMistClient {
         float g = event.getGreen();
         float b = event.getBlue();
 
-        // Keep vanilla's daylight level (night, dusk, storm darkening).
-        float light = Mth.clamp((0.299F * r + 0.587F * g + 0.114F * b) / 0.55F, 0.08F, 1.1F);
+        // Preserve vanilla daylight, night-time and storm darkening.
+        float light = Mth.clamp(
+                (0.299F * r + 0.587F * g + 0.114F * b) / 0.55F,
+                0.08F,
+                1.1F
+        );
 
-        event.setRed(Mth.clamp(Mth.lerp(k, r, MIST_COLOUR[0] * light), 0.0F, 1.0F));
-        event.setGreen(Mth.clamp(Mth.lerp(k, g, MIST_COLOUR[1] * light), 0.0F, 1.0F));
-        event.setBlue(Mth.clamp(Mth.lerp(k, b, MIST_COLOUR[2] * light), 0.0F, 1.0F));
+        event.setRed(Mth.clamp(
+                Mth.lerp(k, r, MIST_COLOUR[0] * light),
+                0.0F,
+                1.0F
+        ));
+
+        event.setGreen(Mth.clamp(
+                Mth.lerp(k, g, MIST_COLOUR[1] * light),
+                0.0F,
+                1.0F
+        ));
+
+        event.setBlue(Mth.clamp(
+                Mth.lerp(k, b, MIST_COLOUR[2] * light),
+                0.0F,
+                1.0F
+        ));
     }
 }

@@ -354,11 +354,22 @@
           "modifier": [
             {
               "type": "minecraft:exploration_map",
-              "destination": "terrainlab:locate/nether_fortress",
+              "destination": "#terrainlab:locate/nether_fortress",
               "decoration": "minecraft:red_x",
               "zoom": 2,
               "search_radius": 50,
               "skip_existing_chunks": true
+            },
+            {
+              "type": "minecraft:filtered",
+              "item_filter": {
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "type": "minecraft:discard"
+              }
             },
             {
               "type": "minecraft:set_custom_data",
@@ -374,7 +385,7 @@
               "target": "item_name"
             }
           ],
-          "name": "minecraft:map",
+          "name": "minecraft:filled_map",
           "weight": 1
         }
       ],

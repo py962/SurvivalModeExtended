@@ -3,8 +3,17 @@
   "default": "minecraft:birch_bees_0002",
   "features": [
     {
-      "chance": 0.0125,
+  "chance": 0.0125,
       "feature": "minecraft:fallen_birch_tree"
+  
+},
+{
+  "chance": 0.2,
+      "feature": "minecraft:orange_poplar_leaf_litter"
+    
+},
+{  "chance": 0.01,
+      "feature": "minecraft:fallen_poplar_tree"
     }
   ]
 }

@@ -1,5 +1,6 @@
 package com.terrainlab.registry;
 
+import com.terrainlab.entity.OversizedMapFrameEntity;
 import com.terrainlab.entity.GhostFishEntity;
 import com.terrainlab.entity.GraniteGolemEntity;
 import com.terrainlab.entity.HouseboatEntity;
@@ -34,6 +35,34 @@ public class ModEntities {
 
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(Registries.ENTITY_TYPE, MODID);
+
+
+    // Physical entity remains the size of a normal wall-mounted item frame.
+// The renderer is responsible for displaying the enlarged frame and map.
+    public static final DeferredHolder<EntityType<?>, EntityType<OversizedMapFrameEntity>>
+            LARGE_MAP_FRAME =
+            ENTITY_TYPES.register("large_map_frame", id ->
+                    EntityType.Builder.<OversizedMapFrameEntity>of(
+                                    OversizedMapFrameEntity::new,
+                                    MobCategory.MISC)
+                            .sized(0.5F, 0.5F)
+                            .clientTrackingRange(10)
+                            .updateInterval(10)
+                            .build(net.minecraft.resources.ResourceKey.create(
+                                    Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<OversizedMapFrameEntity>>
+            EXTRA_LARGE_MAP_FRAME =
+            ENTITY_TYPES.register("extra_large_map_frame", id ->
+                    EntityType.Builder.<OversizedMapFrameEntity>of(
+                                    OversizedMapFrameEntity::new,
+                                    MobCategory.MISC)
+                            .sized(0.5F, 0.5F)
+                            .clientTrackingRange(10)
+                            .updateInterval(10)
+                            .build(net.minecraft.resources.ResourceKey.create(
+                                    Registries.ENTITY_TYPE, id)));
+
 
     public static final DeferredHolder<EntityType<?>, EntityType<HouseboatEntity>> HOUSEBOAT =
             ENTITY_TYPES.register("houseboat", id ->

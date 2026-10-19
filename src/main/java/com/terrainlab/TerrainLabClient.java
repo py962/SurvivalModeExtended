@@ -1,5 +1,6 @@
 package com.terrainlab;
 
+import com.terrainlab.client.renderer.OversizedMapFrameRenderer;
 import com.terrainlab.client.model.GhostFishModel;
 import com.terrainlab.client.model.GraniteGolemModel;
 import com.terrainlab.client.model.HouseboatModel;
@@ -207,6 +208,12 @@ public class TerrainLabClient {
 
     @SubscribeEvent
     static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(
+                ModEntities.LARGE_MAP_FRAME.get(),
+                context -> new OversizedMapFrameRenderer(context, 2));
+        event.registerEntityRenderer(
+                ModEntities.EXTRA_LARGE_MAP_FRAME.get(),
+                context -> new OversizedMapFrameRenderer(context, 3));
         event.registerEntityRenderer(ModEntities.HOUSEBOAT.get(),
                 HouseboatRenderer::new);
         event.registerEntityRenderer(ModEntities.GRANITE_GOLEM.get(),

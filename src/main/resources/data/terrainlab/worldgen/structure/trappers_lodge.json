@@ -11,9 +11,12 @@
       "spawns": [
         {
           "type": "terrainlab:trapper_raider",
-          "weight": 100,
-          "minCount": 1,
-          "maxCount": 1
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 1,
+            "max_inclusive": 1
+          },
+          "weight": 100
         }
       ]
     }

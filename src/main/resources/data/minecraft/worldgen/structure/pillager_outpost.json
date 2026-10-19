@@ -17,8 +17,11 @@
       "spawns": [
         {
           "type": "minecraft:pillager",
-          "maxCount": 1,
-          "minCount": 1,
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 1,
+            "max_inclusive": 1
+          },
           "weight": 1
         }
       ]
