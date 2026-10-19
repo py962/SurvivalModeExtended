@@ -34,45 +34,32 @@ public final class LeatherworkerTrades {
         return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(enchantment, level);
     }
 
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance ranged(ResourceKey<Enchantment> enchantment, int minLevel, int maxLevel) {
-        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.ranged(enchantment, minLevel, maxLevel);
-    }
-
-    // Levels roll across each enchantment's full range; single-level enchantments stay fixed.
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance frostWalker() {
-        return ranged(Enchantments.FROST_WALKER, 1, 2);
-    }
-
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance unbreaking() {
-        return ranged(Enchantments.UNBREAKING, 1, 3);
-    }
-
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance depthStrider() {
-        return ranged(Enchantments.DEPTH_STRIDER, 1, 3);
-    }
-
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance featherFalling() {
-        return ranged(Enchantments.FEATHER_FALLING, 1, 4);
-    }
-
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance agilityRandom() {
-        return ranged(AGILITY, 1, 3);
-    }
-
-    // Shared by the Expert boots and the Master saddle.
+    // Shared by the Expert boots and the Master saddle. All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOOTS_ENCHANTMENTS_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(frostWalker(), unbreaking()),
-            VillagerType.SAVANNA, List.of(depthStrider(), unbreaking()),
-            VillagerType.DESERT, List.of(unbreaking(), agilityRandom()),
-            VillagerType.TAIGA, List.of(frostWalker(), featherFalling()),
-            VillagerType.SNOW, List.of(featherFalling(), unbreaking()),
-            VillagerType.SWAMP, List.of(depthStrider(), agilityRandom()),
-            VillagerType.JUNGLE, List.of(agilityRandom(), featherFalling())
+            VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.SAVANNA, List.of(fixed(Enchantments.DEPTH_STRIDER, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.FEATHER_FALLING, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.DESERT, List.of(fixed(AGILITY, 3)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.FEATHER_FALLING, 4)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.DEPTH_STRIDER, 3)),
+            VillagerType.JUNGLE, List.of(fixed(AGILITY, 2), fixed(Enchantments.FEATHER_FALLING, 2))
     );
+    // Plains set.
+    private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> BOOTS_ENCHANTMENTS_FALLBACK =
+            List.of(fixed(Enchantments.UNBREAKING, 3));
 
-    // Not biome-specific: passed with an empty type map so the fallback always applies.
+    // Overstacking I for every villager type (and as the fallback).
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> OVERSTACKING_ONLY =
             List.of(fixed(OVERSTACK, 1));
+    private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BUNDLE_ENCHANTMENTS_BY_TYPE = Map.of(
+            VillagerType.PLAINS, OVERSTACKING_ONLY,
+            VillagerType.SAVANNA, OVERSTACKING_ONLY,
+            VillagerType.TAIGA, OVERSTACKING_ONLY,
+            VillagerType.DESERT, OVERSTACKING_ONLY,
+            VillagerType.SNOW, OVERSTACKING_ONLY,
+            VillagerType.SWAMP, OVERSTACKING_ONLY,
+            VillagerType.JUNGLE, OVERSTACKING_ONLY
+    );
 
     private static final Map<ResourceKey<VillagerType>, Item> LOCAL_DYE_SOURCE = Map.of(
             VillagerType.PLAINS, Items.OXEYE_DAISY,
@@ -127,14 +114,14 @@ public final class LeatherworkerTrades {
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
         expert.add(TradeListings.SimpleTradeListing.buying(Items.BUNDLE, 1, 1, EXPERT_MAX_USES, 10));
-        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.BUNDLE, Map.of(), OVERSTACKING_ONLY, 7, EXPERT_MAX_USES, 10));
+        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.BUNDLE, BUNDLE_ENCHANTMENTS_BY_TYPE, OVERSTACKING_ONLY, 7, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.buying(Items.LEATHER_BOOTS, 1, 3, EXPERT_MAX_USES, 10));
-        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.LEATHER_BOOTS, BOOTS_ENCHANTMENTS_BY_TYPE, List.of(), 9, EXPERT_MAX_USES, 10));
+        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.LEATHER_BOOTS, BOOTS_ENCHANTMENTS_BY_TYPE, BOOTS_ENCHANTMENTS_FALLBACK, 9, EXPERT_MAX_USES, 10));
 
         // Master (level 5): Enchanted Saddle (boots mapping). XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
         master.add(TradeListings.SimpleTradeListing.buying(Items.SADDLE, 1, 5, MASTER_MAX_USES, 0));
-        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.SADDLE, BOOTS_ENCHANTMENTS_BY_TYPE, List.of(), 11, MASTER_MAX_USES, 0));
+        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.SADDLE, BOOTS_ENCHANTMENTS_BY_TYPE, BOOTS_ENCHANTMENTS_FALLBACK, 11, MASTER_MAX_USES, 0));
     }
 }

@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.terrainlab.debug.GuideSpawnTrace;
 import com.terrainlab.registry.ModAttachments;
 import com.terrainlab.item.OminousBannerItem;
+import com.terrainlab.item.StructureMapIcons;
 import com.terrainlab.network.TrailTraderDialoguePacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,6 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -48,6 +50,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.saveddata.maps.MapDecorationType;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.ValueInput;
@@ -63,12 +66,14 @@ import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Predicate;
 
 /**
  * Shared base for the four Trail Trader guide variants (Ranger, Archeologist,
@@ -620,13 +625,11 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
         ItemLike[] relics = getRelicItems();
         int[] rewardCounts = getRelicRewardCounts();
-        String[] destinations = getMapDestinationNames();
-
         // Map offer: the placeholder is replaced with the real located map
         // when the trade completes.
         offers.add(new MerchantOffer(
                 new ItemCost(Items.EMERALD, 1),
-                buildStubMap(destinations[index]),
+                buildStubMap(tier),
                 MAP_TRADE_MAX_USES,
                 1,
                 0.05F
@@ -664,6 +667,8 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         ItemLike[] relics = getRelicItems();
 
         for (int tier = 1; tier <= MAX_TIER && tier <= relics.length; tier++) {
+            migrateMapOffer(offers, tier);
+
             int i = (tier - 1) * 2 + 1;
 
             if (i >= offers.size()) {
@@ -696,6 +701,41 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         }
     }
 
+    /**
+     * Rebuilds a tier's map offer whose placeholder is outdated (a blank map with a literal
+     * "Map to X" custom name, from before charts used translatable names), keeping its use count.
+     */
+    private void migrateMapOffer(MerchantOffers offers, int tier) {
+        int i = (tier - 1) * 2;
+
+        if (i >= offers.size()) {
+            return;
+        }
+
+        MerchantOffer old = offers.get(i);
+
+        if (mapTierOf(old) != tier) {
+            return;
+        }
+
+        ItemStack result = old.getResult();
+
+        if (!result.has(DataComponents.CUSTOM_NAME)) {
+            return;
+        }
+
+        offers.set(i, new MerchantOffer(
+                old.getItemCostA(),
+                old.getItemCostB(),
+                buildStubMap(tier),
+                old.getUses(),
+                old.getMaxUses(),
+                old.getXp(),
+                old.getPriceMultiplier(),
+                old.getDemand()
+        ));
+    }
+
     /** 1-based tier whose relic offer this is, or 0 if it isn't a relic offer. */
     private int relicTierOf(MerchantOffer offer) {
         Item cost = offer.getItemCostA().item().value();
@@ -725,22 +765,56 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             return 0;
         }
 
-        Component name = offer.getResult().get(DataComponents.CUSTOM_NAME);
-
-        if (name == null) {
-            return 0;
-        }
-
-        String text = name.getString();
         String[] destinations = getMapDestinationNames();
 
         for (int tier = 1; tier <= destinations.length; tier++) {
-            if (text.equals("Map to " + destinations[tier - 1])) {
+            if (hasChartName(offer.getResult(), tier)) {
                 return tier;
             }
         }
 
         return 0;
+    }
+
+    /**
+     * Translation key of a tier's chart name, e.g. {@code item.terrainlab.guide_chart.ancient_city}
+     * for "Ancient City". Used as the ITEM_NAME of both the placeholder and the located chart.
+     */
+    private String chartNameKey(int tier) {
+        return "item.terrainlab.guide_chart."
+                + getMapDestinationNames()[tier - 1].toLowerCase(Locale.ROOT).replace(' ', '_');
+    }
+
+    /**
+     * Whether the stack carries a tier's chart name: the translatable item name, or the literal
+     * "Map to X" custom name placeholders were given before charts used translatable names.
+     */
+    private boolean hasChartName(ItemStack stack, int tier) {
+        Component itemName = stack.get(DataComponents.ITEM_NAME);
+
+        if (itemName != null
+                && itemName.getContents() instanceof TranslatableContents translatable
+                && translatable.getKey().equals(chartNameKey(tier))) {
+            return true;
+        }
+
+        Component customName = stack.get(DataComponents.CUSTOM_NAME);
+
+        return customName != null
+                && customName.getString().equals("Map to " + getMapDestinationNames()[tier - 1]);
+    }
+
+    /**
+     * The icon for a tier's chart, from the shared structure table, or null for destinations
+     * with no icon of their own (those get a target X).
+     */
+    @Nullable
+    private StructureMapIcons.Icon chartIcon(int tier) {
+        TagKey<Structure> tag = getMapDestinationStructureTags()[tier - 1];
+
+        return tag == null
+                ? null
+                : StructureMapIcons.forTag(this.level().registryAccess(), tag);
     }
 
     /**
@@ -828,7 +902,8 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         }
 
         if (stack.is(Items.FILLED_MAP)) {
-            // Only the specific relic map counts; buried-treasure, cartographer and camp maps never do.
+            // Only the specific relic map counts; buried-treasure, cartographer and camp maps
+            // and guide charts never do.
             CustomData data = stack.get(DataComponents.CUSTOM_DATA);
             return data != null && getRequiredRelicMap().equals(data.copyTag().getStringOr(RELIC_MAP_TAG, ""));
         }
@@ -955,6 +1030,13 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             this.mapOrigins[index] = origin.asLong();
         }
 
+        // Marked with the destination's icon where the structure table has one, otherwise a
+        // target X.
+        StructureMapIcons.Icon icon = chartIcon(tier);
+        Holder<MapDecorationType> decoration = icon != null
+                ? icon.decoration().get()
+                : MapDecorationTypes.TARGET_X;
+
         // Create the map against the destination dimension, not the guide's.
         ItemStack map = MapItem.create(
                 destinationLevel,
@@ -971,12 +1053,12 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                 map,
                 found,
                 "+",
-                MapDecorationTypes.TARGET_X
+                decoration
         );
 
         map.set(
-                DataComponents.CUSTOM_NAME,
-                Component.literal("Map to " + destinationName)
+                DataComponents.ITEM_NAME,
+                Component.translatable(chartNameKey(tier))
         );
 
         return map;
@@ -1015,28 +1097,31 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                 + level.dimension().identifier();
     }
 
-    private ItemStack buildStubMap(String destinationName) {
+    /**
+     * The placeholder sold for a tier's chart: a blank map named like the chart. It is swapped
+     * for the located chart when the trade completes.
+     */
+    private ItemStack buildStubMap(int tier) {
         ItemStack stack = new ItemStack(Items.MAP);
 
         stack.set(
-                DataComponents.CUSTOM_NAME,
-                Component.literal(
-                        "Map to " + destinationName
-                )
+                DataComponents.ITEM_NAME,
+                Component.translatable(chartNameKey(tier))
         );
 
         return stack;
     }
 
-    private static boolean isStub(ItemStack stack, String stubName) {
-        if (!stack.is(Items.MAP)) {
+    /**
+     * Whether the stack is a purchased placeholder for a tier's chart: a blank map carrying the
+     * chart's name (translatable, or the literal name older placeholders had).
+     */
+    private boolean isStub(ItemStack stack, int tier) {
+        if (!stack.is(Items.MAP) || stack.has(DataComponents.MAP_ID)) {
             return false;
         }
 
-        Component customName = stack.get(DataComponents.CUSTOM_NAME);
-
-        return customName != null
-                && customName.getString().equals(stubName);
+        return hasChartName(stack, tier);
     }
 
     /**
@@ -1046,12 +1131,12 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
      */
     private static void swapPurchasedStub(
             Player player,
-            String stubName,
+            Predicate<ItemStack> isStub,
             ItemStack replacement) {
 
         ItemStack carried = player.containerMenu.getCarried();
 
-        if (isStub(carried, stubName)) {
+        if (isStub.test(carried)) {
             if (carried.getCount() == 1) {
                 player.containerMenu.setCarried(replacement);
             } else {
@@ -1068,7 +1153,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
             ItemStack stack = player.getInventory().getItem(slot);
 
-            if (!isStub(stack, stubName)) {
+            if (!isStub.test(stack)) {
                 continue;
             }
 
@@ -1102,16 +1187,16 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             int tier) {
 
         String destinationName = getMapDestinationNames()[tier - 1];
-        String stubName = "Map to " + destinationName;
+        Predicate<ItemStack> isStub = stack -> isStub(stack, tier);
 
         ItemStack located = buildDestinationMap(tier);
 
         if (located != null) {
-            swapPurchasedStub(player, stubName, located);
+            swapPurchasedStub(player, isStub, located);
             return;
         }
 
-        swapPurchasedStub(player, stubName, offer.getCostA().copy());
+        swapPurchasedStub(player, isStub, offer.getCostA().copy());
 
         player.displayClientMessage(
                 Component.translatableWithFallback(

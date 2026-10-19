@@ -33,6 +33,11 @@ public final class VillageRecord {
     private double happinessSum = 0.0;
     private int happinessSamples = 0;
 
+    // Village food chest next to the bell (VillageChestService); null = none placed yet.
+    private net.minecraft.core.BlockPos chestPos = null;
+    // True once the first chest has been filled from the loot table; replacement chests start empty.
+    private boolean chestStocked = false;
+
     public long getLastCheckedDay() {
         return lastCheckedDay;
     }
@@ -136,6 +141,22 @@ public final class VillageRecord {
         return happinessSamples;
     }
 
+    public java.util.Optional<net.minecraft.core.BlockPos> getChestPos() {
+        return java.util.Optional.ofNullable(chestPos);
+    }
+
+    public void setChestPos(net.minecraft.core.BlockPos chestPos) {
+        this.chestPos = chestPos == null ? null : chestPos.immutable();
+    }
+
+    public boolean isChestStocked() {
+        return chestStocked;
+    }
+
+    public void setChestStocked(boolean chestStocked) {
+        this.chestStocked = chestStocked;
+    }
+
     /**
      * Persistence codec. Enums are stored by name; {@code xp_granted_tiers} is stored as a list.
      */
@@ -153,9 +174,11 @@ public final class VillageRecord {
             Codec.INT.optionalFieldOf("pending_bell_xp", 0).forGetter(VillageRecord::getPendingBellXp),
             // Later additions are optional so older saves still load.
             Codec.DOUBLE.optionalFieldOf("happiness_sum", 0.0).forGetter(VillageRecord::getHappinessSum),
-            Codec.INT.optionalFieldOf("happiness_samples", 0).forGetter(VillageRecord::getHappinessSamples)
+            Codec.INT.optionalFieldOf("happiness_samples", 0).forGetter(VillageRecord::getHappinessSamples),
+            net.minecraft.core.BlockPos.CODEC.optionalFieldOf("chest_pos").forGetter(VillageRecord::getChestPos),
+            Codec.BOOL.optionalFieldOf("chest_stocked", false).forGetter(VillageRecord::isChestStocked)
     ).apply(instance, (day, food, required, hunger, pop, farmers, tier, score, grantedTiers, pendingXp,
-                       happySum, happySamples) -> {
+                       happySum, happySamples, chest, chestStocked) -> {
         VillageRecord r = new VillageRecord();
         r.setLastCheckedDay(day);
         r.setFoodStock(food);
@@ -175,6 +198,8 @@ public final class VillageRecord {
         r.setPendingBellXp(pendingXp);
         r.happinessSum = happySum;
         r.happinessSamples = happySamples;
+        r.chestPos = chest.orElse(null);
+        r.chestStocked = chestStocked;
         return r;
     }));
 }

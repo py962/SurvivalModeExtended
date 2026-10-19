@@ -4,7 +4,9 @@ import com.terrainlab.registry.ModAttachments;
 import com.terrainlab.village.VillageConstants;
 import com.terrainlab.village.VillageMembershipService;
 import com.terrainlab.village.VillageReputationService;
+import com.terrainlab.village.VillagerChestMealService;
 import com.terrainlab.village.VillagerFearService;
+import com.terrainlab.village.VillagerHealthService;
 import com.terrainlab.village.VillagerMoodService;
 import com.terrainlab.village.VillagerScheduleService;
 import com.terrainlab.village.VillagerThermalService;
@@ -30,7 +32,7 @@ import java.util.Optional;
 
 /**
  * Staggered per-villager behaviour reads (thermal, tired, trapped, schedule, hostile and
- * Sentry-trim sightings, mood), the damage fear hook, and the Fearful-at-dusk override that
+ * Sentry-trim sightings, health, mood, chest meals), the damage fear hook, and the Fearful-at-dusk override that
  * sends villagers to the nearest bed.
  * <p>
  * The bed override uses a raw {@code navigation.moveTo}, which other AI may overwrite; it is
@@ -69,8 +71,12 @@ public final class VillagerBehaviorHandler {
                 checkForNearbyHostiles(villager, level, gameTime);
                 applyFearfulDuskOverride(villager, level, gameTime);
                 checkForSentryTrimSighting(villager, level, gameTime);
+                // Pending food heals and the daily natural heal, before the mood reads health.
+                VillagerHealthService.update(villager, gameTime);
                 // Last, so it sees this read's thermal/tired/trapped/fear results.
                 VillagerMoodService.update(villager, gameTime);
+                // Eat from the village chest if needed, using the mood just computed.
+                VillagerChestMealService.update(villager, level, gameTime);
             }
         }
     }

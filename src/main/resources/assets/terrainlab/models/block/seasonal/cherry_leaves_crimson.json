@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "terrainlab:block/seasonal/cherry_leaves_crimson"
+  }
+}

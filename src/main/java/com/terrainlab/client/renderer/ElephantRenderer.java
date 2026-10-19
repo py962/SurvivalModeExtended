@@ -25,7 +25,7 @@ public class ElephantRenderer extends AgeableMobRenderer<ElephantEntity, CamelRe
     public ElephantRenderer(EntityRendererProvider.Context context) {
         super(context,
                 new ElephantModel(context.bakeLayer(ModModelLayers.ELEPHANT)),
-                new ElephantModel(context.bakeLayer(ModModelLayers.ELEPHANT)),
+                new ElephantModel(context.bakeLayer(ModModelLayers.ELEPHANT_BABY)),
                 1.5F);
         this.addLayer(createSaddleLayer(context));
         this.addLayer(createHowdahLayer(context));

@@ -19,10 +19,12 @@ public final class FoodCategoryTable {
 
     static {
         // HEALTH: zero hunger, custom healing.
+        put(Items.DRIED_KELP, FoodCategory.HEALTH);
+        HEALTH_VALUES.put(Items.DRIED_KELP, new HealthData(1.0F, 200));  // 1/2 heart over 10s
         put(Items.CARROT, FoodCategory.HEALTH);
-        HEALTH_VALUES.put(Items.CARROT, new HealthData(1.0F, 300));      // 0.5 heart over 15s
+        HEALTH_VALUES.put(Items.CARROT, new HealthData(2.0F, 300));      // 1 heart over 15s
         put(Items.APPLE, FoodCategory.HEALTH);
-        HEALTH_VALUES.put(Items.APPLE, new HealthData(2.0F, 400));       // 1 heart over 20s
+        HEALTH_VALUES.put(Items.APPLE, new HealthData(4.0F, 400));       // 2 heart over 20s
         put(Items.GOLDEN_CARROT, FoodCategory.HEALTH);
         HEALTH_VALUES.put(Items.GOLDEN_CARROT, new HealthData(6.0F, 0)); // 3 hearts instant
 
@@ -37,7 +39,7 @@ public final class FoodCategoryTable {
         // Blue Orchid Suspicious Stew is component-based and handled outside this table.
 
         // HUNGER_1: snack, 2 points
-        for (Item i : new Item[]{Items.COOKIE, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.DRIED_KELP, Items.CAKE}) {
+        for (Item i : new Item[]{Items.COOKIE, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.CAKE}) {
             put(i, FoodCategory.HUNGER_1);
             HUNGER_POINTS.put(i, 2);
         }

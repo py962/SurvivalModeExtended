@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "terrainlab:block/seasonal/birch_leaves_yellow"
+  }
+}

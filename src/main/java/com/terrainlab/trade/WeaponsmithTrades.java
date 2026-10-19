@@ -20,8 +20,8 @@ import com.terrainlab.registry.ModEnchantments;
 
 /**
  * Replaces the vanilla Weaponsmith trade table. Planks and wood-variant shields follow the
- * villager's biome type, and each enchanted diamond weapon has its own biome-specific
- * enchantment pair limited to enchantments that suit it.
+ * villager's biome type, and the enchanted diamond weapons share a biome-specific
+ * enchantment set (fixed levels) whose Snow row is weapon-specific.
  */
 public final class WeaponsmithTrades {
 
@@ -29,85 +29,86 @@ public final class WeaponsmithTrades {
 
     private static final ResourceKey<Enchantment> REACH = ModEnchantments.REACH;
     private static final ResourceKey<Enchantment> CLEAVE = ModEnchantments.CLEAVE;
+    private static final ResourceKey<Enchantment> QUICKSTRIKE = ModEnchantments.QUICKSTRIKE;
 
     private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance fixed(ResourceKey<Enchantment> enchantment, int level) {
         return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(enchantment, level);
     }
 
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance ranged(ResourceKey<Enchantment> enchantment, int minLevel, int maxLevel) {
-        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.ranged(enchantment, minLevel, maxLevel);
-    }
 
-    // Enchanted Diamond Sword: Sweeping Edge on the Taiga/Swamp rows.
+    // Enchanted Diamond Sword (Master). All levels are fixed; Snow (Tundra) gets Sweeping Edge.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> SWORD_ENCHANT_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.KNOCKBACK, 1, 2)),
-            VillagerType.SAVANNA, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(REACH, 1, 3)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.TAIGA, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.SWEEPING_EDGE, 1, 3)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.KNOCKBACK, 1, 2), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SWAMP, List.of(ranged(REACH, 1, 3), ranged(Enchantments.SWEEPING_EDGE, 1, 3)),
-            VillagerType.JUNGLE, List.of(ranged(REACH, 1, 3), ranged(Enchantments.UNBREAKING, 1, 3))
+            VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.SAVANNA, List.of(fixed(REACH, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
+            VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.SWEEPING_EDGE, 3)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
+    // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> SWORD_ENCHANT_FALLBACK =
-            List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.KNOCKBACK, 1, 2));
+            List.of(fixed(Enchantments.UNBREAKING, 3));
 
-    // Enchanted Diamond Spear: Lunge on the Taiga/Swamp rows.
+    // Enchanted Diamond Spear (Expert). All levels are fixed; Snow (Tundra) gets Lunge.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> SPEAR_ENCHANT_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.KNOCKBACK, 1, 2)),
-            VillagerType.SAVANNA, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(REACH, 1, 3)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.TAIGA, List.of(ranged(Enchantments.SHARPNESS, 1, 5), fixed(Enchantments.LUNGE, 1)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.KNOCKBACK, 1, 2), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SWAMP, List.of(ranged(REACH, 1, 3), fixed(Enchantments.LUNGE, 1)),
-            VillagerType.JUNGLE, List.of(ranged (REACH, 1, 3), ranged(Enchantments.UNBREAKING, 1, 3))
+            VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.SAVANNA, List.of(fixed(REACH, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
+            VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.LUNGE, 3)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
+    // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> SPEAR_ENCHANT_FALLBACK =
-            List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.KNOCKBACK, 1, 2));
+            List.of(fixed(Enchantments.UNBREAKING, 3));
 
-    // Enchanted Diamond Axe: Cleave on the Taiga/Swamp rows.
+    // Enchanted Diamond Axe (Expert). All levels are fixed; Snow (Tundra) gets Cleave.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> AXE_ENCHANT_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.KNOCKBACK, 1, 2)),
-            VillagerType.SAVANNA, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(REACH, 1,3)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.TAIGA, List.of(ranged(Enchantments.SHARPNESS, 1, 5),ranged(CLEAVE, 1, 3)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.KNOCKBACK, 1, 2), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SWAMP, List.of(ranged(REACH, 1, 3), ranged(CLEAVE, 1, 3)),
-            VillagerType.JUNGLE, List.of(ranged(REACH, 1,3), ranged(Enchantments.UNBREAKING, 1, 3))
+            VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.SAVANNA, List.of(fixed(REACH, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
+            VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
+            VillagerType.SNOW, List.of(fixed(CLEAVE, 3)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
+    // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> AXE_ENCHANT_FALLBACK =
-            List.of(ranged(Enchantments.SHARPNESS, 1, 5), ranged(Enchantments.KNOCKBACK, 1, 2));
+            List.of(fixed(Enchantments.UNBREAKING, 3));
 
     // Wood Planks: same wood per type as Shield 1.
     private static final Map<ResourceKey<VillagerType>, Item> PLANKS_BY_TYPE = Map.of(
             VillagerType.PLAINS, Items.BIRCH_PLANKS,
-            VillagerType.SAVANNA, Items.OAK_PLANKS,
+            VillagerType.SAVANNA, Items.ACACIA_PLANKS,
             VillagerType.DESERT, Items.OAK_PLANKS,
             VillagerType.TAIGA, Items.SPRUCE_PLANKS,
             VillagerType.SNOW, ModItems.PINE_PLANKS.get(),
-            VillagerType.SWAMP, Items.DARK_OAK_PLANKS,
+            VillagerType.SWAMP, Items.BIRCH_PLANKS,
             VillagerType.JUNGLE, Items.BAMBOO_PLANKS
     );
     private static final Item PLANKS_FALLBACK = Items.BIRCH_PLANKS;
 
-    // Shield 1 (Apprentice).
+    // Shield 1 (Apprentice). Plains is Birch in 1.21.11; Poplar in 26.3.
     private static final Map<ResourceKey<VillagerType>, Item> SHIELD_1_BY_TYPE = Map.of(
             VillagerType.PLAINS, ModItems.BIRCH_SHIELD.get(),
-            VillagerType.SAVANNA, ModItems.OAK_SHIELD.get(),
+            VillagerType.SAVANNA, ModItems.ACACIA_SHIELD.get(),
             VillagerType.DESERT, ModItems.OAK_SHIELD.get(),
             VillagerType.TAIGA, ModItems.SPRUCE_SHIELD.get(),
             VillagerType.SNOW, ModItems.PINE_SHIELD.get(),
-            VillagerType.SWAMP, ModItems.DARK_OAK_SHIELD.get(),
+            VillagerType.SWAMP, ModItems.BIRCH_SHIELD.get(),
             VillagerType.JUNGLE, ModItems.BAMBOO_SHIELD.get()
     );
     private static final Item SHIELD_1_FALLBACK = ModItems.BIRCH_SHIELD.get();
 
-    // Shield 2 (Journeyman). Snow is Spruce in 1.21.11; Poplar in 26.3.
+    // Shield 2 (Journeyman).
     private static final Map<ResourceKey<VillagerType>, Item> SHIELD_2_BY_TYPE = Map.of(
             VillagerType.PLAINS, ModItems.CHERRY_SHIELD.get(),
-            VillagerType.SAVANNA, ModItems.ACACIA_SHIELD.get(),
+            VillagerType.SAVANNA, ModItems.JUNGLE_SHIELD.get(),
             VillagerType.DESERT, ModItems.AZALEA_SHIELD.get(),
-            VillagerType.TAIGA, ModItems.PALE_OAK_SHIELD.get(),
-            VillagerType.SNOW, ModItems.SPRUCE_SHIELD.get(),
+            VillagerType.TAIGA, ModItems.DARK_OAK_SHIELD.get(),
+            VillagerType.SNOW, ModItems.PALE_OAK_SHIELD.get(),
             VillagerType.SWAMP, ModItems.MANGROVE_SHIELD.get(),
             VillagerType.JUNGLE, ModItems.JUNGLE_SHIELD.get()
     );

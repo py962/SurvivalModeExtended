@@ -11,8 +11,11 @@
     "EndermanBehaviourMixin",
     "EndermanTeleportMixin",
     "CreeperBehaviourMixin",
+    "CreeperSwellGoalMixin",
     "EndermanTakeMixin",
     "HappyGhastMixin",
+    "LeashableEnchantedLeadMixin",
+    "EntityLeadConsumeMixin",
     "AbstractBoatAccessor",
     "LivingEntityAccessor",
     "AbstractBoatGravityMixin",
@@ -28,6 +31,8 @@
     "PhasingBlockJumpMixin",
     "EnderDragonPhaseBlockingMixin",
     "CopperGolemAiMixin",
+    "VillagerGoalPackagesWorkMixin",
+    "AbstractHorseVillageLoveMixin",
     "SnowGolemDamageMixin",
     "BorrowingSleepMixin",
     "BorrowingInputLockMixin",
@@ -35,6 +40,7 @@
     "StructurePlacementMixin",
     "StructureStartPlacementMixin",
     "StructureGenerationVetoMixin",
+    "JigsawStructureHardcoreVillageMixin",
     "BastionHousingSpawnMixin",
     "MineshaftHeightMixin",
     "AbstractBoatFlowingWaterSinkMixin",
@@ -94,7 +100,11 @@
     "MerchantOfferPricingMixin",
     "VillagerPairPricingMixin",
     "RaidOminousBannerMixin",
-    "PiglinLuckBarterMixin"
+    "PiglinLuckBarterMixin",
+    "LlamaCaribouMateMixin",
+    "HealOrHarmStatFlashMixin",
+    "AbsorptionStatFlashMixin",
+    "OffhandWeaponBreakMixin"
   ],
   "client": [
     "SkyRendererAccessor",
@@ -108,7 +118,11 @@
     "BiomeAmbientUnderwaterMuteMixin",
     "VillagerModelMoodMixin",
     "SpectralVisionGlowMixin",
-    "VillagerHeatTintMixin"
+    "VillagerHeatTintMixin",
+    "BoatHandsFreeMixin",
+    "HudStatFlashMixin",
+    "MultiPlayerGameModeInvoker",
+    "OffhandStrikeUseItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

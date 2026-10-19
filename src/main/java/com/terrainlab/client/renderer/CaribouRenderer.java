@@ -5,15 +5,15 @@ import com.terrainlab.client.model.CaribouModel;
 import com.terrainlab.entity.CaribouEntity;
 import com.terrainlab.registry.ModAttachments;
 import com.terrainlab.registry.ModModelLayers;
+import net.minecraft.client.renderer.entity.AgeableMobRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 
 /**
  * Renders the caribou with {@link CaribouModel}, switching to the sheared texture (and
  * hiding the fluff parts) while the entity is in its post-shear regrowth cooldown.
  */
-public class CaribouRenderer extends MobRenderer<CaribouEntity, CaribouRenderState, CaribouModel> {
+public class CaribouRenderer extends AgeableMobRenderer<CaribouEntity, CaribouRenderState, CaribouModel> {
 
     private static final Identifier TEXTURE =
             Identifier.fromNamespaceAndPath(TerrainLab.MODID, "textures/entity/caribou.png");
@@ -24,7 +24,10 @@ public class CaribouRenderer extends MobRenderer<CaribouEntity, CaribouRenderSta
     private static final long REGROWTH_COOLDOWN_TICKS = 24000L;
 
     public CaribouRenderer(EntityRendererProvider.Context context) {
-        super(context, new CaribouModel(context.bakeLayer(ModModelLayers.CARIBOU)), 0.7F);
+        super(context,
+                new CaribouModel(context.bakeLayer(ModModelLayers.CARIBOU)),
+                new CaribouModel(context.bakeLayer(ModModelLayers.CARIBOU_BABY)),
+                0.7F);
     }
 
     @Override

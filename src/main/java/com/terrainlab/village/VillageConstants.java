@@ -71,9 +71,9 @@ public final class VillageConstants {
     // Village XP and reputation schedule. XP is banked per village and released at the bell
     // (VillageBellRewardService); reputation is applied immediately (VillageReputationService).
     // Tier-up XP is paid only on a tier's first-ever upgrade.
-    public static final int TIER_UP_XP_LEVEL2 = 100;
-    public static final int TIER_UP_XP_LEVEL3 = 500;
-    public static final int TIER_UP_XP_LEVEL4 = 2000;
+    public static final int TIER_UP_XP_LEVEL2 = 200;
+    public static final int TIER_UP_XP_LEVEL3 = 1000;
+    public static final int TIER_UP_XP_LEVEL4 = 4000;
 
     // Reputation given to players near the bell on a tier's first-ever upgrade. Hamlet's fades
     // (minor gossip); Village's and Town's are permanent (major gossip, shared 100 cap with curing).
@@ -82,11 +82,11 @@ public final class VillageConstants {
     public static final int TIER_UP_REPUTATION_LEVEL4 = 50;
 
     // One-time, server-wide bonus for the first tier-3 village of each biome type.
-    public static final int BIOME_MILESTONE_XP = 500;
+    public static final int BIOME_MILESTONE_XP = 1000;
 
     // Nightly sunset bonus: NIGHT_LEVEL2_XP for tier 3, NIGHT_LEVEL3_XP for tier 4.
-    public static final int NIGHT_LEVEL2_XP = 20;
-    public static final int NIGHT_LEVEL3_XP = 100;
+    public static final int NIGHT_LEVEL2_XP = 50;
+    public static final int NIGHT_LEVEL3_XP = 200;
 
     // Applied to the player who breaks a bell.
     public static final int DESTROY_BELL_REPUTATION = -150;

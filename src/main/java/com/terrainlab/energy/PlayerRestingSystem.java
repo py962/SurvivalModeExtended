@@ -63,6 +63,7 @@ public final class PlayerRestingSystem {
                 // "[REST] wake: elapsed={} simulated ticks, fraction={}, conversions={}",
                 // elapsed, fraction, conversions);
 
+        com.terrainlab.player.StatFlash.Snapshot before = com.terrainlab.player.StatFlash.capture(player);
         for (int i = 0; i < conversions; i++) {
             boolean converted = tryConvertOnePoint(player);
             if (!converted) {
@@ -70,6 +71,8 @@ public final class PlayerRestingSystem {
                 break;
             }
         }
+        // Golden flash on whatever the night restored (health and/or energy; hunger only drops).
+        com.terrainlab.player.StatFlash.sendGains(player, before);
     }
 
     /**

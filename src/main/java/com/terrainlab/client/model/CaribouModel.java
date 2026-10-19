@@ -7,6 +7,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.MeshTransformer;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 
 /**
@@ -18,6 +19,13 @@ public class CaribouModel extends QuadrupedModel<CaribouRenderState> {
 
     public CaribouModel(ModelPart root) {
         super(root);
+    }
+
+    // Calves render at half size, matching their half-size hitbox.
+    public static final MeshTransformer BABY_TRANSFORMER = MeshTransformer.scaling(0.5F);
+
+    public static LayerDefinition createBabyLayer() {
+        return createBodyLayer().apply(BABY_TRANSFORMER);
     }
 
     public static LayerDefinition createBodyLayer() {

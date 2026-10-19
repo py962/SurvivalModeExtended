@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "terrainlab:agility",
+    "terrainlab:cleave",
+    "terrainlab:overstacking",
+    "terrainlab:quickstrike",
+    "terrainlab:reach",
+    "terrainlab:recall"
+  ]
+}

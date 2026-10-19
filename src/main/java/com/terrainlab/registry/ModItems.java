@@ -20,6 +20,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import com.terrainlab.item.TieredArrowItem;
 import com.terrainlab.entity.TieredArrowEntity;
+import com.terrainlab.item.OversizedMapFrameItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -402,6 +403,21 @@ public class ModItems {
                             .setId(net.minecraft.resources.ResourceKey.create(
                                     net.minecraft.core.registries.Registries.ITEM, id))
                             .stacksTo(1)));
+
+    // Oversized map frames: one shared map displayed across a 2x2 or 3x3 arrangement.
+    public static final DeferredItem<OversizedMapFrameItem> LARGE_ITEM_FRAME =
+            ITEMS.register("large_item_frame", id ->
+                    new OversizedMapFrameItem(2, new Item.Properties()
+                            .setId(net.minecraft.resources.ResourceKey.create(
+                                    net.minecraft.core.registries.Registries.ITEM, id))
+                            .stacksTo(16)));
+
+    public static final DeferredItem<OversizedMapFrameItem> EXTRA_LARGE_ITEM_FRAME =
+            ITEMS.register("extra_large_item_frame", id ->
+                    new OversizedMapFrameItem(3, new Item.Properties()
+                            .setId(net.minecraft.resources.ResourceKey.create(
+                                    net.minecraft.core.registries.Registries.ITEM, id))
+                            .stacksTo(16)));
 
     // Wood shields. Combat behaviour comes from the blocks_attacks component built by
     // ShieldFactory from ShieldDefinitions; ShieldCombatEvents handles the stats the component

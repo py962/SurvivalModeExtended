@@ -88,7 +88,7 @@
             {
               "function": "minecraft:exploration_map",
               "destination": "terrainlab:locate/trial_chamber",
-              "decoration": "minecraft:red_x",
+              "decoration": "minecraft:trial_chambers",
               "zoom": 2,
               "search_radius": 100,
               "skip_existing_chunks": true

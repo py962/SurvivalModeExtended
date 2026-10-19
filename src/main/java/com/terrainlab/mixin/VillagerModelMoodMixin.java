@@ -69,6 +69,22 @@ public abstract class VillagerModelMoodMixin {
                 this.arms.x += tremble;
                 this.arms.y -= 0.4F * s;
             }
+            case VillagerMoodService.INJURED -> {
+                // Favouring one side (+x in model space): the folded arms slide over to clutch the flank, a slight
+                // lean and head tilt toward it, weight off the right leg, and an occasional wince.
+                // (The villager's arms are one rigid part, so "one arm on the side" is approximated.)
+                float wince = Mth.clamp((Mth.sin(t * 0.07F) - 0.85F) / 0.15F, 0.0F, 1.0F);
+                this.arms.x += 1.3F * s;
+                this.arms.y += 0.8F * s;
+                this.arms.yRot += 0.3F * s;
+                this.arms.zRot += 0.12F * s;
+                body.zRot += 0.05F * s;
+                this.head.x += 0.5F * s;
+                this.head.zRot += 0.1F * s;
+                this.head.xRot += (0.15F + 0.12F * wince) * s;
+                this.rightLeg.xRot -= 0.12F * s;
+                this.rightLeg.zRot += 0.04F * s;
+            }
             case VillagerMoodService.COLD -> {
                 // Shivering hunch, arms hugged tight to the chest.
                 float shiver = Mth.sin(t * 3.3F) * 0.22F * s;

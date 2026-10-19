@@ -25,6 +25,9 @@ public class CelestialPairShapedRecipe extends ShapedRecipe {
     @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         ItemStack result = super.assemble(input, registries);
+        if (result.isEmpty()) {
+            return result;
+        }
         for (ItemStack stack : input.items()) {
             if (stack.getItem() instanceof CelestialPearlItem) {
                 var pairId = stack.get(ModDataComponents.CELESTIAL_PAIR_ID.get());

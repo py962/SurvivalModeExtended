@@ -1,6 +1,5 @@
 package com.terrainlab.trade;
 
-import com.terrainlab.registry.ModEnchantments;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
@@ -17,91 +16,29 @@ import java.util.Map;
 
 /**
  * Replaces the vanilla Armorer trade table. Enchanted diamond armour carries a
- * biome-specific enchantment pair; the Swamp chestplate is the only source of Reach.
+ * biome-specific enchantment set at fixed levels, the same for every piece.
  */
 public final class ArmorerTrades {
 
     private ArmorerTrades() {}
 
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance ranged(
-            ResourceKey<Enchantment> enchantment,
-            int minLevel,
-            int maxLevel
-    ) {
-        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.ranged(
-                enchantment,
-                minLevel,
-                maxLevel
-        );
+    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance fixed(ResourceKey<Enchantment> enchantment, int level) {
+        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(enchantment, level);
     }
 
-    // Enchantment pairs for the enchanted diamond armour sells (all pieces except the Swamp chestplate).
+    // Shared by all four enchanted diamond armour sells. All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> ENCHANT_PAIR_BY_TYPE = Map.of(
-            VillagerType.PLAINS,
-            List.of(
-                    ranged(Enchantments.PROTECTION, 1, 4),
-                    ranged(Enchantments.THORNS, 1, 3)
-            ),
-
-            VillagerType.SAVANNA,
-            List.of(
-                    ranged(Enchantments.PROTECTION, 1, 4),
-                    ranged(Enchantments.UNBREAKING, 1, 3)
-            ),
-
-            VillagerType.DESERT,
-            List.of(
-                    ranged(Enchantments.BLAST_PROTECTION, 1, 4),
-                    ranged(Enchantments.UNBREAKING, 1, 3)
-            ),
-
-            VillagerType.TAIGA,
-            List.of(
-                    ranged(Enchantments.BLAST_PROTECTION, 1, 4),
-                    ranged(Enchantments.THORNS, 1, 3)
-            ),
-
-            VillagerType.SNOW,
-            List.of(
-                    ranged(Enchantments.FIRE_PROTECTION, 1, 4),
-                    ranged(Enchantments.THORNS, 1, 3)
-            ),
-
-            VillagerType.SWAMP,
-            List.of(
-                    ranged(Enchantments.UNBREAKING, 1, 3),
-                    ranged(Enchantments.THORNS, 1, 3)
-            ),
-
-            VillagerType.JUNGLE,
-            List.of(
-                    ranged(Enchantments.PROJECTILE_PROTECTION, 1, 4),
-                    ranged(Enchantments.UNBREAKING, 1, 3)
-            )
+            VillagerType.PLAINS, List.of(fixed(Enchantments.PROTECTION, 2), fixed(Enchantments.THORNS, 2)),
+            VillagerType.SAVANNA, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.BLAST_PROTECTION, 4)),
+            VillagerType.DESERT, List.of(fixed(Enchantments.UNBREAKING, 2), fixed(Enchantments.THORNS, 2)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.PROTECTION, 4)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.PROJECTILE_PROTECTION, 4)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.THORNS, 3))
     );
-
-    // Same pairs as the other pieces, except the Swamp chestplate swaps Thorns for Reach.
-    private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> CHESTPLATE_ENCHANT_PAIR_BY_TYPE =
-            chestplatePairs();
-
-    private static Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> chestplatePairs() {
-        var pairs = new java.util.HashMap<>(ENCHANT_PAIR_BY_TYPE);
-        pairs.put(VillagerType.SWAMP, List.of(
-                ranged(Enchantments.UNBREAKING, 1, 3),
-                ranged(ModEnchantments.REACH, 1, 3)
-        ));
-        return Map.copyOf(pairs);
-    }
-
-    // Plains pair.
+    // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> ENCHANT_PAIR_FALLBACK =
-            List.of(
-                    ranged(Enchantments.PROTECTION, 1, 4),
-                    ranged(Enchantments.THORNS, 1, 3)
-            );
-
-    private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> CHESTPLATE_ENCHANT_PAIR_FALLBACK =
-            ENCHANT_PAIR_FALLBACK;
+            List.of(fixed(Enchantments.PROTECTION, 2), fixed(Enchantments.THORNS, 2));
 
     private static final int NOVICE_MAX_USES = 16;
     private static final int APPRENTICE_MAX_USES = 12;
@@ -286,12 +223,11 @@ public final class ArmorerTrades {
                 )
         );
 
-        // Chestplate uses its own map so Swamp gets Reach.
         expert.add(
                 new TradeListings.VillagerTypeEnchantedSellListing(
                         Items.DIAMOND_CHESTPLATE,
-                        CHESTPLATE_ENCHANT_PAIR_BY_TYPE,
-                        CHESTPLATE_ENCHANT_PAIR_FALLBACK,
+                        ENCHANT_PAIR_BY_TYPE,
+                        ENCHANT_PAIR_FALLBACK,
                         16,
                         EXPERT_MAX_USES,
                         10

@@ -75,8 +75,11 @@ public class ModLeashHandler {
             for (Leashable leashed : leashedToPlayer) {
                 if (leashed instanceof HappyGhast ghast) {
                     // removeLeash() drops no lead item; the lead moves to the boat-to-ghast line.
+                    // The ghast's stored (enchanted) lead goes with it; read it before removeLeash() forgets it.
+                    net.minecraft.world.item.ItemStack ghastLead = EnchantedLeadHandler.peek(ghast).copy();
                     ghast.removeLeash();
                     boat.setLeashedTo(ghast, true);
+                    EnchantedLeadHandler.record(boat, ghastLead.isEmpty() ? new ItemStack(Items.LEAD) : ghastLead);
                     if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                         com.terrainlab.advancement.ModAdvancements.award(serverPlayer, "houseboat_ghast");
                     }

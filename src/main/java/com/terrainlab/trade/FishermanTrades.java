@@ -15,39 +15,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Replaces the vanilla Fisherman trade table. The Master tier sells a fishing rod with a
- * biome-specific enchantment pair, each level rolled randomly up to its vanilla maximum.
+ * Replaces the vanilla Fisherman trade table. The Master tier sells a fishing rod with
+ * biome-specific enchantments at fixed levels.
  */
 public final class FishermanTrades {
 
     private FishermanTrades() {}
 
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance ranged(ResourceKey<Enchantment> enchantment, int minLevel, int maxLevel) {
-        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.ranged(enchantment, minLevel, maxLevel);
+    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance fixed(ResourceKey<Enchantment> enchantment, int level) {
+        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(enchantment, level);
     }
 
-    // Vanilla max levels: Lure III, Luck of the Sea III, Unbreaking III.
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance lure() {
-        return ranged(Enchantments.LURE, 1, 3);
-    }
-
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance luckOfTheSea() {
-        return ranged(Enchantments.LUCK_OF_THE_SEA, 1, 3);
-    }
-
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance unbreaking() {
-        return ranged(Enchantments.UNBREAKING, 1, 3);
-    }
-
+    // Fishing rod enchantments per villager type. All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> FISHING_ROD_ENCHANTMENTS_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(lure(), luckOfTheSea()),
-            VillagerType.SAVANNA, List.of(luckOfTheSea(), unbreaking()),
-            VillagerType.DESERT, List.of(lure(), unbreaking()),
-            VillagerType.TAIGA, List.of(lure(), luckOfTheSea()),
-            VillagerType.SNOW, List.of(luckOfTheSea(), unbreaking()),
-            VillagerType.SWAMP, List.of(lure(), unbreaking()),
-            VillagerType.JUNGLE, List.of(lure(), luckOfTheSea())
+            VillagerType.PLAINS, List.of(fixed(Enchantments.LURE, 3)),
+            VillagerType.SAVANNA, List.of(fixed(Enchantments.LUCK_OF_THE_SEA, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.DESERT, List.of(fixed(Enchantments.LURE, 2), fixed(Enchantments.LUCK_OF_THE_SEA, 2)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.LURE, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.LURE, 2), fixed(Enchantments.LUCK_OF_THE_SEA, 2)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.LUCK_OF_THE_SEA, 2), fixed(Enchantments.UNBREAKING, 2))
     );
+    // Plains set.
+    private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> FISHING_ROD_ENCHANTMENTS_FALLBACK =
+            List.of(fixed(Enchantments.LURE, 3));
 
     private static final int NOVICE_MAX_USES = 16;
     private static final int APPRENTICE_MAX_USES = 12;
@@ -100,6 +91,6 @@ public final class FishermanTrades {
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
         master.add(TradeListings.SimpleTradeListing.buying(Items.FISHING_ROD, 1, 5, MASTER_MAX_USES, 0));
-        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.FISHING_ROD, FISHING_ROD_ENCHANTMENTS_BY_TYPE, List.of(), 11, MASTER_MAX_USES, 0));
+        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.FISHING_ROD, FISHING_ROD_ENCHANTMENTS_BY_TYPE, FISHING_ROD_ENCHANTMENTS_FALLBACK, 11, MASTER_MAX_USES, 0));
     }
 }

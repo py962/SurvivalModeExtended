@@ -16,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Replaces a villager's plain ambient sound with a mood voice when it is fearful, tired, hungry or
- * trapped (first match wins). The tired and trapped voices also broadcast an entity event so clients
+ * Replaces a villager's plain ambient sound with a mood voice when it is fearful, injured, tired,
+ * hungry or trapped (first match wins). The tired and trapped voices also broadcast an entity event so clients
  * play the matching gesture ({@link VillagerGestureAccess}).
  */
 @Mixin(Villager.class)
@@ -37,6 +37,8 @@ public abstract class VillagerMoodSoundMixin implements VillagerGestureAccess {
         int flags = self.getData(ModAttachments.VILLAGER_MOOD_FLAGS.get());
         if ((flags & VillagerMoodService.FEARFUL) != 0) {
             cir.setReturnValue(ModSounds.VILLAGER_MOOD_FEARFUL.get());
+        } else if ((flags & VillagerMoodService.INJURED) != 0) {
+            cir.setReturnValue(ModSounds.VILLAGER_MOOD_INJURED.get());
         } else if ((flags & VillagerMoodService.TIRED) != 0) {
             cir.setReturnValue(ModSounds.VILLAGER_MOOD_TIRED.get());
             terrainlab$sendGesture(self, EVENT_YAWN);

@@ -30,10 +30,7 @@ import static net.minecraft.world.item.alchemy.Potions.HARMING;
 
 /**
  * Replaces the vanilla Fletcher trade table. Special feathers, tipped-arrow effects and
- * bow/crossbow enchantment pairs all vary by villager biome type.
- *
- * <p>Multishot and Infinity are single-level enchantments, so they are fixed at I; all
- * others roll up to their vanilla maximum.
+ * bow/crossbow enchantments all vary by villager biome type. Enchantment levels are fixed.
  */
 public final class FletcherTrades {
 
@@ -56,35 +53,34 @@ public final class FletcherTrades {
         return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(enchantment, level);
     }
 
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance ranged(ResourceKey<Enchantment> enchantment, int minLevel, int maxLevel) {
-        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.ranged(enchantment, minLevel, maxLevel);
-    }
 
-    // Bow-only enchantments (plus Unbreaking).
+    // Enchanted Bow (Master). All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOW_ENCHANT_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(ranged(Enchantments.POWER, 1, 5), ranged(Enchantments.PUNCH, 1, 2)),
-            VillagerType.SAVANNA, List.of(ranged(Enchantments.POWER, 1, 5), ranged(Enchantments.PUNCH, 1, 2)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.PUNCH, 1, 2), fixed(Enchantments.INFINITY, 1)),
-            VillagerType.TAIGA, List.of(ranged(Enchantments.POWER, 1, 5), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.PUNCH, 1, 2), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SWAMP, List.of(ranged(Enchantments.POWER, 1, 5), fixed(Enchantments.INFINITY, 1)),
-            VillagerType.JUNGLE, List.of(fixed(Enchantments.INFINITY, 1), ranged(Enchantments.UNBREAKING, 1, 3))
+            VillagerType.PLAINS, List.of(fixed(Enchantments.PUNCH, 2)),
+            VillagerType.SAVANNA, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.PUNCH, 1), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.DESERT, List.of(fixed(Enchantments.POWER, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.PUNCH, 1), fixed(Enchantments.POWER, 2)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.POWER, 5)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.INFINITY, 1))
     );
+    // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> BOW_ENCHANT_FALLBACK =
-            List.of(ranged(Enchantments.POWER, 1, 5), ranged(Enchantments.PUNCH, 1, 2));
+            List.of(fixed(Enchantments.PUNCH, 2));
 
-    // Crossbow-only enchantments (plus Unbreaking).
+    // Enchanted Crossbow (Expert). All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> CROSSBOW_ENCHANT_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(fixed(Enchantments.MULTISHOT, 1), ranged(Enchantments.PIERCING, 1, 4)),
-            VillagerType.SAVANNA, List.of(fixed(Enchantments.MULTISHOT, 1), ranged(Enchantments.PIERCING, 1, 4)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.PIERCING, 1, 4), ranged(Enchantments.QUICK_CHARGE, 1, 3)),
-            VillagerType.TAIGA, List.of(fixed(Enchantments.MULTISHOT, 1), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.PIERCING, 1, 4), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SWAMP, List.of(fixed(Enchantments.MULTISHOT, 1), ranged(Enchantments.QUICK_CHARGE, 1, 3)),
-            VillagerType.JUNGLE, List.of(ranged(Enchantments.QUICK_CHARGE, 1, 3), ranged(Enchantments.UNBREAKING, 1, 3))
+            VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.SAVANNA, List.of(fixed(Enchantments.MULTISHOT, 1)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.QUICK_CHARGE, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.DESERT, List.of(fixed(Enchantments.QUICK_CHARGE, 3)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.PIERCING, 2), fixed(Enchantments.QUICK_CHARGE, 2)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.PIERCING, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.PIERCING, 4))
     );
+    // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> CROSSBOW_ENCHANT_FALLBACK =
-            List.of(fixed(Enchantments.MULTISHOT, 1), ranged(Enchantments.PIERCING, 1, 4));
+            List.of(fixed(Enchantments.UNBREAKING, 3));
 
     // Special Feather: bird species per villager type.
     private static final Map<ResourceKey<VillagerType>, Item> FEATHER_BY_TYPE = Map.of(

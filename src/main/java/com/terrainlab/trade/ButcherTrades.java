@@ -13,11 +13,12 @@ import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import java.util.List;
 import java.util.Map;
 
+import com.terrainlab.registry.ModEnchantments;
 import com.terrainlab.registry.ModItems;
 
 /**
  * Replaces the vanilla Butcher trade table. Meat trades buy raw and sell cooked;
- * Taiga and Snow villagers trade venison instead of beef. Master trades Rabbit Stew.
+ * Taiga and Snow villagers trade venison instead of beef. Master sells a Reach II lead.
  */
 public final class ButcherTrades {
 
@@ -44,6 +45,10 @@ public final class ButcherTrades {
             VillagerType.JUNGLE, Items.COOKED_BEEF
     );
     private static final Item COOKED_BEEF_OR_VENISON_FALLBACK = Items.COOKED_BEEF;
+
+    // Not biome-specific: passed with an empty type map so the fallback always applies.
+    private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> REACH_LEAD =
+            List.of(TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(ModEnchantments.REACH, 2));
 
     private static final int NOVICE_MAX_USES = 16;
     private static final int APPRENTICE_MAX_USES = 12;
@@ -75,26 +80,27 @@ public final class ButcherTrades {
         apprentice.add(TradeListings.SimpleTradeListing.buying(Items.MUTTON, 9, 1, APPRENTICE_MAX_USES, 2));
         apprentice.add(TradeListings.SimpleTradeListing.selling(Items.COOKED_MUTTON, 7, 1, APPRENTICE_MAX_USES, 2));
 
-        // Journeyman (level 3): Lead, Pork (raw buy / cooked sell) - 5 XP/trade
+        // Journeyman (level 3): Pork (raw buy / cooked sell), Beef/Venison (villager type, raw buy / cooked sell) - 5 XP/trade
         List<VillagerTrades.ItemListing> journeyman = trades.get(3);
         journeyman.clear();
-        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.LEAD, 5, 1, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.LEAD, 3, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.PORKCHOP, 9, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.COOKED_PORKCHOP, 7, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.buying(RAW_BEEF_OR_VENISON, RAW_BEEF_OR_VENISON_FALLBACK, 7, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.selling(COOKED_BEEF_OR_VENISON, COOKED_BEEF_OR_VENISON_FALLBACK, 5, 1, JOURNEYMAN_MAX_USES, 5));
 
-        // Expert (level 4): Beef/Venison (villager type, raw buy / cooked sell), Bucket of Milk - 10 XP/trade
+        // Expert (level 4): Bucket of Milk, Rabbit Stew - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
-        expert.add(TradeListings.VillagerTypeVariantTradeListing.buying(RAW_BEEF_OR_VENISON, RAW_BEEF_OR_VENISON_FALLBACK, 7, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.VillagerTypeVariantTradeListing.selling(COOKED_BEEF_OR_VENISON, COOKED_BEEF_OR_VENISON_FALLBACK, 5, 1, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.buying(Items.MILK_BUCKET, 1, 1, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.selling(Items.MILK_BUCKET, 1, 3, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.RABBIT_STEW, 5, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.selling(Items.RABBIT_STEW, 3, 1, EXPERT_MAX_USES, 10));
 
-        // Master (level 5): Rabbit Stew. XP 0: no level above Master.
+        // Master (level 5): Enchanted Lead (Reach II). The buy side accepts any enchanted lead.
+        // XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.RABBIT_STEW, 5, 1, MASTER_MAX_USES, 0));
-        master.add(TradeListings.SimpleTradeListing.selling(Items.RABBIT_STEW, 3, 1, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.LEAD, 1, 4, MASTER_MAX_USES, 0));
+        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.LEAD, Map.of(), REACH_LEAD, 5, MASTER_MAX_USES, 0));
     }
 }

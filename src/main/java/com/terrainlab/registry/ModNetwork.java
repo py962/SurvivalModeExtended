@@ -85,6 +85,11 @@ public class ModNetwork {
                 com.terrainlab.network.DeathPickingStatePacket.STREAM_CODEC,
                 com.terrainlab.network.DeathPickingStatePacket::handle
         );
+        registrar.playToClient(
+                com.terrainlab.network.DeathOptionsPacket.TYPE,
+                com.terrainlab.network.DeathOptionsPacket.STREAM_CODEC,
+                com.terrainlab.network.DeathOptionsPacket::handle
+        );
 
         // Client mirror of the heat source index (see HeatSourceSyncPacket).
         registrar.playToClient(
@@ -117,6 +122,20 @@ public class ModNetwork {
                 com.terrainlab.network.CodexResultPacket.TYPE,
                 com.terrainlab.network.CodexResultPacket.STREAM_CODEC,
                 com.terrainlab.network.CodexResultPacket::handle
+        );
+
+        // Golden HUD flash on discrete health/hunger/energy gains (see StatFlash).
+        registrar.playToClient(
+                com.terrainlab.network.StatFlashPacket.TYPE,
+                com.terrainlab.network.StatFlashPacket.STREAM_CODEC,
+                com.terrainlab.network.StatFlashPacket::handle
+        );
+
+        // Dual wielding: right-click off-hand strike (see DualWield).
+        registrar.playToServer(
+                com.terrainlab.network.OffhandStrikePacket.TYPE,
+                com.terrainlab.network.OffhandStrikePacket.STREAM_CODEC,
+                com.terrainlab.network.OffhandStrikePacket::handle
         );
 
         // Replicator: the GUI button counts as one redstone pulse.

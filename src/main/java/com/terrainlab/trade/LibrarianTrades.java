@@ -27,35 +27,37 @@ public final class LibrarianTrades {
 
     private static final ResourceKey<Enchantment> RECALL = ModEnchantments.RECALL;
 
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance fixed(ResourceKey<Enchantment> enchantment, int level) {
-        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(enchantment, level);
-    }
-
     private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance ranged(ResourceKey<Enchantment> enchantment, int minLevel, int maxLevel) {
         return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.ranged(enchantment, minLevel, maxLevel);
     }
 
-    // Enchanted Book 1 (Expert).
+    // Enchanted Book 1 (Expert). Levels roll from I up to the enchantment's maximum.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOOK_1_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(fixed(Enchantments.VANISHING_CURSE, 1)),
-            VillagerType.SAVANNA, List.of(fixed(Enchantments.CHANNELING, 1)),
-            VillagerType.DESERT, List.of(fixed(Enchantments.BINDING_CURSE, 1)),
+            VillagerType.PLAINS, List.of(ranged(Enchantments.FLAME, 1, 1)),
+            VillagerType.SAVANNA, List.of(ranged(Enchantments.RESPIRATION, 1, 3)),
             VillagerType.TAIGA, List.of(ranged(Enchantments.FIRE_ASPECT, 1, 2)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.RESPIRATION, 1, 3)),
-            VillagerType.SWAMP, List.of(fixed(Enchantments.AQUA_AFFINITY, 1)),
+            VillagerType.DESERT, List.of(ranged(Enchantments.FIRE_PROTECTION, 1, 4)),
+            VillagerType.SNOW, List.of(ranged(Enchantments.FROST_WALKER, 1, 2)),
+            VillagerType.SWAMP, List.of(ranged(Enchantments.AQUA_AFFINITY, 1, 1)),
             VillagerType.JUNGLE, List.of(ranged(Enchantments.BANE_OF_ARTHROPODS, 1, 5))
     );
+    // Plains set.
+    private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> BOOK_1_FALLBACK =
+            List.of(ranged(Enchantments.FLAME, 1, 1));
 
-    // Enchanted Book 2 (Master).
+    // Enchanted Book 2 (Master). Levels roll from I up to the enchantment's maximum.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOOK_2_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(ranged(Enchantments.SMITE, 1, 5)),
-            VillagerType.SAVANNA, List.of(ranged(Enchantments.RIPTIDE, 1, 3)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.TAIGA, List.of(ranged(Enchantments.LOOTING, 1, 3)),
-            VillagerType.SNOW, List.of(fixed(Enchantments.FLAME, 1)),
-            VillagerType.SWAMP, List.of(fixed(Enchantments.MENDING, 1)),
-            VillagerType.JUNGLE, List.of(fixed(RECALL, 1))
+            VillagerType.SAVANNA, List.of(ranged(Enchantments.IMPALING, 1, 5)),
+            VillagerType.TAIGA, List.of(ranged(Enchantments.BREACH, 1, 4)),
+            VillagerType.DESERT, List.of(ranged(Enchantments.FORTUNE, 1, 3)),
+            VillagerType.SNOW, List.of(ranged(Enchantments.LOOTING, 1, 3)),
+            VillagerType.SWAMP, List.of(ranged(Enchantments.MENDING, 1, 1)),
+            VillagerType.JUNGLE, List.of(ranged(RECALL, 1, 1))
     );
+    // Plains set.
+    private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> BOOK_2_FALLBACK =
+            List.of(ranged(Enchantments.SMITE, 1, 5));
 
     private static final int NOVICE_MAX_USES = 16;
     private static final int APPRENTICE_MAX_USES = 12;
@@ -99,7 +101,7 @@ public final class LibrarianTrades {
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
         expert.add(TradeListings.SimpleTradeListing.buying(Items.ENCHANTED_BOOK, 1, 4, EXPERT_MAX_USES, 10));
-        expert.add(new TradeListings.VillagerTypeEnchantedBookSellListing(BOOK_1_BY_TYPE, List.of(), 10, EXPERT_MAX_USES, 10));
+        expert.add(new TradeListings.VillagerTypeEnchantedBookSellListing(BOOK_1_BY_TYPE, BOOK_1_FALLBACK, 10, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.buying(ModItems.CALENDAR.get(), 1, 3, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.selling(ModItems.CALENDAR.get(), 1, 5, EXPERT_MAX_USES, 10));
 
@@ -108,6 +110,6 @@ public final class LibrarianTrades {
         master.clear();
         // Buys below the Expert sell price (10), so the villager's own books cannot be flipped for profit.
         master.add(TradeListings.SimpleTradeListing.buying(Items.ENCHANTED_BOOK, 1, 6, MASTER_MAX_USES, 0));
-        master.add(new TradeListings.VillagerTypeEnchantedBookSellListing(BOOK_2_BY_TYPE, List.of(), 12, MASTER_MAX_USES, 0));
+        master.add(new TradeListings.VillagerTypeEnchantedBookSellListing(BOOK_2_BY_TYPE, BOOK_2_FALLBACK, 12, MASTER_MAX_USES, 0));
     }
 }

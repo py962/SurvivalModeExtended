@@ -44,6 +44,25 @@ public final class VillagerFoodAccess {
         }
     }
 
+    /** Upper bound for {@link #addFoodLevel}; well inside vanilla's byte save format. */
+    public static final int MAX_FOOD_LEVEL = 64;
+
+    /**
+     * Adds eaten food points to vanilla {@code foodLevel}, capped at {@link #MAX_FOOD_LEVEL} (vanilla
+     * saves it as a byte). Vanilla also spends this store on breeding (12 points per attempt).
+     */
+    public static void addFoodLevel(Villager villager, int points) {
+        if (FOOD_LEVEL_FIELD == null || points <= 0) {
+            return;
+        }
+        try {
+            int current = FOOD_LEVEL_FIELD.getInt(villager);
+            FOOD_LEVEL_FIELD.setInt(villager, Math.min(MAX_FOOD_LEVEL, current + points));
+        } catch (IllegalAccessException e) {
+            com.terrainlab.TerrainLab.LOGGER.warn("[VILLAGER_FOOD_ACCESS] setInt failed on {}: {}", villager, e.toString());
+        }
+    }
+
     private static Field resolveFoodLevelField() {
         try {
             Field f = Villager.class.getDeclaredField("foodLevel");

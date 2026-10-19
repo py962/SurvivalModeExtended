@@ -1,23 +1,15 @@
 {
   "type": "minecraft:ruined_portal",
   "biomes": [
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:birch_forest",
     "minecraft:old_growth_birch_forest",
     "minecraft:dark_forest",
     "minecraft:taiga",
     "minecraft:snowy_taiga",
     "minecraft:old_growth_pine_taiga",
     "minecraft:old_growth_spruce_taiga",
-    "minecraft:windswept_forest",
-    "minecraft:jungle",
-    "minecraft:sparse_jungle",
-    "minecraft:bamboo_jungle",
-    "minecraft:swamp",
     "minecraft:mangrove_swamp",
-    "minecraft:wooded_badlands",
-    "minecraft:grove"
+    "minecraft:grove",
+    "terrainlab:marsh"
   ],
   "setups": [
     {

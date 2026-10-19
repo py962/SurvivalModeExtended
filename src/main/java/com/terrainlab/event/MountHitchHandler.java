@@ -61,6 +61,7 @@ public class MountHitchHandler {
         if (leadHand == null) return;
 
         leashableMount.setLeashedTo(player, true);
+        EnchantedLeadHandler.record(mountEntity, player.getItemInHand(leadHand));
         if (!player.hasInfiniteMaterials()) {
             player.getItemInHand(leadHand).shrink(1);
         }
@@ -81,6 +82,7 @@ public class MountHitchHandler {
         if (leadHand == null) return;
 
         leashableMount.setLeashedTo(player, true);
+        EnchantedLeadHandler.record(vehicle, player.getItemInHand(leadHand));
         if (!player.hasInfiniteMaterials()) {
             player.getItemInHand(leadHand).shrink(1);
         }

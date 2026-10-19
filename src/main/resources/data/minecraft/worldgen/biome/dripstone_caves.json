@@ -106,7 +106,13 @@
         "maxCount": 4,
         "minCount": 4,
         "weight": 50
-      }    
+      },
+      {
+        "type": "minecraft:cave_spider",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 20
+      }
     ],
     "underground_water_creature": [
       {

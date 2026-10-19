@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "terrainlab:item/enderwood"
-  }
+  "parent": "terrainlab:block/enderwood"
 }

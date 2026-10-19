@@ -45,10 +45,42 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
     private int dragStartOffset;
 
     public VillageInfoScreen(VillageInfoMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
+        super(menu, playerInventory, villageTitle(menu.getSnapshot()));
         this.imageWidth = PANEL_WIDTH;
         // No inventory slots, so hide the vanilla "Inventory" label.
         this.inventoryLabelY = -1000;
+    }
+
+    /**
+     * Creates the title using Minecraft's biome-to-villager-type mapping,
+     * already resolved and transmitted in the village snapshot.
+     */
+    private static Component villageTitle(
+            VillageInfoSnapshot.Snapshot snapshot
+    ) {
+        String type = snapshot.villageType();
+        String fallback = switch (type) {
+            case "plains" -> "Plains Village";
+            case "desert" -> "Desert Village";
+            case "savanna" -> "Savanna Village";
+            case "snow" -> "Snowy Village";
+            case "taiga" -> "Taiga Village";
+            case "jungle" -> "Jungle Village";
+            case "swamp" -> "Swamp Village";
+            default -> null;
+        };
+
+        if (fallback == null) {
+            return Component.translatableWithFallback(
+                    "gui.terrainlab.village_info.title",
+                    "Village"
+            );
+        }
+
+        return Component.translatableWithFallback(
+                "gui.terrainlab.village_info.title." + type,
+                fallback
+        );
     }
 
     @Override
@@ -351,6 +383,7 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
     private static String statusText(VillageInfoSnapshot.Row row) {
         List<String> parts = new ArrayList<>();
         if (row.scared()) parts.add("Scared");
+        if (row.injured()) parts.add("Injured");
         if (row.tired()) parts.add("Tired");
         if (row.trapped()) parts.add("Trapped");
         if (row.hungry()) parts.add("Hungry");
@@ -361,6 +394,7 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
 
     private static int statusColor(VillageInfoSnapshot.Row row) {
         if (row.scared()) return 0xFFFF5555;
+        if (row.injured()) return 0xFFE03C3C;
         if (row.tired()) return 0xFFFFAA00;
         if (row.trapped()) return 0xFFAA55FF;
         if (row.hungry()) return 0xFFD4A04C;

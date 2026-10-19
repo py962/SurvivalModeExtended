@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Map icons for structures that vanilla has no icon for. Sprites live in
+ * Map icons for structures that vanilla has no icon for (see {@link com.terrainlab.item.StructureMapIcons}). Sprites live in
  * {@code assets/terrainlab/textures/map/decorations/}, which the vanilla map decoration atlas picks up.
  */
 public final class ModMapDecorations {

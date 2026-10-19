@@ -1,6 +1,7 @@
 
 package com.terrainlab.event;
 
+import com.terrainlab.TerrainLab;
 import com.terrainlab.item.ShieldDefinitions;
 import com.terrainlab.item.ShieldStats;
 import com.terrainlab.registry.ModItems;
@@ -33,7 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Wood-shield behaviour the {@code blocks_attacks} component cannot express: knockback taken and
+ * Wood-shield behaviour the blocks_attacks component cannot express: knockback taken and
  * dealt, thorns, autoblock, magic ward, fire immunity, directional blast coverage, and the
  * lightness energy drain hook used by PlayerEnergySystem.
  */
@@ -49,16 +50,34 @@ public final class ShieldCombatEvents {
     private static final Map<UUID, Map<String, long[]>> magicWindows =
             new ConcurrentHashMap<>();
 
-    private static Map<Item, ShieldStats> statsByItem;
+    private static volatile Map<Item, ShieldStats> statsByItem;
 
     private static Map<Item, ShieldStats> statsByItem() {
         if (statsByItem == null) {
-            Map<Item, ShieldStats> map = new IdentityHashMap<>();
-            for (ShieldStats stats : ShieldDefinitions.ALL) {
-                map.put(ModItems.SHIELD_ITEMS.get(stats.id()).get(), stats);
+            synchronized (ShieldCombatEvents.class) {
+                if (statsByItem == null) {
+                    Map<Item, ShieldStats> map = new IdentityHashMap<>();
+
+                    for (ShieldStats stats : ShieldDefinitions.ALL) {
+                        var deferredItem = ModItems.SHIELD_ITEMS.get(stats.id());
+
+                        if (deferredItem == null) {
+                            TerrainLab.LOGGER.error(
+                                    "Missing shield item registration for ShieldStats ID: {}",
+                                    stats.id()
+                            );
+                            continue;
+                        }
+
+                        Item item = deferredItem.get();
+                        map.put(item, stats);
+                    }
+
+                    statsByItem = map;
+                }
             }
-            statsByItem = map;
         }
+
         return statsByItem;
     }
 
@@ -102,6 +121,11 @@ public final class ShieldCombatEvents {
             return;
         }
 
+        // A crouch-bypassed melee hit went past the shield, so it takes knockback as if unshielded.
+        if (ShieldBypass.wasBypassedThisTick(entity)) {
+            return;
+        }
+
         float multiplier = stats.knockbackMultiplier();
         if (multiplier != 1.0f) {
             event.setStrength(event.getStrength() * multiplier);
@@ -121,8 +145,18 @@ public final class ShieldCombatEvents {
             return;
         }
 
+        boolean crouchBypass = ShieldBypass.isCrouchBypass(source, entity);
+
         if (isBlockingWithShield(entity)) {
+            if (crouchBypass) {
+                ShieldBypass.markBypassed(entity);
+            }
             applyFireImmunity(event, entity, source);
+            return;
+        }
+
+        // A crouching melee attacker slips past autoblock as well as a raised shield.
+        if (crouchBypass) {
             return;
         }
 
@@ -131,7 +165,8 @@ public final class ShieldCombatEvents {
 
     /**
      * A raised shield that blocks a melee hit shoves the attacker (knockback rating) and deals thorns
-     * damage (thorns rating). Autoblocks never reach this event, so they trigger neither.
+     * damage (thorns rating). Autoblocks never reach this event, so they trigger neither. Crouch-bypassed hits
+     * are already unblocked by {@link ShieldBypass} at HIGHEST priority, so they trigger neither.
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onShieldBash(LivingShieldBlockEvent event) {
@@ -146,8 +181,7 @@ public final class ShieldCombatEvents {
 
         DamageSource source = event.getDamageSource();
 
-        // Explosions (a creeper is its own direct source) and thorns (two thorns shields facing each
-        // other would otherwise retaliate forever) are not melee hits.
+        // Explosions and thorns are not melee hits.
         if (source.is(DamageTypeTags.IS_EXPLOSION) || source.is(DamageTypes.THORNS)) {
             return;
         }
@@ -183,13 +217,14 @@ public final class ShieldCombatEvents {
     }
 
     /**
-     * Extra energy drained this tick by the shield the player is raising (lightness 0-1); 0 when not
-     * raising a wood shield. Called from PlayerEnergySystem#tick next to the sprint drain.
+     * Extra energy drained this tick by the shield the player is raising.
+     * Returns 0 when not raising a wood shield.
      */
     public static float raisedShieldEnergyDrain(ServerPlayer player) {
         if (!player.isUsingItem()) {
             return 0.0f;
         }
+
         ShieldStats stats = statsFor(player.getUseItem());
         return stats == null ? 0.0f : stats.raisedEnergyDrainPerTick();
     }
@@ -210,24 +245,30 @@ public final class ShieldCombatEvents {
         }
     }
 
-    /** Ticks of Slow Falling granted per refresh; renewed every tick while the shield is raised. */
+    /** Ticks of Slow Falling granted per refresh while the bamboo shield is raised. */
     private static final int PARACHUTE_DURATION_TICKS = 5;
 
     /**
-     * Bamboo shield only: while raised it acts as a parachute, giving Slow Falling. The effect is
-     * hidden (no particles) and lapses a few ticks after the shield is lowered.
+     * Bamboo shield only: while raised it acts as a parachute, giving Slow Falling.
      */
     @SubscribeEvent
     public static void onPlayerTickBambooParachute(PlayerTickEvent.Post event) {
         LivingEntity player = event.getEntity();
+
         if (player.level().isClientSide()
                 || !player.isBlocking()
                 || !player.getUseItem().is(ModItems.SHIELD_ITEMS.get("bamboo_shield").get())) {
             return;
         }
+
         player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
                 net.minecraft.world.effect.MobEffects.SLOW_FALLING,
-                PARACHUTE_DURATION_TICKS, 0, true, false, true));
+                PARACHUTE_DURATION_TICKS,
+                0,
+                true,
+                false,
+                true
+        ));
     }
 
     private static void applyFireImmunity(
@@ -298,7 +339,9 @@ public final class ShieldCombatEvents {
     private static void showAutoBlock(LivingEntity entity, InteractionHand hand) {
         entity.level().playSound(
                 null,
-                entity.getX(), entity.getY(), entity.getZ(),
+                entity.getX(),
+                entity.getY(),
+                entity.getZ(),
                 SoundEvents.SHIELD_BLOCK,
                 entity.getSoundSource(),
                 1.0F,
@@ -391,16 +434,14 @@ public final class ShieldCombatEvents {
     }
 
     /**
-     * Explosion damage against a raised wood shield is blocked by blast coverage instead of the
-     * blocks_attacks angle (which follows the knockback rating): fully blocked when the explosion
-     * lies within {@link ShieldStats#blastCoverageDegrees()} of the facing direction (blast 4: from
-     * anywhere, even with no known position), otherwise not blocked at all. Blast 2 therefore matches
-     * vanilla's 90 degrees. Runs before {@link #onShieldBash}.
+     * Explosion damage against a raised wood shield is blocked by blast coverage
+     * instead of the blocks_attacks angle.
      */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onShieldBlockExplosion(LivingShieldBlockEvent event) {
         DamageSource source = event.getDamageSource();
-        if (!source.is(DamageTypeTags.IS_EXPLOSION) || source.is(DamageTypeTags.BYPASSES_SHIELD)) {
+        if (!source.is(DamageTypeTags.IS_EXPLOSION)
+                || source.is(DamageTypeTags.BYPASSES_SHIELD)) {
             return;
         }
 
@@ -443,13 +484,14 @@ public final class ShieldCombatEvents {
     }
 
     /**
-     * Whether a raised shield covers an explosion at {@code center}, measuring the horizontal angle
-     * from the head's facing as vanilla's shield blocking does. A null position counts as behind.
+     * Whether a raised shield covers an explosion at center, measuring the horizontal angle
+     * from the head's facing as vanilla's shield blocking does.
      */
     private static boolean blastCovers(LivingEntity entity, ShieldStats stats, Vec3 center) {
         if (stats.blastBlocksAllDirections()) {
             return true;
         }
+
         float coverage = stats.blastCoverageDegrees();
         if (coverage <= 0.0f || center == null) {
             return false;
@@ -461,15 +503,17 @@ public final class ShieldCombatEvents {
 
         double angleDegrees;
         if (length < 1.0E-4) {
-            // Centred on the player: vanilla's zero vector gives a 90 degree angle.
             angleDegrees = 90.0;
         } else {
             double yaw = Math.toRadians(entity.getYHeadRot());
             double facingX = -Math.sin(yaw);
             double facingZ = Math.cos(yaw);
             double dot = (dx * facingX + dz * facingZ) / length;
-            angleDegrees = Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, dot))));
+            angleDegrees = Math.toDegrees(
+                    Math.acos(Math.max(-1.0, Math.min(1.0, dot)))
+            );
         }
+
         return angleDegrees <= coverage;
     }
 

@@ -65,21 +65,21 @@ public final class FarmerTrades {
         novice.add(TradeListings.SimpleTradeListing.buying(Items.CARROT, 18, 1, NOVICE_MAX_USES, 1));
         novice.add(TradeListings.SimpleTradeListing.selling(Items.CARROT, 14, 1, NOVICE_MAX_USES, 1));
 
-        // Apprentice (level 2): Potato, Brown Mushroom - 2 XP/trade
+        // Apprentice (level 2): Potato, Apple-or-Beetroot (villager type) - 2 XP/trade
         List<VillagerTrades.ItemListing> apprentice = trades.get(2);
         apprentice.clear();
         apprentice.add(TradeListings.SimpleTradeListing.buying(Items.POTATO, 18, 1, APPRENTICE_MAX_USES, 2));
         apprentice.add(TradeListings.SimpleTradeListing.selling(Items.POTATO, 14, 1, APPRENTICE_MAX_USES, 2));
-        apprentice.add(TradeListings.SimpleTradeListing.buying(Items.BROWN_MUSHROOM, 9, 1, APPRENTICE_MAX_USES, 2));
-        apprentice.add(TradeListings.SimpleTradeListing.selling(Items.BROWN_MUSHROOM, 7, 1, APPRENTICE_MAX_USES, 2));
+        apprentice.add(TradeListings.VillagerTypeVariantTradeListing.buying(APPLE_OR_BEETROOT, APPLE_OR_BEETROOT_FALLBACK, 9, 1, APPRENTICE_MAX_USES, 2));
+        apprentice.add(TradeListings.VillagerTypeVariantTradeListing.selling(APPLE_OR_BEETROOT, APPLE_OR_BEETROOT_FALLBACK, 7, 1, APPRENTICE_MAX_USES, 2));
 
-        // Journeyman (level 3): Apple-or-Beetroot (villager type), Bread - 5 XP/trade
+        // Journeyman (level 3): Bread, Brown Mushroom - 5 XP/trade
         List<VillagerTrades.ItemListing> journeyman = trades.get(3);
         journeyman.clear();
-        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.buying(APPLE_OR_BEETROOT, APPLE_OR_BEETROOT_FALLBACK, 9, 1, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.selling(APPLE_OR_BEETROOT, APPLE_OR_BEETROOT_FALLBACK, 7, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.BREAD, 9, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.BREAD, 7, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.BROWN_MUSHROOM, 9, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.BROWN_MUSHROOM, 7, 1, JOURNEYMAN_MAX_USES, 5));
 
         // Expert (level 4): Red Mushroom, Melon-or-Pumpkin (villager type) - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);

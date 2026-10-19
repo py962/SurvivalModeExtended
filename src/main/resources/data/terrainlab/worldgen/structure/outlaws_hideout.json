@@ -12,7 +12,7 @@
       "spawns": [
         {
           "type": "terrainlab:outlaw_raider",
-          "weight": 100,
+          "weight": 10,
           "minCount": 2,
           "maxCount": 4
         }

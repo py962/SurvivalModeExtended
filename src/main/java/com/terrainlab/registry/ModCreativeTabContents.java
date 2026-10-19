@@ -88,6 +88,8 @@ public class ModCreativeTabContents {
             event.accept(ModItems.AZALEA_HANGING_SIGN);
             event.accept(ModItems.ENDERWOOD_SIGN);
             event.accept(ModItems.ENDERWOOD_HANGING_SIGN);
+            event.accept(ModItems.LARGE_ITEM_FRAME);
+            event.accept(ModItems.EXTRA_LARGE_ITEM_FRAME);
             for (CelestialVariant variant : CelestialVariant.values()) {
                 if (variant.usesVanillaConduit()) continue; // vanilla Conduit is already in this tab
                 event.accept(ModItems.CELESTIAL_CONDUIT_ITEMS.get(variant));

@@ -30,23 +30,19 @@ public final class ToolsmithTrades {
         return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.fixed(enchantment, level);
     }
 
-    private static TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance ranged(ResourceKey<Enchantment> enchantment, int minLevel, int maxLevel) {
-        return TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance.ranged(enchantment, minLevel, maxLevel);
-    }
-
-    // Shared by all four enchanted diamond tool trades.
+    // Shared by all four enchanted diamond tool trades. All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> ENCHANT_PAIR_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(ranged(Enchantments.EFFICIENCY, 1, 5), ranged(Enchantments.FORTUNE, 1, 3)),
-            VillagerType.SAVANNA, List.of(ranged(Enchantments.UNBREAKING, 1, 3), ranged(Enchantments.FORTUNE, 1, 3)),
-            VillagerType.DESERT, List.of(fixed(REACH, 1), ranged(Enchantments.FORTUNE, 1, 3)),
-            VillagerType.TAIGA, List.of(ranged(Enchantments.EFFICIENCY, 1, 5), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SNOW, List.of(fixed(Enchantments.SILK_TOUCH, 1), ranged(Enchantments.UNBREAKING, 1, 3)),
-            VillagerType.SWAMP, List.of(fixed(Enchantments.SILK_TOUCH, 1), fixed(REACH, 1)),
-            VillagerType.JUNGLE, List.of(ranged(Enchantments.EFFICIENCY, 1, 5), fixed(Enchantments.SILK_TOUCH, 1))
+            VillagerType.PLAINS, List.of(fixed(Enchantments.EFFICIENCY, 2), fixed(REACH, 2)),
+            VillagerType.SAVANNA, List.of(fixed(REACH, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.DESERT, List.of(fixed(Enchantments.EFFICIENCY, 5)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.SILK_TOUCH, 1)),
+            VillagerType.SWAMP, List.of(fixed(Enchantments.UNBREAKING, 2), fixed(REACH, 2)),
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.EFFICIENCY, 2), fixed(Enchantments.UNBREAKING, 2))
     );
-    // Plains default.
+    // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> ENCHANT_PAIR_FALLBACK =
-            List.of(ranged(Enchantments.EFFICIENCY, 1, 5), ranged(Enchantments.FORTUNE, 1, 3));
+            List.of(fixed(Enchantments.EFFICIENCY, 2), fixed(REACH, 2));
 
     private static final int NOVICE_MAX_USES = 16;
     private static final int APPRENTICE_MAX_USES = 12;

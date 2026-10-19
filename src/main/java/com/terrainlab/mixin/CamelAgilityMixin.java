@@ -1,3 +1,4 @@
+
 package com.terrainlab.mixin;
 
 import com.terrainlab.registry.ModEnchantments;
@@ -11,22 +12,42 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 /**
- * Scales the horizontal part of a camel's dash (also the Elephant, which extends Camel) by the
- * saddle's Agility level: x1.5 / x2.0 / x2.5. The Agility attribute alone only raises the dash's
- * upward push.
+ * Increases only the horizontal distance of a camel's dash according to
+ * the Agility enchantment on its saddle.
+ *
+ * Agility I:   1.5x horizontal distance
+ * Agility II:  2.0x horizontal distance
+ * Agility III: 2.5x horizontal distance
+ *
+ * The vanilla vertical jump momentum is left unchanged.
  */
 @Mixin(Camel.class)
 public abstract class CamelAgilityMixin {
 
     @ModifyArg(
             method = "executeRidersJump",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"),
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/phys/Vec3;scale(D)Lnet/minecraft/world/phys/Vec3;"
+            ),
+            index = 0,
             require = 1
     )
-    private double terrainlab$agilityDashDistance(double scale) {
+    private double terrainlab$agilityDashDistance(double horizontalMomentum) {
         Camel camel = (Camel) (Object) this;
-        Holder<Enchantment> agility = ModEnchantments.holder(camel.registryAccess(), ModEnchantments.AGILITY);
-        int level = EnchantmentHelper.getItemEnchantmentLevel(agility, camel.getItemBySlot(EquipmentSlot.SADDLE));
-        return scale * (1.0 + 0.5 * level);
+
+        Holder<Enchantment> agility = ModEnchantments.holder(
+                camel.registryAccess(),
+                ModEnchantments.AGILITY
+        );
+
+        int level = EnchantmentHelper.getItemEnchantmentLevel(
+                agility,
+                camel.getItemBySlot(EquipmentSlot.SADDLE)
+        );
+
+        double multiplier = 1.0 + (0.5 * level);
+
+        return horizontalMomentum * multiplier;
     }
 }

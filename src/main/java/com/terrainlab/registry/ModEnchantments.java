@@ -21,6 +21,7 @@ public final class ModEnchantments {
     public static final ResourceKey<Enchantment> REACH = key("reach");
     public static final ResourceKey<Enchantment> RECALL = key("recall");
     public static final ResourceKey<Enchantment> CLEAVE = key("cleave");
+    public static final ResourceKey<Enchantment> QUICKSTRIKE = key("quickstrike");
 
     private static ResourceKey<Enchantment> key(String path) {
         return ResourceKey.create(Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(TerrainLab.MODID, path));

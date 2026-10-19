@@ -57,7 +57,7 @@ public final class TradeListings {
     }
 
     /**
-     * Gear: enchantable or damageable items, saddles, bundles and enchanted books. Shears and
+     * Gear: enchantable or damageable items, saddles, bundles, leads and enchanted books. Shears and
      * shields are traded plain both ways, so they are excluded.
      */
     private static boolean requiresEnchantment(ItemStack stack) {
@@ -68,6 +68,7 @@ public final class TradeListings {
                 || stack.isDamageableItem()
                 || stack.is(Items.SADDLE)
                 || stack.is(Items.BUNDLE)
+                || stack.is(Items.LEAD)
                 || stack.is(Items.ENCHANTED_BOOK);
     }
 

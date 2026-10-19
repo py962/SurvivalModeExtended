@@ -11,8 +11,20 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.Brain;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -32,7 +44,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Elephant: a rideable Camel variant whose howdah lets the rider sleep on
@@ -44,7 +59,23 @@ public class ElephantEntity extends Camel {
 
     private static final float REMOUNT_Y_OFFSET = 4.0F;
     private static final double MOUNTED_SWIM_MIN_RISE = 0.04D;
+    // Height of the temporary howdah bed above the elephant's feet. Fixed (not the hitbox height) so
+    // the bed stays one block above the howdah, exactly where it was with the old 4.0-tall hitbox.
     private static final int TEMP_BED_HEIGHT = 4;
+
+    // Babies are this fraction of the adult hitbox and model (see ModEntities / ElephantRenderer).
+    public static final float BABY_SCALE = 0.45F;
+    // Blocks of head and back kept above water when swimming (scaled by age); see getFluidJumpThreshold.
+    private static final double SWIM_HEAD_ALLOWANCE = 0.4D;
+
+    // Dash charge: mobs the elephant runs into during a dash are knocked away and hurt, once per dash.
+    private static final float CHARGE_DAMAGE = 6.0F;
+    private static final double CHARGE_KNOCKBACK = 2.0D;
+    // Server ticks after the dash starts during which hits count, on top of the dash itself.
+    private static final int CHARGE_WINDOW_TICKS = 15;
+
+    private int chargeTicks = 0;
+    private final Set<UUID> chargeHits = new HashSet<>();
 
     private BlockPos tempBedPos = null;
     private BlockPos tempBedFootPos = null;
@@ -68,19 +99,120 @@ public class ElephantEntity extends Camel {
         super(entityType, level);
     }
 
+    // Vanilla Camel brain, but breeding with elephants instead of camels.
     @Override
-    public float getPickRadius() {
-        return 3.0F;
+    protected Brain<?> makeBrain(com.mojang.serialization.Dynamic<?> dynamic) {
+        return ElephantAi.makeBrain(this.brainProvider().makeBrain(dynamic));
+    }
+
+    /**
+     * Camel hard-codes camel sizes for sitting and babies. The elephant model has no sitting pose
+     * (it stays standing when the camel AI "sits" it), so sitting keeps the standing box; babies
+     * are the adult box scaled by {@link #BABY_SCALE}.
+     */
+    @Override
+    public EntityDimensions getDefaultDimensions(Pose pose) {
+        EntityDimensions adult = this.getType().getDimensions();
+        return this.isBaby() ? adult.scale(BABY_SCALE) : adult;
+    }
+
+    @Override
+    public float getAgeScale() {
+        return this.isBaby() ? BABY_SCALE : 1.0F;
+    }
+
+    /**
+     * Floats once water is deeper than just below the eyes, so a swimming elephant shows only its
+     * head and the top of its back (adult: 3.4 - 0.4 = 3.0 blocks; the rider sits at 4.0) and wades
+     * through anything shallower.
+     */
+    @Override
+    public double getFluidJumpThreshold() {
+        return Math.max(0.4D, this.getEyeHeight() - SWIM_HEAD_ALLOWANCE * this.getAgeScale());
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return ModSounds.ELEPHANT_AMBIENT.get();
+        return this.isBaby() ? ModSounds.ELEPHANT_BABY_AMBIENT.get() : ModSounds.ELEPHANT_AMBIENT.get();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        return ModSounds.ELEPHANT_HURT.get();
+        return this.isBaby() ? ModSounds.ELEPHANT_BABY_HURT.get() : ModSounds.ELEPHANT_HURT.get();
+    }
+
+    // Trumpet when the dash (charge) starts; played by Camel#handleStartJump.
+    @Override
+    protected SoundEvent getDashingSound() {
+        return ModSounds.ELEPHANT_TRUMPET.get();
+    }
+
+    @Override
+    public void handleStartJump(int jumpScale) {
+        super.handleStartJump(jumpScale);
+        this.chargeTicks = CHARGE_WINDOW_TICKS;
+        this.chargeHits.clear();
+    }
+
+    // Food: sugar cane and melon slices heal and grow babies; hay bales also breed.
+
+    @Override
+    public boolean isFood(ItemStack itemStack) {
+        return itemStack.is(Items.SUGAR_CANE) || itemStack.is(Items.MELON_SLICE) || itemStack.is(Items.HAY_BLOCK);
+    }
+
+    @Override
+    protected boolean handleEating(Player player, ItemStack itemStack) {
+        if (!this.isFood(itemStack)) {
+            return false;
+        }
+
+        boolean hay = itemStack.is(Items.HAY_BLOCK);
+        float heal = hay ? 10.0F : 2.0F;
+        int ageUpSeconds = hay ? 90 : 10;
+
+        boolean couldHeal = this.getHealth() < this.getMaxHealth();
+        if (couldHeal) {
+            this.heal(heal);
+        }
+
+        boolean couldSetInLove = hay && this.isTamed() && this.getAge() == 0 && this.canFallInLove();
+        if (couldSetInLove) {
+            this.setInLove(player);
+        }
+
+        boolean couldAgeUp = this.isBaby();
+        if (couldAgeUp) {
+            this.level().addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), 0.0, 0.0, 0.0);
+            if (!this.level().isClientSide()) {
+                this.ageUp(ageUpSeconds);
+            }
+        }
+
+        if (!couldHeal && !couldSetInLove && !couldAgeUp) {
+            return false;
+        }
+
+        if (!this.isSilent()) {
+            SoundEvent eatingSound = this.getEatingSound();
+            if (eatingSound != null) {
+                this.level().playSound(null, this.getX(), this.getY(), this.getZ(), eatingSound, this.getSoundSource(),
+                        1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+            }
+        }
+
+        this.gameEvent(GameEvent.EAT);
+        return true;
+    }
+
+    @Override
+    public boolean canMate(Animal partner) {
+        return partner != this && partner instanceof ElephantEntity && super.canMate(partner);
+    }
+
+    @Override
+    public @Nullable Camel getBreedOffspring(ServerLevel level, AgeableMob partner) {
+        return com.terrainlab.registry.ModEntities.ELEPHANT.get().create(level, EntitySpawnReason.BREEDING);
     }
 
     @Override
@@ -133,7 +265,10 @@ public class ElephantEntity extends Camel {
 
         super.travel(travelVector);
 
-        if (this.isVehicle() && this.isInWater() && !this.onGround()) {
+        // Ridden float: rise while the water is deeper than the swim threshold, so the elephant swims
+        // with its head and back out instead of walking the riverbed; shallower water is waded.
+        if (this.isVehicle() && this.isInWater()
+                && this.getFluidHeight(FluidTags.WATER) > this.getFluidJumpThreshold()) {
             Vec3 delta = this.getDeltaMovement();
 
             if (delta.y < MOUNTED_SWIM_MIN_RISE) {
@@ -152,6 +287,13 @@ public class ElephantEntity extends Camel {
 
         if (level().isClientSide()) {
             return;
+        }
+
+        if (this.chargeTicks > 0 || this.isDashing()) {
+            this.applyChargeHits((ServerLevel) this.level());
+        }
+        if (this.chargeTicks > 0) {
+            this.chargeTicks--;
         }
 
         // Clean up any temporary bed saved by a previous session.
@@ -282,6 +424,32 @@ public class ElephantEntity extends Camel {
     }
 
     /**
+     * Dash charge: every living entity the elephant touches during the dash is knocked away from it
+     * and hurt once. Skips the elephant's own passengers, the rider's pets, armor stands, spectators
+     * and creative players, and players the rider is not allowed to harm (PvP off or same team).
+     */
+    private void applyChargeHits(ServerLevel level) {
+        Entity rider = this.getControllingPassenger();
+        AABB hitBox = this.getBoundingBox().inflate(0.5D, 0.0D, 0.5D);
+
+        for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, hitBox)) {
+            if (target == this || !target.isAlive() || target instanceof ArmorStand) continue;
+            if (target.getRootVehicle() == this.getRootVehicle()) continue; // passengers, incl. the rider
+            if (this.chargeHits.contains(target.getUUID())) continue;
+            if (target instanceof OwnableEntity pet && rider != null && pet.getOwner() == rider) continue;
+            if (target instanceof Player player) {
+                if (player.isSpectator() || player.isCreative()) continue;
+                if (rider instanceof Player riderPlayer && !riderPlayer.canHarmPlayer(player)) continue;
+            }
+
+            this.chargeHits.add(target.getUUID());
+            DamageSource source = this.damageSources().mobAttack(this);
+            target.hurtServer(level, source, CHARGE_DAMAGE);
+            target.knockback(CHARGE_KNOCKBACK, this.getX() - target.getX(), this.getZ() - target.getZ());
+        }
+    }
+
+    /**
      * Server-side entry point for a howdah sleep request.
      */
     public void attemptHowdahSleep(ServerPlayer player) {
@@ -354,10 +522,10 @@ public class ElephantEntity extends Camel {
             return;
         }
 
-        // Place the temporary bed directly above the elephant.
+        // Place the temporary bed directly above the elephant (fixed height, independent of the hitbox).
         BlockPos footPos = BlockPos.containing(
                 this.getX(),
-                this.getY() + this.getBbHeight() + 0.1D,
+                this.getY() + TEMP_BED_HEIGHT + 0.1D,
                 this.getZ()
         );
 
