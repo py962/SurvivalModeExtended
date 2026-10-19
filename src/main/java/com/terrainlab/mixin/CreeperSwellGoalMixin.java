@@ -4,6 +4,7 @@
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.SwellGoal;
 import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +19,7 @@ public abstract class CreeperSwellGoalMixin {
     private LivingEntity target;
 
     @Shadow
+    @Final
     private net.minecraft.world.entity.monster.Creeper creeper;
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)

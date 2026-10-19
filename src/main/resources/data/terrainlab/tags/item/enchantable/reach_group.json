@@ -1,6 +1,7 @@
 {
   "values": [
     "#minecraft:enchantable/mining",
-    "#minecraft:enchantable/weapon"
+    "#minecraft:enchantable/weapon",
+    "minecraft:lead"
   ]
 }

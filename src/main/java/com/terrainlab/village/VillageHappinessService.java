@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Computes a village's happiness as the fraction of members with no negative state
- * (thermal discomfort, fear, tiredness, trapped or hungry).
+ * (thermal discomfort, fear, tiredness, trapped, hungry or injured).
  */
 public final class VillageHappinessService {
 
@@ -26,8 +26,9 @@ public final class VillageHappinessService {
             boolean tired = VillagerTiredService.isTired(villager, gameTime);
             boolean trapped = VillagerTrappedService.isTrapped(villager);
             boolean hungry = VillagerMoodService.isHungry(villager);
+            boolean injured = VillagerMoodService.isInjured(villager);
 
-            if (thermal != VillagerThermalState.COMFORTABLE || fearful || tired || trapped || hungry) {
+            if (thermal != VillagerThermalState.COMFORTABLE || fearful || tired || trapped || hungry || injured) {
                 negative++;
             }
         }

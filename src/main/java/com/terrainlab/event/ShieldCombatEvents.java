@@ -1,6 +1,7 @@
 
 package com.terrainlab.event;
 
+import com.terrainlab.TerrainLab;
 import com.terrainlab.item.ShieldDefinitions;
 import com.terrainlab.item.ShieldStats;
 import com.terrainlab.registry.ModItems;
@@ -61,9 +62,9 @@ public final class ShieldCombatEvents {
                         var deferredItem = ModItems.SHIELD_ITEMS.get(stats.id());
 
                         if (deferredItem == null) {
-                            System.err.println(
-                                    "[TerrainLab] Missing shield item registration for ShieldStats ID: "
-                                            + stats.id()
+                            TerrainLab.LOGGER.error(
+                                    "Missing shield item registration for ShieldStats ID: {}",
+                                    stats.id()
                             );
                             continue;
                         }

@@ -14,6 +14,8 @@
     "CreeperSwellGoalMixin",
     "EndermanTakeMixin",
     "HappyGhastMixin",
+    "LeashableEnchantedLeadMixin",
+    "EntityLeadConsumeMixin",
     "AbstractBoatAccessor",
     "LivingEntityAccessor",
     "AbstractBoatGravityMixin",
@@ -29,6 +31,8 @@
     "PhasingBlockJumpMixin",
     "EnderDragonPhaseBlockingMixin",
     "CopperGolemAiMixin",
+    "VillagerGoalPackagesWorkMixin",
+    "AbstractHorseVillageLoveMixin",
     "SnowGolemDamageMixin",
     "BorrowingSleepMixin",
     "BorrowingInputLockMixin",
@@ -92,7 +96,8 @@
     "MerchantOfferPricingMixin",
     "VillagerPairPricingMixin",
     "RaidOminousBannerMixin",
-    "PiglinLuckBarterMixin"
+    "PiglinLuckBarterMixin",
+    "LlamaCaribouMateMixin"
   ],
   "client": [
     "SkyRendererAccessor",
@@ -107,7 +112,8 @@
     "BiomeAmbientUnderwaterMuteMixin",
     "VillagerModelMoodMixin",
     "SpectralVisionGlowMixin",
-    "VillagerHeatTintMixin"
+    "VillagerHeatTintMixin",
+    "BoatHandsFreeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

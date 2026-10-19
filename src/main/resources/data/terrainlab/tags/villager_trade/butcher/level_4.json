@@ -1,10 +1,8 @@
 {
   "values": [
-    "terrainlab:butcher/level_4/buys_beef",
-    "terrainlab:butcher/level_4/buys_venison",
-    "terrainlab:butcher/level_4/sells_cooked_beef",
-    "terrainlab:butcher/level_4/sells_cooked_venison",
     "terrainlab:butcher/level_4/buys_milk_bucket",
-    "terrainlab:butcher/level_4/sells_milk_bucket"
+    "terrainlab:butcher/level_4/sells_milk_bucket",
+    "terrainlab:butcher/level_4/buys_rabbit_stew",
+    "terrainlab:butcher/level_4/sells_rabbit_stew"
   ]
 }

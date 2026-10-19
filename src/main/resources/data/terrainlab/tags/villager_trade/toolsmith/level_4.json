@@ -1,20 +1,20 @@
 {
   "values": [
     "terrainlab:toolsmith/level_4/buys_diamond_shovel",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_reach_fortune",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency_silk_touch",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency_fortune",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_unbreaking_fortune",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_silk_touch_unbreaking",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_silk_touch_reach",
+    "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency",
     "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency_unbreaking",
+    "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency_reach",
+    "terrainlab:toolsmith/level_4/sells_diamond_shovel_reach",
+    "terrainlab:toolsmith/level_4/sells_diamond_shovel_silk_touch",
+    "terrainlab:toolsmith/level_4/sells_diamond_shovel_unbreaking_reach",
+    "terrainlab:toolsmith/level_4/sells_diamond_shovel_unbreaking",
     "terrainlab:toolsmith/level_4/buys_diamond_axe",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_reach_fortune",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency_silk_touch",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency_fortune",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_unbreaking_fortune",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_silk_touch_unbreaking",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_silk_touch_reach",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency_unbreaking"
+    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency",
+    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency_unbreaking",
+    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency_reach",
+    "terrainlab:toolsmith/level_4/sells_diamond_axe_reach",
+    "terrainlab:toolsmith/level_4/sells_diamond_axe_silk_touch",
+    "terrainlab:toolsmith/level_4/sells_diamond_axe_unbreaking_reach",
+    "terrainlab:toolsmith/level_4/sells_diamond_axe_unbreaking"
   ]
 }

@@ -31,6 +31,7 @@ public final class VillageInfoSnapshot {
             boolean tired,
             boolean trapped,
             boolean hungry,
+            boolean injured,
             VillagerThermalState thermalState
     ) {
     }
@@ -122,6 +123,9 @@ public final class VillageInfoSnapshot {
             boolean hungry =
                     VillagerMoodService.isHungry(villager);
 
+            boolean injured =
+                    VillagerMoodService.isInjured(villager);
+
             rows.add(new Row(
                     professionKey,
                     level_,
@@ -129,6 +133,7 @@ public final class VillageInfoSnapshot {
                     tired,
                     trapped,
                     hungry,
+                    injured,
                     thermal
             ));
         }

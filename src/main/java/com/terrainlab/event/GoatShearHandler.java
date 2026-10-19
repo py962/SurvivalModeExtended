@@ -79,7 +79,7 @@ public class GoatShearHandler {
 
         goat.playSound(SoundEvents.SHEEP_SHEAR, 1.0F, 1.0F);
 
-        // Award 2 XP only if this goat is inside an active Luck Conduit.
+        // Award shearing XP (applies everywhere, not only near a Luck Conduit).
         if (goat.level() instanceof ServerLevel level) {
             CelestialLuckXpHandler.awardShearingXp(level, goat);
         }

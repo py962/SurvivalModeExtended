@@ -14,23 +14,15 @@
     "entity": "this",
     "predicate": {
       "minecraft:predicates": {
-        "minecraft:villager/variant": "minecraft:snow"
+        "minecraft:villager/variant": "minecraft:swamp"
       }
     }
   },
   "given_item_modifier": {
     "type": "minecraft:set_enchantments",
     "enchantments": {
-      "minecraft:piercing": {
-        "type": "minecraft:uniform",
-        "min": 1,
-        "max": 4
-      },
-      "minecraft:unbreaking": {
-        "type": "minecraft:uniform",
-        "min": 1,
-        "max": 3
-      }
+      "minecraft:piercing": 2,
+      "minecraft:unbreaking": 2
     }
   }
 }

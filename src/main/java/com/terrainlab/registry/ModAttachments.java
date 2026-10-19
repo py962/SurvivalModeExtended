@@ -351,6 +351,72 @@ public class ModAttachments {
                             .sync(ByteBufCodecs.VAR_INT)
                             .build());
 
+    // Villager health and chest meals (VillagerHealthService, VillagerChestMealService). All serialized.
+    // Remaining heal-over-time from chest food.
+    public static final Supplier<AttachmentType<com.terrainlab.village.VillagerPendingHeal>> VILLAGER_PENDING_HEAL =
+            ATTACHMENT_TYPES.register("villager_pending_heal", () ->
+                    AttachmentType.builder(() -> com.terrainlab.village.VillagerPendingHeal.NONE)
+                            .serialize(com.terrainlab.village.VillagerPendingHeal.MAP_CODEC, h -> !h.isEmpty())
+                            .build());
+
+    // Game time of the last 1 HP natural heal (or of the last read at full health); -1 = not started.
+    public static final Supplier<AttachmentType<Long>> VILLAGER_LAST_NATURAL_HEAL_TICK =
+            ATTACHMENT_TYPES.register("villager_last_natural_heal_tick", () ->
+                    AttachmentType.builder(() -> -1L)
+                            .serialize(Codec.LONG.fieldOf("villager_last_natural_heal_tick"), t -> t >= 0L)
+                            .build());
+
+    // Timed temperature offset from warming/cooling chest food, added to the villager's combined temperature.
+    public static final Supplier<AttachmentType<com.terrainlab.village.VillagerFoodTempOffset>> VILLAGER_FOOD_TEMP_OFFSET =
+            ATTACHMENT_TYPES.register("villager_food_temp_offset", () ->
+                    AttachmentType.builder(() -> com.terrainlab.village.VillagerFoodTempOffset.NONE)
+                            .serialize(com.terrainlab.village.VillagerFoodTempOffset.MAP_CODEC, o -> o.offset() != 0.0F)
+                            .build());
+
+    // Game time of the villager's last meal from the village chest (meal cooldown); -1 = never.
+    public static final Supplier<AttachmentType<Long>> VILLAGER_LAST_CHEST_MEAL_TICK =
+            ATTACHMENT_TYPES.register("villager_last_chest_meal_tick", () ->
+                    AttachmentType.builder(() -> -1L)
+                            .serialize(Codec.LONG.fieldOf("villager_last_chest_meal_tick"), t -> t >= 0L)
+                            .build());
+
+    // Game time the villager's eating animation ends; the held food is cleared after it (also after a
+    // reload mid-meal). 0 = not eating.
+    public static final Supplier<AttachmentType<Long>> VILLAGER_EATING_UNTIL =
+            ATTACHMENT_TYPES.register("villager_eating_until", () ->
+                    AttachmentType.builder(() -> 0L)
+                            .serialize(Codec.LONG.fieldOf("villager_eating_until"), t -> t > 0L)
+                            .build());
+
+    // Profession work behaviour cooldowns (village.work): last chest delivery, slaughter, breeding per species. Serialized.
+    public static final Supplier<AttachmentType<com.terrainlab.village.VillagerWorkState>> VILLAGER_WORK_STATE =
+            ATTACHMENT_TYPES.register("villager_work_state", () ->
+                    AttachmentType.builder(() -> com.terrainlab.village.VillagerWorkState.NONE)
+                            .serialize(com.terrainlab.village.VillagerWorkState.MAP_CODEC, s -> !s.isEmpty())
+                            .build());
+
+    // Set on a wild caribou a butcher put in love, so it may breed untamed (AbstractHorseVillageLoveMixin). Transient.
+    public static final Supplier<AttachmentType<Boolean>> CARIBOU_VILLAGE_LOVE =
+            ATTACHMENT_TYPES.register("caribou_village_love", () ->
+                    AttachmentType.builder(() -> false).build());
+
+    // Per-chunk seasonal ground plants (SeasonalPlantService): player-placed positions that are exempt,
+    // and dormant naturally generated plants waiting for their season. Serialized when non-empty.
+    public static final Supplier<AttachmentType<com.terrainlab.season.plants.SeasonalPlantChunkData>> SEASONAL_PLANTS =
+            ATTACHMENT_TYPES.register("seasonal_plants", () ->
+                    AttachmentType.<com.terrainlab.season.plants.SeasonalPlantChunkData>builder(
+                                    (Supplier<com.terrainlab.season.plants.SeasonalPlantChunkData>) com.terrainlab.season.plants.SeasonalPlantChunkData::new)
+                            .serialize(com.terrainlab.season.plants.SeasonalPlantChunkData.MAP_CODEC, data -> !data.isEmpty())
+                            .build());
+
+    // The lead item that leashed this entity (only when it carries components, e.g. enchantments or a name),
+    // so the lead dropped when the leash breaks is the same lead. See EnchantedLeadHandler. Serialized.
+    public static final Supplier<AttachmentType<net.minecraft.world.item.ItemStack>> LEASH_LEAD_ITEM =
+            ATTACHMENT_TYPES.register("leash_lead_item", () ->
+                    AttachmentType.builder(() -> net.minecraft.world.item.ItemStack.EMPTY)
+                            .serialize(net.minecraft.world.item.ItemStack.OPTIONAL_CODEC.fieldOf("lead"), stack -> !stack.isEmpty())
+                            .build());
+
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
     }

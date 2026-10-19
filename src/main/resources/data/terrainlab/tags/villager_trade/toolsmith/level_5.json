@@ -1,12 +1,12 @@
 {
   "values": [
     "terrainlab:toolsmith/level_5/buys_diamond_pickaxe",
-    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_reach_fortune",
-    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_efficiency_silk_touch",
-    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_efficiency_fortune",
-    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_unbreaking_fortune",
-    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_silk_touch_unbreaking",
-    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_silk_touch_reach",
-    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_efficiency_unbreaking"
+    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_efficiency",
+    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_efficiency_unbreaking",
+    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_efficiency_reach",
+    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_reach",
+    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_silk_touch",
+    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_unbreaking_reach",
+    "terrainlab:toolsmith/level_5/sells_diamond_pickaxe_unbreaking"
   ]
 }

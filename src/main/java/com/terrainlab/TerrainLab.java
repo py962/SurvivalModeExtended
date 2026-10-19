@@ -130,6 +130,9 @@ public class TerrainLab {
         // Villager behaviour, daily village tick and the villageinfo debug command.
         NeoForge.EVENT_BUS.register(com.terrainlab.event.VillagerBehaviorHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.VillageDailyTickHandler.class);
+        // Villager healing rules (LivingHealEvent) and chest-meal eating animations.
+        NeoForge.EVENT_BUS.register(com.terrainlab.village.VillagerHealthService.class);
+        NeoForge.EVENT_BUS.register(com.terrainlab.village.VillagerChestMealService.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.VillageEconomyHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.PlayerMilestoneHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.StructureStatsCommand.class);
@@ -137,6 +140,7 @@ public class TerrainLab {
         // Villager and wandering trader trades are data-driven: data/minecraft/trade_set overrides
         // point at the terrainlab villager_trade tags (see data/terrainlab/villager_trade).
         com.terrainlab.registry.ModLootConditions.register(modEventBus);
+        com.terrainlab.registry.ModLootModifiers.register(modEventBus);
 
         // Client-only registrations; guarded so client classes never load on a dedicated server.
         if (FMLEnvironment.getDist().isClient()) {

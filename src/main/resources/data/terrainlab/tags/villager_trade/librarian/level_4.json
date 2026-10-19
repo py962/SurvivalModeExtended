@@ -1,14 +1,13 @@
 {
   "values": [
     "terrainlab:librarian/level_4/buys_enchanted_book",
-    "terrainlab:librarian/level_4/sells_enchanted_book_binding_curse",
+    "terrainlab:librarian/level_4/sells_enchanted_book_fire_protection",
     "terrainlab:librarian/level_4/sells_enchanted_book_bane_of_arthropods",
-    "terrainlab:librarian/level_4/sells_enchanted_book_vanishing_curse",
-    "terrainlab:librarian/level_4/sells_enchanted_book_channeling",
+    "terrainlab:librarian/level_4/sells_enchanted_book_flame",
     "terrainlab:librarian/level_4/sells_enchanted_book_respiration",
+    "terrainlab:librarian/level_4/sells_enchanted_book_frost_walker",
     "terrainlab:librarian/level_4/sells_enchanted_book_aqua_affinity",
     "terrainlab:librarian/level_4/sells_enchanted_book_fire_aspect",
-    "terrainlab:librarian/level_4/sells_enchanted_book_",
     "terrainlab:librarian/level_4/buys_calendar",
     "terrainlab:librarian/level_4/sells_calendar"
   ]

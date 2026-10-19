@@ -59,22 +59,10 @@ public class OversizedMapFrameRenderer
         );
 
         /*
-         * The 2x2 entity is anchored at its bottom-left wall block.
-         * Shift its visual centre half a block up and along the horizontal
-         * footprint axis. The 3x3 entity is already centred on its anchor.
-         *
-         * This translation is applied before rotation, so it follows
-         * world coordinates.
+         * The entity's bounding box spans the full 2x2 / 3x3 footprint,
+         * so its position (the render origin) is already the visual
+         * centre of the frame for both sizes. No anchor shift is needed.
          */
-        if (size == 2) {
-            Direction horizontal = direction.getCounterClockWise();
-
-            poseStack.translate(
-                    horizontal.getStepX() * 0.5F,
-                    0.5F,
-                    horizontal.getStepZ() * 0.5F
-            );
-        }
 
         // Move the frame model just in front of the supporting wall.
         poseStack.translate(

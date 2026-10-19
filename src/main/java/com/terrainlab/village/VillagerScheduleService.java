@@ -55,6 +55,11 @@ public final class VillagerScheduleService {
 
         Phase phase = phaseAt(com.terrainlab.season.SolarTime.solarTimeOfDay(level));
 
+        // A running work behaviour (village.work) is moving the villager on its own trip.
+        if (com.terrainlab.village.work.VillagerWork.isBusy(villager)) {
+            return;
+        }
+
         switch (phase) {
             case WANDER -> {
                 // No command: vanilla idle/wander AI stays in control.

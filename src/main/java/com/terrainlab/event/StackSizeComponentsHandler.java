@@ -7,6 +7,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantable;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
@@ -17,13 +18,16 @@ import java.util.List;
  * Raises stack sizes so villager trades hand over and accept their full counts, with related
  * items matched for consistency: stews, beds and book and quill to 16; filled buckets,
  * potions and leather flasks to 3. Items with durability cannot stack, so shears and
- * shields are traded singly instead.
+ * shields are traded singly instead. Also makes saddles enchantable at the enchanting table.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class StackSizeComponentsHandler {
 
     private static final int LARGE_TRADE_STACK = 16;
     private static final int SMALL_TRADE_STACK = 3;
+
+    // Enchanting-table enchantability for saddles (leather armour is 15, iron 9).
+    private static final int SADDLE_ENCHANTABILITY = 10;
 
     // Stews and the book and quill, matching written books.
     private static final List<Item> LARGE_STACK_ITEMS = List.of(
@@ -52,5 +56,9 @@ public final class StackSizeComponentsHandler {
             event.modify(item, (patch, context, it) -> patch.set(DataComponents.MAX_STACK_SIZE, SMALL_TRADE_STACK));
         }
         event.modify(ModItems.LEATHER_FLASK.get(), (patch, context, it) -> patch.set(DataComponents.MAX_STACK_SIZE, SMALL_TRADE_STACK));
+
+        // Saddles can be enchanted at the enchanting table (agility, feather falling, depth strider;
+        // see the enchantment JSONs and the enchantable item tags). Bundles and leads stay unenchantable.
+        event.modify(Items.SADDLE, (patch, context, it) -> patch.set(DataComponents.ENCHANTABLE, new Enchantable(SADDLE_ENCHANTABILITY)));
     }
 }

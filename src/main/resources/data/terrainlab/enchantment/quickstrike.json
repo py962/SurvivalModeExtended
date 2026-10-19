@@ -1,0 +1,21 @@
+{
+  "description": { "translate": "enchantment.terrainlab.quickstrike" },
+  "supported_items": "#terrainlab:enchantable/quickstrike_group",
+  "primary_items": "#terrainlab:enchantable/quickstrike_group",
+  "weight": 5,
+  "max_level": 4,
+  "min_cost": { "base": 5, "per_level_above_first": 9 },
+  "max_cost": { "base": 25, "per_level_above_first": 9 },
+  "anvil_cost": 2,
+  "slots": ["mainhand"],
+  "effects": {
+    "minecraft:attributes": [
+      {
+        "id": "terrainlab:enchantment.quickstrike",
+        "attribute": "minecraft:attack_speed",
+        "amount": { "type": "minecraft:linear", "base": 0.25, "per_level_above_first": 0.25 },
+        "operation": "add_multiplied_base"
+      }
+    ]
+  }
+}

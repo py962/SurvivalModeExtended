@@ -4,14 +4,18 @@ import com.terrainlab.registry.ModEntities;
 import com.terrainlab.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class OversizedMapFrameEntity extends ItemFrame {
@@ -58,6 +62,56 @@ public class OversizedMapFrameEntity extends ItemFrame {
     }
 
     /**
+     * Bounding box covering the whole 2x2 / 3x3 footprint on the wall,
+     * using the same anchor convention as survives() (2x2 = bottom-left,
+     * 3x3 = centre). This is used for interaction, hit detection and
+     * render culling. The entity position becomes the footprint centre.
+     */
+    @Override
+    protected AABB calculateBoundingBox(BlockPos blockPos, Direction direction) {
+        if (!direction.getAxis().isHorizontal()) {
+            return super.calculateBoundingBox(blockPos, direction);
+        }
+
+        Direction horizontal = direction.getCounterClockWise();
+        int start = getFootprintStart();
+        int end = start + getFrameSize() - 1;
+
+        Vec3 first = Vec3.atCenterOf(
+                blockPos.relative(horizontal, start).above(start)
+        ).relative(direction, -0.46875);
+        Vec3 last = Vec3.atCenterOf(
+                blockPos.relative(horizontal, end).above(end)
+        ).relative(direction, -0.46875);
+
+        boolean alongX = direction.getAxis() == Direction.Axis.X;
+
+        return new AABB(first, last).inflate(
+                alongX ? 0.03125 : 0.5,
+                0.5,
+                alongX ? 0.5 : 0.03125
+        );
+    }
+
+    /**
+     * Placement / survival checks use the full footprint, not the
+     * vanilla 0.75 block pop box.
+     */
+    @Override
+    protected AABB getPopBox() {
+        return calculateBoundingBox(getPos(), getDirection());
+    }
+
+    /**
+     * The entity centre is not inside its anchor block for 2x2 frames,
+     * so sync the anchor block position (as vanilla paintings do).
+     */
+    @Override
+    public Vec3 trackingPosition() {
+        return Vec3.atLowerCornerOf(getPos());
+    }
+
+    /**
      * Checks support for every wall block covered by the frame.
      *
      * 2x2: two blocks across and two blocks upward from the bottom-left.
@@ -91,8 +145,28 @@ public class OversizedMapFrameEntity extends ItemFrame {
             }
         }
 
-        // Preserve vanilla item-frame coexistence validation.
-        return canCoexist(false);
+        AABB footprint = getPopBox();
+
+        // The space in front of the wall must be clear, as for vanilla frames.
+        if (hasLevelCollision(footprint)) {
+            return false;
+        }
+
+        // No other hanging entity (item frame, painting, large frame)
+        // may overlap any part of the footprint.
+        return !level().hasEntities(
+                EntityTypeTest.forClass(HangingEntity.class),
+                footprint,
+                other -> other != this
+        );
+    }
+
+    /**
+     * True for frames that cannot be modified by players (e.g. "Fixed"
+     * or invulnerable frames). hurtClient has no side effects.
+     */
+    private boolean isLocked() {
+        return !hurtClient(damageSources().generic());
     }
 
     private static boolean isSupportedDisplayItem(ItemStack stack) {
@@ -110,9 +184,24 @@ public class OversizedMapFrameEntity extends ItemFrame {
         ItemStack held = player.getItemInHand(hand);
 
         if (!getItem().isEmpty()) {
-            // Sneaking with an empty hand removes the displayed item normally.
+            // Sneaking with an empty hand removes the displayed item,
+            // exactly as punching a vanilla frame does (drops it, or
+            // just clears it in creative).
             if (player.isShiftKeyDown() && held.isEmpty()) {
-                return super.interact(player, hand, location);
+                if (isLocked()) {
+                    return InteractionResult.PASS;
+                }
+
+                if (level() instanceof ServerLevel serverLevel
+                        && serverLevel.mayInteract(player, getPos())) {
+                    hurtServer(
+                            serverLevel,
+                            damageSources().playerAttack(player),
+                            0.0F
+                    );
+                }
+
+                return InteractionResult.SUCCESS;
             }
 
             // Do not let clicking rotate an already-filled frame.

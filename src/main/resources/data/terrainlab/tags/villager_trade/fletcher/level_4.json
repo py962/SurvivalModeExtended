@@ -9,11 +9,12 @@
     "terrainlab:fletcher/level_4/sells_tipped_arrow_poison",
     "terrainlab:fletcher/level_4/sells_tipped_arrow_harming",
     "terrainlab:fletcher/level_4/buys_crossbow",
+    "terrainlab:fletcher/level_4/sells_crossbow_quick_charge",
+    "terrainlab:fletcher/level_4/sells_crossbow_piercing",
+    "terrainlab:fletcher/level_4/sells_crossbow_unbreaking",
+    "terrainlab:fletcher/level_4/sells_crossbow_multishot",
     "terrainlab:fletcher/level_4/sells_crossbow_piercing_quick_charge",
-    "terrainlab:fletcher/level_4/sells_crossbow_quick_charge_unbreaking",
-    "terrainlab:fletcher/level_4/sells_crossbow_multishot_piercing",
     "terrainlab:fletcher/level_4/sells_crossbow_piercing_unbreaking",
-    "terrainlab:fletcher/level_4/sells_crossbow_multishot_quick_charge",
-    "terrainlab:fletcher/level_4/sells_crossbow_multishot_unbreaking"
+    "terrainlab:fletcher/level_4/sells_crossbow_quick_charge_unbreaking"
   ]
 }

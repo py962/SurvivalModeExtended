@@ -17,8 +17,8 @@ import java.util.UUID;
 public final class PlayerCushionRestingSystem {
 
     /**
-     * One hunger point is converted into energy every 80 ticks
-     * spent sitting on a cushion (4 seconds at 20 TPS).
+     * One hunger point is converted into energy every 400 ticks
+     * spent sitting on a cushion (20 seconds at 20 TPS).
      */
     private static final int TICKS_PER_CONVERSION = 400;
 

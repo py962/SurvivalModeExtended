@@ -1,0 +1,18 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 5
+  },
+  "gives": {
+    "id": "minecraft:lead"
+  },
+  "max_uses": 2,
+  "xp": 0,
+  "reputation_discount": 0.05,
+  "given_item_modifier": {
+    "type": "minecraft:set_enchantments",
+    "enchantments": {
+      "terrainlab:reach": 2
+    }
+  }
+}

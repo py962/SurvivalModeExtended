@@ -1,20 +1,20 @@
 {
   "values": [
     "terrainlab:armorer/level_4/buys_diamond_leggings",
-    "terrainlab:armorer/level_4/sells_diamond_leggings_blast_protection_unbreaking",
-    "terrainlab:armorer/level_4/sells_diamond_leggings_projectile_protection_unbreaking",
-    "terrainlab:armorer/level_4/sells_diamond_leggings_protection_thorns",
-    "terrainlab:armorer/level_4/sells_diamond_leggings_protection_unbreaking",
-    "terrainlab:armorer/level_4/sells_diamond_leggings_fire_protection_thorns",
     "terrainlab:armorer/level_4/sells_diamond_leggings_unbreaking_thorns",
-    "terrainlab:armorer/level_4/sells_diamond_leggings_blast_protection_thorns",
+    "terrainlab:armorer/level_4/sells_diamond_leggings_thorns",
+    "terrainlab:armorer/level_4/sells_diamond_leggings_protection_thorns",
+    "terrainlab:armorer/level_4/sells_diamond_leggings_unbreaking",
+    "terrainlab:armorer/level_4/sells_diamond_leggings_protection",
+    "terrainlab:armorer/level_4/sells_diamond_leggings_projectile_protection",
+    "terrainlab:armorer/level_4/sells_diamond_leggings_blast_protection",
     "terrainlab:armorer/level_4/buys_diamond_chestplate",
-    "terrainlab:armorer/level_4/sells_diamond_chestplate_blast_protection_unbreaking",
-    "terrainlab:armorer/level_4/sells_diamond_chestplate_projectile_protection_unbreaking",
+    "terrainlab:armorer/level_4/sells_diamond_chestplate_unbreaking_thorns",
+    "terrainlab:armorer/level_4/sells_diamond_chestplate_thorns",
     "terrainlab:armorer/level_4/sells_diamond_chestplate_protection_thorns",
-    "terrainlab:armorer/level_4/sells_diamond_chestplate_protection_unbreaking",
-    "terrainlab:armorer/level_4/sells_diamond_chestplate_fire_protection_thorns",
-    "terrainlab:armorer/level_4/sells_diamond_chestplate_unbreaking_reach",
-    "terrainlab:armorer/level_4/sells_diamond_chestplate_blast_protection_thorns"
+    "terrainlab:armorer/level_4/sells_diamond_chestplate_unbreaking",
+    "terrainlab:armorer/level_4/sells_diamond_chestplate_protection",
+    "terrainlab:armorer/level_4/sells_diamond_chestplate_projectile_protection",
+    "terrainlab:armorer/level_4/sells_diamond_chestplate_blast_protection"
   ]
 }

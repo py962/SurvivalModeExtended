@@ -2,7 +2,9 @@
   "values": [
     "terrainlab:farmer/level_2/buys_potato",
     "terrainlab:farmer/level_2/sells_potato",
-    "terrainlab:farmer/level_2/buys_brown_mushroom",
-    "terrainlab:farmer/level_2/sells_brown_mushroom"
+    "terrainlab:farmer/level_2/buys_beetroot",
+    "terrainlab:farmer/level_2/buys_apple",
+    "terrainlab:farmer/level_2/sells_beetroot",
+    "terrainlab:farmer/level_2/sells_apple"
   ]
 }

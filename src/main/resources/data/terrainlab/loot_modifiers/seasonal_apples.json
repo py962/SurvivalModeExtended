@@ -1,0 +1,40 @@
+{
+  "type": "terrainlab:seasonal_apples",
+  "condition": {
+    "type": "minecraft:any_of",
+    "terms": [
+      { "type": "neoforge:loot_table_id", "loot_table_id": "minecraft:blocks/oak_leaves" },
+      { "type": "neoforge:loot_table_id", "loot_table_id": "minecraft:blocks/dark_oak_leaves" }
+    ]
+  },
+  "extra_roll": {
+    "type": "minecraft:all_of",
+    "terms": [
+      {
+        "type": "minecraft:inverted",
+        "term": {
+          "type": "minecraft:any_of",
+          "terms": [
+            { "type": "neoforge:can_item_perform_ability", "ability": "shears_dig" },
+            {
+              "type": "minecraft:match_tool",
+              "predicate": {
+                "predicates": {
+                  "minecraft:enchantments": [
+                    { "enchantments": "minecraft:silk_touch", "levels": { "min": 1 } }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      { "type": "minecraft:survives_explosion" },
+      {
+        "type": "minecraft:table_bonus",
+        "enchantment": "minecraft:fortune",
+        "chances": [0.005, 0.0055555557, 0.00625, 0.008333334, 0.025]
+      }
+    ]
+  }
+}

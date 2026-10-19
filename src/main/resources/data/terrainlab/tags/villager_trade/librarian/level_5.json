@@ -1,13 +1,12 @@
 {
   "values": [
     "terrainlab:librarian/level_5/buys_enchanted_book",
-    "terrainlab:librarian/level_5/sells_enchanted_book_unbreaking",
+    "terrainlab:librarian/level_5/sells_enchanted_book_fortune",
     "terrainlab:librarian/level_5/sells_enchanted_book_recall",
     "terrainlab:librarian/level_5/sells_enchanted_book_smite",
-    "terrainlab:librarian/level_5/sells_enchanted_book_riptide",
-    "terrainlab:librarian/level_5/sells_enchanted_book_flame",
-    "terrainlab:librarian/level_5/sells_enchanted_book_mending",
+    "terrainlab:librarian/level_5/sells_enchanted_book_impaling",
     "terrainlab:librarian/level_5/sells_enchanted_book_looting",
-    "terrainlab:librarian/level_5/sells_enchanted_book_"
+    "terrainlab:librarian/level_5/sells_enchanted_book_mending",
+    "terrainlab:librarian/level_5/sells_enchanted_book_breach"
   ]
 }

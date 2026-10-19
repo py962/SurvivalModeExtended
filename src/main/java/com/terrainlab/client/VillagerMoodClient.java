@@ -70,6 +70,8 @@ public final class VillagerMoodClient {
                 sprites -> new VillagerMoodParticle.Provider(sprites, Motion.RISE));
         event.registerSpriteSet(ModParticles.VILLAGER_HUNGRY.get(),
                 sprites -> new VillagerMoodParticle.Provider(sprites, Motion.BOB));
+        event.registerSpriteSet(ModParticles.VILLAGER_INJURED.get(),
+                sprites -> new VillagerMoodParticle.Provider(sprites, Motion.POP));
     }
 
     @SubscribeEvent
@@ -168,6 +170,11 @@ public final class VillagerMoodClient {
         } else if (state == VillagerMoodService.HUNGRY) {
             level.addParticle(ModParticles.VILLAGER_HUNGRY.get(),
                     x, top + 0.35D, z, 0.0D, 0.0D, 0.0D);
+
+        } else if (state == VillagerMoodService.INJURED) {
+            // A small red cross popping above the head, slightly off to one side.
+            level.addParticle(ModParticles.VILLAGER_INJURED.get(),
+                    x + side.x * 0.15D, top + 0.3D, z + side.z * 0.15D, 0.0D, 0.0D, 0.0D);
 
         } else if (state == VillagerMoodService.TRAPPED) {
             // Vanilla's angry-villager cloud; its provider adds +0.5 to Y itself.

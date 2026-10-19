@@ -3,13 +3,12 @@
     "terrainlab:leatherworker/level_4/buys_bundle",
     "terrainlab:leatherworker/level_4/sells_bundle_overstacking",
     "terrainlab:leatherworker/level_4/buys_leather_boots",
-    "terrainlab:leatherworker/level_4/sells_leather_boots_unbreaking_agility",
+    "terrainlab:leatherworker/level_4/sells_leather_boots_agility",
     "terrainlab:leatherworker/level_4/sells_leather_boots_agility_feather_falling",
-    "terrainlab:leatherworker/level_4/sells_leather_boots_frost_walker_unbreaking",
+    "terrainlab:leatherworker/level_4/sells_leather_boots_unbreaking",
     "terrainlab:leatherworker/level_4/sells_leather_boots_depth_strider_unbreaking",
-    "terrainlab:leatherworker/level_4/sells_leather_boots_feather_falling_unbreaking",
-    "terrainlab:leatherworker/level_4/sells_leather_boots_depth_strider_agility",
-    "terrainlab:leatherworker/level_4/sells_leather_boots_frost_walker_feather_falling",
-    "terrainlab:leatherworker/level_4/sells_leather_boots_"
+    "terrainlab:leatherworker/level_4/sells_leather_boots_feather_falling",
+    "terrainlab:leatherworker/level_4/sells_leather_boots_depth_strider",
+    "terrainlab:leatherworker/level_4/sells_leather_boots_feather_falling_unbreaking"
   ]
 }

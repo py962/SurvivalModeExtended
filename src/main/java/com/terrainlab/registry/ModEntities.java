@@ -45,9 +45,12 @@ public class ModEntities {
                     EntityType.Builder.<OversizedMapFrameEntity>of(
                                     OversizedMapFrameEntity::new,
                                     MobCategory.MISC)
+                            .noLootTable()
                             .sized(0.5F, 0.5F)
+                            .eyeHeight(0.0F)
                             .clientTrackingRange(10)
-                            .updateInterval(10)
+                            .noUpdateInterval()
+                            .dontTrackDeltas()
                             .build(net.minecraft.resources.ResourceKey.create(
                                     Registries.ENTITY_TYPE, id)));
 
@@ -57,9 +60,12 @@ public class ModEntities {
                     EntityType.Builder.<OversizedMapFrameEntity>of(
                                     OversizedMapFrameEntity::new,
                                     MobCategory.MISC)
+                            .noLootTable()
                             .sized(0.5F, 0.5F)
+                            .eyeHeight(0.0F)
                             .clientTrackingRange(10)
-                            .updateInterval(10)
+                            .noUpdateInterval()
+                            .dontTrackDeltas()
                             .build(net.minecraft.resources.ResourceKey.create(
                                     Registries.ENTITY_TYPE, id)));
 
@@ -142,6 +148,8 @@ public class ModEntities {
                                     CaribouEntity::new,
                                     MobCategory.CREATURE)
                             .sized(0.9F, 1.87F)
+                            // Head centre is ~1.25 blocks up (cow-like stance); the 1.87 height is antlers.
+                            .eyeHeight(1.4F)
                             .build(net.minecraft.resources.ResourceKey.create(
                                     Registries.ENTITY_TYPE, id)));
 
@@ -171,7 +179,10 @@ public class ModEntities {
                     EntityType.Builder.<com.terrainlab.entity.ElephantEntity>of(
                                     com.terrainlab.entity.ElephantEntity::new,
                                     MobCategory.CREATURE)
-                            .sized(5.3F, 4.0F)
+                            // Matches the model's body: 2-block-wide trunk plus ears, ~4 blocks long
+                            // (a square box can't follow the length), back at 3.75, head top 4.1.
+                            .sized(3.2F, 3.9F)
+                            .eyeHeight(3.4F)
                             .build(net.minecraft.resources.ResourceKey.create(
                                     Registries.ENTITY_TYPE, id)));
 

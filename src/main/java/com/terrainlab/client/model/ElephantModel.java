@@ -6,6 +6,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.MeshTransformer;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.entity.state.CamelRenderState;
 import net.minecraft.util.Mth;
@@ -44,6 +45,11 @@ public class ElephantModel extends EntityModel<CamelRenderState> {
         this.frontRightLeg = this.body.getChild("front_right_leg");
         this.backLeftLeg = this.body.getChild("back_left_leg");
         this.backRightLeg = this.body.getChild("back_right_leg");
+    }
+
+    /** Calf: the adult mesh scaled to ElephantEntity.BABY_SCALE (feet kept on the ground), matching its hitbox. */
+    public static LayerDefinition createBabyLayer() {
+        return createBodyLayer().apply(MeshTransformer.scaling(com.terrainlab.entity.ElephantEntity.BABY_SCALE));
     }
 
     public static LayerDefinition createBodyLayer() {

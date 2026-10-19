@@ -64,6 +64,11 @@ public class VillageSavedData extends SavedData {
         return records.computeIfAbsent(id, k -> new VillageRecord());
     }
 
+    /** The record for a village if one exists, without creating it. */
+    public java.util.Optional<VillageRecord> find(VillageId id) {
+        return java.util.Optional.ofNullable(records.get(id));
+    }
+
     public Set<VillageId> knownVillageIds() {
         return records.keySet();
     }

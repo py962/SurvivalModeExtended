@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * An unhappy villager thinks less of every player: -5 reputation for each discomfort it currently
- * has (cold or hot, fearful, tired, trapped, hungry), read from its mood flags. Applied live on top
+ * has (cold or hot, fearful, tired, trapped, hungry, injured), read from its mood flags. Applied live on top
  * of gossip, so it raises that villager's prices only while the problem lasts and stores nothing.
  */
 @Mixin(Villager.class)

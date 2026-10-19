@@ -21,6 +21,8 @@ public class ModModelLayers {
 
     public static final ModelLayerLocation CARIBOU = new ModelLayerLocation(
             Identifier.fromNamespaceAndPath(TerrainLab.MODID, "caribou"), "main");
+    public static final ModelLayerLocation CARIBOU_BABY = new ModelLayerLocation(
+            Identifier.fromNamespaceAndPath(TerrainLab.MODID, "caribou_baby"), "main");
 
     // Adult goat with the extra "body_fluff" part; babies reuse vanilla's GOAT_BABY layer.
     public static final ModelLayerLocation GOAT = new ModelLayerLocation(
@@ -40,6 +42,8 @@ public class ModModelLayers {
 
     public static final ModelLayerLocation ELEPHANT = new ModelLayerLocation(
             Identifier.fromNamespaceAndPath(TerrainLab.MODID, "elephant"), "main");
+    public static final ModelLayerLocation ELEPHANT_BABY = new ModelLayerLocation(
+            Identifier.fromNamespaceAndPath(TerrainLab.MODID, "elephant_baby"), "main");
 
     // Fur cloak body mesh, rendered through Curios.
     public static final ModelLayerLocation FUR_CLOAK = new ModelLayerLocation(

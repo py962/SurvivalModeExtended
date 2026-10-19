@@ -82,6 +82,7 @@ public class VillageInfoMenu extends AbstractContainerMenu {
             buf.writeBoolean(row.tired());
             buf.writeBoolean(row.trapped());
             buf.writeBoolean(row.hungry());
+            buf.writeBoolean(row.injured());
             buf.writeUtf(row.thermalState().name());
         }
     }
@@ -107,6 +108,7 @@ public class VillageInfoMenu extends AbstractContainerMenu {
             boolean tired = buf.readBoolean();
             boolean trapped = buf.readBoolean();
             boolean hungry = buf.readBoolean();
+            boolean injured = buf.readBoolean();
 
             VillagerThermalState thermalState =
                     VillagerThermalState.valueOf(buf.readUtf());
@@ -118,6 +120,7 @@ public class VillageInfoMenu extends AbstractContainerMenu {
                     tired,
                     trapped,
                     hungry,
+                    injured,
                     thermalState
             ));
         }

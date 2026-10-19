@@ -98,6 +98,24 @@
       "terrainlab:entity/elephant/death"
     ]
   },
+  "elephant.trumpet": {
+    "subtitle": "subtitles.entity.elephant.trumpet",
+    "sounds": [
+      "terrainlab:entity/elephant/trumpet"
+    ]
+  },
+  "elephant.baby_ambient": {
+    "subtitle": "subtitles.entity.elephant.baby_ambient",
+    "sounds": [
+      "terrainlab:entity/elephant/baby_ambient"
+    ]
+  },
+  "elephant.baby_hurt": {
+    "subtitle": "subtitles.entity.elephant.baby_hurt",
+    "sounds": [
+      "terrainlab:entity/elephant/baby_hurt"
+    ]
+  },
   "caribou.ambient": {
     "subtitle": "subtitles.entity.caribou.ambient",
     "sounds": [
@@ -114,6 +132,18 @@
     "subtitle": "subtitles.entity.caribou.death",
     "sounds": [
       "terrainlab:entity/caribou/death"
+    ]
+  },
+  "caribou.baby_ambient": {
+    "subtitle": "subtitles.entity.caribou.baby_ambient",
+    "sounds": [
+      "terrainlab:entity/caribou/baby_ambient"
+    ]
+  },
+  "caribou.baby_hurt": {
+    "subtitle": "subtitles.entity.caribou.baby_hurt",
+    "sounds": [
+      "terrainlab:entity/caribou/baby_hurt"
     ]
   },
   "caribou.herd_ambience": {
@@ -293,6 +323,26 @@
         "name": "minecraft:mob/villager/idle3",
         "pitch": 1.5,
         "volume": 0.7
+      }
+    ]
+  },
+  "villager.mood.injured": {
+    "subtitle": "subtitles.terrainlab.villager.mood.injured",
+    "sounds": [
+      {
+        "name": "minecraft:mob/villager/haggle1",
+        "pitch": 0.5,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:mob/villager/haggle3",
+        "pitch": 0.5,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:mob/villager/no2",
+        "pitch": 0.55,
+        "volume": 0.75
       }
     ]
   },

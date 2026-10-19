@@ -41,12 +41,18 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> ELEPHANT_AMBIENT = register("elephant.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> ELEPHANT_HURT = register("elephant.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> ELEPHANT_DEATH = register("elephant.death");
+    // Played when a ridden elephant starts its dash (charge).
+    public static final DeferredHolder<SoundEvent, SoundEvent> ELEPHANT_TRUMPET = register("elephant.trumpet");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ELEPHANT_BABY_AMBIENT = register("elephant.baby_ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ELEPHANT_BABY_HURT = register("elephant.baby_hurt");
     // TODO: ELEPHANT_STEP once a footstep sound exists.
 
     // Caribou
     public static final DeferredHolder<SoundEvent, SoundEvent> CARIBOU_AMBIENT = register("caribou.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> CARIBOU_HURT = register("caribou.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> CARIBOU_DEATH = register("caribou.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CARIBOU_BABY_AMBIENT = register("caribou.baby_ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CARIBOU_BABY_HURT = register("caribou.baby_hurt");
     // Distant herd ambience (bells, grunting), not an individual mob's idle sound.
     public static final DeferredHolder<SoundEvent, SoundEvent> CARIBOU_HERD_AMBIENCE = register("caribou.herd_ambience");
     // TODO: CARIBOU_STEP once a footstep sound exists.
@@ -71,6 +77,7 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> VILLAGER_MOOD_TIRED = register("villager.mood.tired");
     public static final DeferredHolder<SoundEvent, SoundEvent> VILLAGER_MOOD_TRAPPED = register("villager.mood.trapped");
     public static final DeferredHolder<SoundEvent, SoundEvent> VILLAGER_MOOD_FEARFUL = register("villager.mood.fearful");
+    public static final DeferredHolder<SoundEvent, SoundEvent> VILLAGER_MOOD_INJURED = register("villager.mood.injured");
 
     // Celestial Forge: ritual synth loop (20 s) and the transform swell ending in a low boom.
     public static final DeferredHolder<SoundEvent, SoundEvent> CELESTIAL_FORGE_RITUAL = register("block.celestial_forge.ritual");

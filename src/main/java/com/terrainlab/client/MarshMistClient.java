@@ -166,10 +166,9 @@ public final class MarshMistClient {
         heightFactor += (heightTarget - heightFactor) * 0.1F;
         exposure += (exposureTarget - exposure) * 0.1F;
 
-        // FIX: approach the actual solar-time factor.
-        // Do not multiply the existing value by the target:
-        // timeFactor starts at zero, so multiplication would
-        // leave it permanently at zero.
+        // Ease timeFactor toward the current solar-time factor.
+        // This is an additive approach (not a multiply), so it can
+        // rise from its initial value of zero.
         float timeTarget = overworld
                 ? timeOfDayFactor(SolarTime.solarTimeOfDay(level))
                 : 0.0F;

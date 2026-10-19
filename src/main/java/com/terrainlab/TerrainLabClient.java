@@ -152,12 +152,16 @@ public class TerrainLabClient {
                 GhostFishModel::createBodyLayer);
         event.registerLayerDefinition(ModModelLayers.CARIBOU,
                 CaribouModel::createBodyLayer);
+        event.registerLayerDefinition(ModModelLayers.CARIBOU_BABY,
+                CaribouModel::createBabyLayer);
         event.registerLayerDefinition(ModModelLayers.GOAT,
                 TerrainLabGoatModel::createBodyLayer);
         event.registerLayerDefinition(ModModelLayers.OWL,
                 OwlModel::createBodyLayer);
         event.registerLayerDefinition(ModModelLayers.ELEPHANT,
                 ElephantModel::createBodyLayer);
+        event.registerLayerDefinition(ModModelLayers.ELEPHANT_BABY,
+                ElephantModel::createBabyLayer);
         event.registerLayerDefinition(ModModelLayers.GOOSE,
                 GooseModel::createBodyLayer);
         event.registerLayerDefinition(ModModelLayers.VULTURE,

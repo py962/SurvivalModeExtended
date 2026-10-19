@@ -17,7 +17,8 @@ import java.util.Map;
 /**
  * Daily village cycle.
  * <ul>
- *   <li>Hourly while the sun is up: a happiness sample per village.</li>
+ *   <li>Hourly while the sun is up: a happiness sample per village, and the village food chest
+ *       is ensured next to each bell (also at sunset; see VillageChestService).</li>
  *   <li>At solar sunset: the hunger and tier checks (using the day's
  *       average happiness), then the nightly bonus for the top two tiers
  *       is banked and all banked bell XP is released at the bell.</li>
@@ -75,6 +76,8 @@ public final class VillageDailyTickHandler {
                 VillageMembershipService.assignVillagersToNearestVillage(level, bells);
         long now = level.getGameTime();
         for (BlockPos bell : bells) {
+            // Every discovered village gets its food chest (placed once; re-placed if broken).
+            VillageChestService.ensureChest(level, bell);
             List<Villager> members = membership.getOrDefault(bell, List.of());
             if (!members.isEmpty()) {
                 saved.getOrCreate(new VillageId(level.dimension(), bell))
@@ -97,6 +100,7 @@ public final class VillageDailyTickHandler {
         for (BlockPos bell : bells) {
             VillageId id = new VillageId(level.dimension(), bell);
             VillageRecord record = saved.getOrCreate(id);
+            VillageChestService.ensureChest(level, bell);
             if (record.getLastCheckedDay() != solarDay) {
                 List<Villager> members = membership.getOrDefault(bell, List.of());
                 VillageHungerService.runDailyCheck(level, id, members);

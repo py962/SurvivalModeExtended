@@ -42,6 +42,17 @@ public final class VillagerThermalService {
 
         double combinedTemp = ambientTemp + WaterImmersionEffect.coolingContribution(wetness);
 
+        // Warming/cooling food from the village chest: a timed offset that decays linearly to 0.
+        VillagerFoodTempOffset foodOffset = villager.getData(ModAttachments.VILLAGER_FOOD_TEMP_OFFSET.get());
+        if (foodOffset.offset() != 0.0F) {
+            long now = level.getGameTime();
+            if (now >= foodOffset.endTick()) {
+                villager.setData(ModAttachments.VILLAGER_FOOD_TEMP_OFFSET.get(), VillagerFoodTempOffset.NONE);
+            } else {
+                combinedTemp += foodOffset.currentAt(now);
+            }
+        }
+
         // A Shield conduit in range holds the villager at a comfortable temperature.
         if (CelestialConduitRegistry.get(level).hasActiveNearby(CelestialVariant.SHIELD, level.dimension(), pos)) {
             combinedTemp = VillageConstants.THERMAL_SHIELD_COMFORT_C;

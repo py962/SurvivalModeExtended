@@ -7,10 +7,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemFrameItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.GameEvent;
 
 public class OversizedMapFrameItem extends ItemFrameItem {
 
@@ -47,6 +50,8 @@ public class OversizedMapFrameItem extends ItemFrameItem {
         Level level = context.getLevel();
         BlockPos wallAnchor = context.getClickedPos();
         Direction facing = context.getClickedFace();
+        Player player = context.getPlayer();
+        ItemStack itemInHand = context.getItemInHand();
 
         // Item frames must face horizontally away from a wall.
         if (!facing.getAxis().isHorizontal()) {
@@ -57,6 +62,12 @@ public class OversizedMapFrameItem extends ItemFrameItem {
         // 2x2 = bottom-left; 3x3 = centre.
         BlockPos entityPos = wallAnchor.relative(facing);
 
+        // Vanilla ItemFrameItem checks: build height and mayUseItemAt.
+        if (player != null
+                && !mayPlace(player, facing, itemInHand, entityPos)) {
+            return InteractionResult.FAIL;
+        }
+
         OversizedMapFrameEntity frame = new OversizedMapFrameEntity(
                 entityTypeForSize(size),
                 level,
@@ -64,7 +75,23 @@ public class OversizedMapFrameItem extends ItemFrameItem {
                 facing
         );
 
-        // Checks the complete footprint, wall support and vanilla coexistence.
+        // The whole footprint must also be inside the build height.
+        int footprintStart = frame.getFootprintStart();
+
+        if (!level.isInsideBuildHeight(entityPos.above(footprintStart))
+                || !level.isInsideBuildHeight(
+                entityPos.above(footprintStart + size - 1))) {
+            return InteractionResult.FAIL;
+        }
+
+        // Copy custom name / entity data from the item, as vanilla does.
+        EntityType.<OversizedMapFrameEntity>createDefaultStackConfig(
+                level,
+                itemInHand,
+                player
+        ).apply(frame);
+
+        // Checks the complete footprint, wall support and overlap.
         if (!frame.survives()) {
             return InteractionResult.FAIL;
         }
@@ -74,13 +101,15 @@ public class OversizedMapFrameItem extends ItemFrameItem {
             return InteractionResult.SUCCESS;
         }
 
+        frame.playPlacementSound();
+        level.gameEvent(player, GameEvent.ENTITY_PLACE, frame.position());
+
         if (!level.addFreshEntity(frame)) {
             return InteractionResult.FAIL;
         }
 
-        if (context.getPlayer() == null
-                || !context.getPlayer().getAbilities().instabuild) {
-            context.getItemInHand().shrink(1);
+        if (player == null || !player.getAbilities().instabuild) {
+            itemInHand.shrink(1);
         }
 
         return InteractionResult.SUCCESS;

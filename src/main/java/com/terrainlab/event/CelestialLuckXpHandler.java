@@ -13,10 +13,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -26,8 +27,8 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
-import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockGrowFeatureEvent;
@@ -56,6 +57,7 @@ public final class CelestialLuckXpHandler {
     private static final int ANIMAL_MATURE_XP = 10;
 
     private static final long PLANT_REWARD_COOLDOWN_TICKS = 24_000L;
+    private static final int PLANT_REWARD_CLEANUP_INTERVAL_TICKS = 1_200;
 
     private static final int KILL_EXCLUSION_RADIUS = 3;
     private static final int KILL_EXCLUSION_TICKS = 2;
@@ -152,8 +154,9 @@ public final class CelestialLuckXpHandler {
     }
 
     /*
-     * Shared reward method used by the existing goat and caribou
-     * shearing implementations after they successfully drop fur.
+     * Shared reward method used by the sheep, goat and caribou
+     * shearing paths after they successfully drop wool/fur.
+     * Shearing XP is awarded everywhere; no Luck Conduit is required.
      */
     public static void awardShearingXp(
             ServerLevel level,
@@ -285,8 +288,8 @@ public final class CelestialLuckXpHandler {
         if (!(event.getTarget() instanceof Sheep sheep)
                 || !(event.getLevel() instanceof ServerLevel level)
                 || !event.getItemStack().is(Items.SHEARS)
-                || sheep.isSheared()
-                || !hasLuckConduit(level, sheep.blockPosition())) {
+                || sheep.isSheared()) {
+            // Shearing XP applies everywhere, like goats and caribou.
             return;
         }
 
@@ -341,13 +344,9 @@ public final class CelestialLuckXpHandler {
 
         long now = level.getGameTime();
 
-        plantRewards.values().removeIf(
-                tick -> now - tick > PLANT_REWARD_COOLDOWN_TICKS
-        );
-
         PlantSpot spot = new PlantSpot(level.dimension(), pos);
 
-        if (plantRewards.putIfAbsent(spot, now) != null) {
+        if (!claimPlantReward(spot, now)) {
             return;
         }
 
@@ -360,6 +359,23 @@ public final class CelestialLuckXpHandler {
                     pos
             );
         }
+    }
+
+    /*
+     * Returns true (and records the reward) if this spot has not been
+     * rewarded within the cooldown. Expired entries are purged
+     * periodically from onServerTick rather than on every reward.
+     */
+    private static boolean claimPlantReward(PlantSpot spot, long now) {
+        Long previous = plantRewards.get(spot);
+
+        if (previous != null
+                && now - previous <= PLANT_REWARD_COOLDOWN_TICKS) {
+            return false;
+        }
+
+        plantRewards.put(spot, now);
+        return true;
     }
 
     private static IntegerProperty findAgeProperty(BlockState state) {
@@ -421,6 +437,20 @@ public final class CelestialLuckXpHandler {
     public static void onServerTick(ServerTickEvent.Post event) {
         MinecraftServer server = event.getServer();
 
+        if (!plantRewards.isEmpty()
+                && server.getTickCount()
+                % PLANT_REWARD_CLEANUP_INTERVAL_TICKS == 0) {
+            plantRewards.entrySet().removeIf(entry -> {
+                ServerLevel level = server.getLevel(
+                        entry.getKey().dimension()
+                );
+
+                return level == null
+                        || level.getGameTime() - entry.getValue()
+                        > PLANT_REWARD_COOLDOWN_TICKS;
+            });
+        }
+
         Iterator<PendingSheepShear> sheepIterator =
                 pendingSheepShears.iterator();
 
@@ -478,16 +508,12 @@ public final class CelestialLuckXpHandler {
 
             long now = level.getGameTime();
 
-            plantRewards.values().removeIf(
-                    tick -> now - tick > PLANT_REWARD_COOLDOWN_TICKS
-            );
-
             PlantSpot spot = new PlantSpot(
                     level.dimension(),
                     pending.pos()
             );
 
-            if (plantRewards.putIfAbsent(spot, now) != null) {
+            if (!claimPlantReward(spot, now)) {
                 continue;
             }
 
@@ -559,7 +585,9 @@ public final class CelestialLuckXpHandler {
     }
 
     /*
-     * Track baby ageable mobs when they enter the world.
+     * Track baby animals when they enter the world. This also covers
+     * bred offspring (added via addFreshEntity) and babies reloaded
+     * from disk. Spawn-egg babies are not tracked.
      */
     @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
@@ -567,22 +595,26 @@ public final class CelestialLuckXpHandler {
             return;
         }
 
-        if (event.getEntity() instanceof AgeableMob animal
-                && animal.isBaby()) {
+        if (event.getEntity() instanceof Animal animal
+                && animal.isBaby()
+                && animal.getSpawnType()
+                != EntitySpawnReason.SPAWN_ITEM_USE) {
             trackedBabyAnimals.add(animal.getUUID());
         }
     }
 
     /*
-     * Also track newborn animals created through breeding.
+     * Stop tracking babies that die, unload or change dimension.
+     * They are re-tracked by onEntityJoin if they come back as babies.
      */
     @SubscribeEvent
-    public static void onBreed(BabyEntitySpawnEvent event) {
-        AgeableMob child = event.getChild();
-
-        if (child != null && child.isBaby()) {
-            trackedBabyAnimals.add(child.getUUID());
+    public static void onEntityLeave(EntityLeaveLevelEvent event) {
+        if (event.getLevel().isClientSide()
+                || !(event.getEntity() instanceof Animal)) {
+            return;
         }
+
+        trackedBabyAnimals.remove(event.getEntity().getUUID());
     }
 
     /*
@@ -591,7 +623,7 @@ public final class CelestialLuckXpHandler {
      */
     @SubscribeEvent
     public static void onAnimalTick(EntityTickEvent.Post event) {
-        if (!(event.getEntity() instanceof AgeableMob animal)
+        if (!(event.getEntity() instanceof Animal animal)
                 || animal.level().isClientSide()
                 || !trackedBabyAnimals.contains(animal.getUUID())) {
             return;

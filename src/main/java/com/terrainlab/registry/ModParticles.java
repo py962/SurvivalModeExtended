@@ -29,6 +29,8 @@ public final class ModParticles {
             PARTICLE_TYPES.register("villager_tired", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> VILLAGER_HUNGRY =
             PARTICLE_TYPES.register("villager_hungry", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> VILLAGER_INJURED =
+            PARTICLE_TYPES.register("villager_injured", () -> new SimpleParticleType(false));
 
     // Sandstorm grains and dust clouds, tinted per biome by SandstormParticle's provider.
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SANDSTORM_GRAIN =

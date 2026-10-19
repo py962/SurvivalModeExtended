@@ -78,7 +78,8 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
     private static Component villageTitle(
             VillageInfoSnapshot.Snapshot snapshot
     ) {
-        String title = switch (snapshot.villageType()) {
+        String type = snapshot.villageType();
+        String fallback = switch (type) {
             case "plains" -> "Plains Village";
             case "desert" -> "Desert Village";
             case "savanna" -> "Savanna Village";
@@ -86,10 +87,20 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
             case "taiga" -> "Taiga Village";
             case "jungle" -> "Jungle Village";
             case "swamp" -> "Swamp Village";
-            default -> "Village";
+            default -> null;
         };
 
-        return Component.literal(title);
+        if (fallback == null) {
+            return Component.translatableWithFallback(
+                    "gui.terrainlab.village_info.title",
+                    "Village"
+            );
+        }
+
+        return Component.translatableWithFallback(
+                "gui.terrainlab.village_info.title." + type,
+                fallback
+        );
     }
 
     @Override
@@ -650,6 +661,9 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
         if (row.scared()) {
             parts.add("Scared");
         }
+        if (row.injured()) {
+            parts.add("Injured");
+        }
         if (row.tired()) {
             parts.add("Tired");
         }
@@ -672,6 +686,9 @@ public class VillageInfoScreen extends AbstractContainerScreen<VillageInfoMenu> 
     private static int statusColor(VillageInfoSnapshot.Row row) {
         if (row.scared()) {
             return 0xFFFF5555;
+        }
+        if (row.injured()) {
+            return 0xFFE03C3C;
         }
         if (row.tired()) {
             return 0xFFFFAA00;

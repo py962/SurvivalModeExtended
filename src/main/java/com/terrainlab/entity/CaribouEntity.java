@@ -3,6 +3,7 @@
 
 import com.terrainlab.event.CelestialLuckXpHandler;
 import com.terrainlab.registry.ModAttachments;
+import com.terrainlab.registry.ModEntities;
 import com.terrainlab.registry.ModItems;
 import com.terrainlab.registry.ModSounds;
 
@@ -14,10 +15,12 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.animal.equine.Llama;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import org.jspecify.annotations.Nullable;
 
 public class CaribouEntity extends Llama {
 
@@ -45,16 +49,35 @@ public class CaribouEntity extends Llama {
         // No-op: caribou never spit.
     }
 
+    /**
+     * Bred calves are caribou (Llama#getBreedOffspring then copies strength and variant from
+     * the parents). Crossbreeding with llamas is blocked by LlamaCaribouMateMixin.
+     */
+    @Override
+    protected @Nullable Llama makeNewLlama() {
+        return ModEntities.CARIBOU.get().create(this.level(), EntitySpawnReason.BREEDING);
+    }
+
+    /**
+     * Calves are the caribou box (and eye height) at half size. Llama's own baby size is built
+     * from the llama's eye height, which would put a calf's eyes above its head.
+     */
+    @Override
+    public EntityDimensions getDefaultDimensions(Pose pose) {
+        EntityDimensions adult = this.getType().getDimensions();
+        return this.isBaby() ? adult.scale(this.getAgeScale()) : adult;
+    }
+
     @Override
     protected SoundEvent getAmbientSound() {
-        return ModSounds.CARIBOU_AMBIENT.get();
+        return this.isBaby() ? ModSounds.CARIBOU_BABY_AMBIENT.get() : ModSounds.CARIBOU_AMBIENT.get();
     }
 
     @Override
     protected SoundEvent getHurtSound(
             net.minecraft.world.damagesource.DamageSource damageSource
     ) {
-        return ModSounds.CARIBOU_HURT.get();
+        return this.isBaby() ? ModSounds.CARIBOU_BABY_HURT.get() : ModSounds.CARIBOU_HURT.get();
     }
 
     @Override
@@ -133,7 +156,7 @@ public class CaribouEntity extends Llama {
                     1.0F
             );
 
-            // Award 2 XP after successful shearing, if within a Luck Conduit.
+            // Award shearing XP after successful shearing (applies everywhere).
             if (level() instanceof ServerLevel serverLevel) {
                 CelestialLuckXpHandler.awardShearingXp(
                         serverLevel,
