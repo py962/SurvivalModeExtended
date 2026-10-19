@@ -16,6 +16,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.damagesource.DamageTypes;
+import com.terrainlab.network.DeathOptionsPacket;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,6 +35,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.enchanting.GetEnchantmentLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -585,16 +589,11 @@ public class CelestialEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerDeath(LivingDeathEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) {
-            return;
-        }
+    /** Which Death-conduit options a death at the player's current position qualifies for. */
+    private record DeathEligibility(boolean conduitEligible, boolean amuletEligible) {
+    }
 
-        if (!(player.level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-
+    private static DeathEligibility computeDeathEligibility(ServerPlayer player, ServerLevel serverLevel) {
         boolean hasActiveDeathAmulet = CuriosCompat.findStack(
                         player,
                         "necklace",
@@ -641,11 +640,57 @@ public class CelestialEventHandler {
 
         // Respawning at a Death conduit: from anywhere with an active Death amulet, otherwise only
         // when the death happened within an active Death conduit's range.
-        DeathRespawnManager.captureDeath(
-                player,
+        return new DeathEligibility(
                 hasActiveDeathAmulet ? anyActiveDeathConduit : diedNearActiveDeathConduit,
                 hasActiveDeathAmulet || diedNearActiveDeathConduit
         );
+    }
+
+    /**
+     * Hardcore worlds: a death that would have qualified for a Death-conduit respawn is prevented
+     * instead, at the cost of 100 levels. Runs first so that, when cancelled, no other listener
+     * (including {@link #onPlayerDeath}) treats it as a death; LivingDeathEvent fires at the top of
+     * ServerPlayer.die, before the death message, drops and XP. A totem of undying is checked by
+     * vanilla before die() and so still takes precedence.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onHardcorePlayerDeath(LivingDeathEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)
+                || !(player.level() instanceof ServerLevel serverLevel)
+                || !serverLevel.getServer().isHardcore()
+                || player.isSpectator()
+                // /kill is final, as it is for a totem.
+                || event.getSource().is(DamageTypes.GENERIC_KILL)) {
+            return;
+        }
+
+        DeathEligibility eligibility = computeDeathEligibility(player, serverLevel);
+        if (DeathRespawnManager.tryHardcoreRescue(player, eligibility.conduitEligible())) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerDeath(LivingDeathEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+
+        if (!(player.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        // Hardcore has no respawn choice: the Death conduit acts before death instead
+        // (onHardcorePlayerDeath), so neither option is offered there.
+        DeathEligibility eligibility = serverLevel.getServer().isHardcore()
+                ? new DeathEligibility(false, false)
+                : computeDeathEligibility(player, serverLevel);
+
+        DeathRespawnManager.captureDeath(player, eligibility.conduitEligible(), eligibility.amuletEligible());
+        // Tell the client which death-screen buttons to show. Sent before vanilla's
+        // ClientboundPlayerCombatKillPacket, which opens the DeathScreen.
+        PacketDistributor.sendToPlayer(player,
+                new DeathOptionsPacket(eligibility.conduitEligible(), eligibility.amuletEligible()));
     }
 
     @SubscribeEvent

@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
@@ -16,6 +17,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -109,7 +111,10 @@ public final class DeathRespawnManager {
     }
 
     public static void chooseConduitRespawn(UUID playerId) {
-        if (pendingCaptures.containsKey(playerId)) {
+        DeathCapture capture = pendingCaptures.get(playerId);
+        if (capture != null && !capture.conduitEligible()) {
+            if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: {} clicked 'Respawn at Death Conduit' but it was not available - ignored", playerId);
+        } else if (capture != null) {
             pendingChoice.put(playerId, Choice.CONDUIT);
             if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: {} chose 'Respawn at Death Conduit'", playerId);
         } else if (CelestialDebug.VERBOSE) {
@@ -118,7 +123,10 @@ public final class DeathRespawnManager {
     }
 
     public static void choosePickLocation(UUID playerId) {
-        if (pendingCaptures.containsKey(playerId)) {
+        DeathCapture capture = pendingCaptures.get(playerId);
+        if (capture != null && !capture.amuletEligible()) {
+            if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: {} chose spectator picking but it was not available - ignored", playerId);
+        } else if (capture != null) {
             pendingChoice.put(playerId, Choice.PICK);
             if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: {} chose spectator picking", playerId);
         } else if (CelestialDebug.VERBOSE) {
@@ -152,27 +160,109 @@ public final class DeathRespawnManager {
             return;
         }
 
-        var server = serverOf(player);
-        ServerLevel lookupLevel = server.getLevel(capture.loc().dimension());
-        if (lookupLevel == null) lookupLevel = server.overworld();
-        var record = CelestialConduitRegistry.get(lookupLevel)
-                .findNearestActive(CelestialVariant.DEATH, capture.loc().dimension(), capture.loc().pos());
-        if (record.isEmpty()) {
-            if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: respawn position for {} - no active Death conduit any more, vanilla placement", player.getName().getString());
+        Optional<ConduitSpot> spot = findConduitRespawnSpot(serverOf(player), capture.loc().dimension(), capture.loc().pos());
+        if (spot.isEmpty()) {
+            if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: respawn position for {} - no usable active Death conduit any more, vanilla placement", player.getName().getString());
             return;
         }
-        ServerLevel destLevel = server.getLevel(record.get().dimension());
-        if (destLevel == null) {
-            if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: respawn position for {} - conduit dimension {} not loaded, vanilla placement",
-                    player.getName().getString(), record.get().dimension().identifier());
-            return;
-        }
-        Vec3 spot = safeSpotAbove(destLevel, record.get().pos());
-        event.setTeleportTransition(new TeleportTransition(destLevel, spot, Vec3.ZERO,
+        event.setTeleportTransition(new TeleportTransition(spot.get().level(), spot.get().pos(), Vec3.ZERO,
                 player.getYRot(), player.getXRot(), TeleportTransition.DO_NOTHING));
         conduitRespawnApplied.put(id, true);
         if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: respawn position for {} set to Death conduit {} {} -> {}",
-                player.getName().getString(), destLevel.dimension().identifier(), record.get().pos(), spot);
+                player.getName().getString(), spot.get().level().dimension().identifier(), spot.get().conduitPos(), spot.get().pos());
+    }
+
+    /** Where a Death-conduit respawn (or hardcore rescue) puts the player. */
+    public record ConduitSpot(ServerLevel level, Vec3 pos, BlockPos conduitPos) {
+    }
+
+    /**
+     * The respawn spot above the active Death conduit nearest to {@code fromPos}, preferring
+     * {@code fromDim} and falling back to other dimensions. Empty if none is active or its
+     * dimension is not loaded.
+     */
+    public static Optional<ConduitSpot> findConduitRespawnSpot(MinecraftServer server, ResourceKey<Level> fromDim, BlockPos fromPos) {
+        ServerLevel lookupLevel = server.getLevel(fromDim);
+        if (lookupLevel == null) lookupLevel = server.overworld();
+        var record = CelestialConduitRegistry.get(lookupLevel)
+                .findNearestActive(CelestialVariant.DEATH, fromDim, fromPos);
+        if (record.isEmpty()) {
+            return Optional.empty();
+        }
+        ServerLevel destLevel = server.getLevel(record.get().dimension());
+        if (destLevel == null) {
+            if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: Death conduit dimension {} not loaded",
+                    record.get().dimension().identifier());
+            return Optional.empty();
+        }
+        return Optional.of(new ConduitSpot(destLevel, safeSpotAbove(destLevel, record.get().pos()), record.get().pos()));
+    }
+
+    /** Experience levels a hardcore rescue costs. */
+    public static final int HARDCORE_RESCUE_LEVEL_COST = 100;
+
+    /**
+     * Hardcore worlds only, called at the start of LivingDeathEvent: if the death would have
+     * qualified for a Death-conduit respawn and the player has enough levels, prevents it, charges
+     * {@link #HARDCORE_RESCUE_LEVEL_COST} levels and teleports the player to the conduit's respawn
+     * spot. Returns true when the death was prevented (the caller cancels the event).
+     */
+    public static boolean tryHardcoreRescue(ServerPlayer player, boolean conduitEligible) {
+        if (!conduitEligible || player.experienceLevel < HARDCORE_RESCUE_LEVEL_COST) {
+            if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: hardcore rescue for {} not possible - eligible={} levels={}",
+                    player.getName().getString(), conduitEligible, player.experienceLevel);
+            return false;
+        }
+        ServerLevel fromLevel = (ServerLevel) player.level();
+        Optional<ConduitSpot> spot = findConduitRespawnSpot(serverOf(player), fromLevel.dimension(), player.blockPosition());
+        if (spot.isEmpty()) {
+            return false;
+        }
+
+        int levelsBefore = player.experienceLevel;
+        player.giveExperienceLevels(-HARDCORE_RESCUE_LEVEL_COST);
+        if (player.experienceLevel != levelsBefore - HARDCORE_RESCUE_LEVEL_COST) {
+            // Another mod changed or cancelled the level change: put it back and let the death happen.
+            player.setExperienceLevels(levelsBefore);
+            return false;
+        }
+
+        Vec3 from = player.position();
+        playRescueEffects(fromLevel, from, net.minecraft.sounds.SoundEvents.ENDERMAN_TELEPORT);
+
+        player.stopRiding();
+        player.setHealth(player.getMaxHealth() / 2.0F);
+        player.clearFire();
+        player.resetFallDistance();
+        player.setDeltaMovement(Vec3.ZERO);
+        for (var effect : java.util.List.copyOf(player.getActiveEffects())) {
+            if (effect.getEffect().value().getCategory() == net.minecraft.world.effect.MobEffectCategory.HARMFUL) {
+                player.removeEffect(effect.getEffect());
+            }
+        }
+
+        ConduitSpot dest = spot.get();
+        teleportPlayer(player, dest.level(), dest.pos(), player.getYRot(), player.getXRot());
+        player.resetFallDistance();
+        player.setDeltaMovement(Vec3.ZERO);
+        // A few seconds of full invulnerability on arrival (set after the teleport, which may reset it).
+        player.setInvulnerableTime(60);
+        playRescueEffects(dest.level(), dest.pos(), net.minecraft.sounds.SoundEvents.RESPAWN_ANCHOR_SET_SPAWN);
+
+        player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("message.terrainlab.death.conduit_rescue")
+                .withStyle(net.minecraft.ChatFormatting.DARK_PURPLE), true);
+        if (CelestialDebug.VERBOSE) CelestialDebug.log("DEATH: hardcore rescue - {} saved at {} {}, moved to Death conduit {} {} ({} -> {} levels)",
+                player.getName().getString(), fromLevel.dimension().identifier(), BlockPos.containing(from),
+                dest.level().dimension().identifier(), dest.conduitPos(), levelsBefore, player.experienceLevel);
+        return true;
+    }
+
+    private static void playRescueEffects(ServerLevel level, Vec3 pos, net.minecraft.sounds.SoundEvent sound) {
+        level.playSound(null, pos.x, pos.y, pos.z, sound, net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.REVERSE_PORTAL,
+                pos.x, pos.y + 1.0, pos.z, 60, 0.4, 0.9, 0.4, 0.05);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL,
+                pos.x, pos.y + 1.0, pos.z, 80, 0.5, 1.0, 0.5, 0.6);
     }
 
     /** First spot from the frame's top (conduit y+3) upward with two non-colliding blocks;

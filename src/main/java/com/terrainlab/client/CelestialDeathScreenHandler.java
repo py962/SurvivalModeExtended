@@ -12,9 +12,10 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 /**
- * Adds the two Celestial Death respawn-choice buttons to the vanilla DeathScreen.
- * The buttons are always shown; the server falls back to a normal respawn when the
- * player is not eligible.
+ * Adds the Celestial Death respawn-choice buttons to the vanilla DeathScreen, each only when
+ * the server reported that option as available for this death ({@link ClientDeathOptionsState},
+ * fed by DeathOptionsPacket). Nothing is added in hardcore worlds, where the Death conduit
+ * instead prevents the death outright. The server re-validates every choice.
  */
 public class CelestialDeathScreenHandler {
 
@@ -24,29 +25,54 @@ public class CelestialDeathScreenHandler {
             return;
         }
 
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null && mc.level.getLevelData().isHardcore()) {
+            return;
+        }
+        boolean conduitAvailable = ClientDeathOptionsState.conduitAvailable();
+        boolean pickAvailable = ClientDeathOptionsState.pickAvailable();
+        if (!conduitAvailable && !pickAvailable) {
+            return;
+        }
+
         int width = screen.width;
         int centerX = width / 2;
+        int y = screen.height / 4 + 120;
 
-        Button conduitButton = Button.builder(
-                        Component.translatable("gui.terrainlab.death.respawn_at_conduit"),
-                        button -> {
-                            ClientPacketDistributor.sendToServer(new DeathConduitRespawnPacket());
-                            performVanillaRespawn();
-                        })
-                .bounds(centerX - 100, screen.height / 4 + 120, 200, 20)
-                .build();
+        if (conduitAvailable) {
+            event.addListener(Button.builder(
+                            Component.translatable("gui.terrainlab.death.respawn_at_conduit"),
+                            button -> {
+                                ClientPacketDistributor.sendToServer(new DeathConduitRespawnPacket());
+                                performVanillaRespawn();
+                            })
+                    .bounds(centerX - 100, y, 200, 20)
+                    .build());
+            y += 24;
+        }
 
-        Button pickButton = Button.builder(
-                        Component.translatable("gui.terrainlab.death.choose_respawn_location"),
-                        button -> {
-                            ClientPacketDistributor.sendToServer(new DeathStartPickingPacket());
-                            performVanillaRespawn();
-                        })
-                .bounds(centerX - 100, screen.height / 4 + 144, 200, 20)
-                .build();
+        if (pickAvailable) {
+            event.addListener(Button.builder(
+                            Component.translatable("gui.terrainlab.death.choose_respawn_location"),
+                            button -> {
+                                ClientPacketDistributor.sendToServer(new DeathStartPickingPacket());
+                                performVanillaRespawn();
+                            })
+                    .bounds(centerX - 100, y, 200, 20)
+                    .build());
+        }
+    }
 
-        event.addListener(conduitButton);
-        event.addListener(pickButton);
+    /**
+     * DeathOptionsPacket handler. The packet is normally processed before the DeathScreen opens;
+     * if a DeathScreen is already showing, it is re-initialised so the buttons appear.
+     */
+    public static void onOptionsReceived(boolean conduit, boolean pick) {
+        ClientDeathOptionsState.set(conduit, pick);
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.gui.screen() instanceof DeathScreen screen) {
+            screen.init(screen.width, screen.height);
+        }
     }
 
     /** Sends the same PERFORM_RESPAWN command as vanilla's Respawn button. */

@@ -79,12 +79,12 @@ public final class VillagerWorkConstants {
     /** Catch items kept when the village has no chest; fishing stops at this many. */
     public static final int FISH_MAX_WITHOUT_CHEST = 16;
     /** Weights (percent) in temperate water: cod / salmon / dried kelp. */
-    public static final int FISH_COD_WEIGHT = 40;
-    public static final int FISH_SALMON_WEIGHT = 35;
+    public static final int FISH_COD_WEIGHT = 45;
+    public static final int FISH_SALMON_WEIGHT = 30;
     public static final int FISH_KELP_WEIGHT = 25;
     /** Weights in cold biomes (base temperature below {@link #FISH_COLD_TEMPERATURE}). */
-    public static final int FISH_COLD_COD_WEIGHT = 35;
-    public static final int FISH_COLD_SALMON_WEIGHT = 50;
+    public static final int FISH_COLD_COD_WEIGHT = 30;
+    public static final int FISH_COLD_SALMON_WEIGHT = 45;
     public static final float FISH_COLD_TEMPERATURE = 0.3F;
     /** Time between scans for open water after a scan found none. */
     public static final int FISH_WATER_SCAN_INTERVAL_TICKS = 2400;

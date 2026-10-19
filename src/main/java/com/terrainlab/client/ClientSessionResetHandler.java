@@ -17,5 +17,17 @@ public final class ClientSessionResetHandler {
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientDeathPickingState.reset();
         ClientAuroraState.reset();
+        ClientDeathOptionsState.reset();
+    }
+
+    @SubscribeEvent
+    public static void onLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        ClientDeathOptionsState.reset();
+    }
+
+    /** Fires when the local player is recreated (respawn or dimension change): the death is over. */
+    @SubscribeEvent
+    public static void onClone(ClientPlayerNetworkEvent.Clone event) {
+        ClientDeathOptionsState.reset();
     }
 }

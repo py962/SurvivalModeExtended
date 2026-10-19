@@ -85,6 +85,11 @@ public class ModNetwork {
                 com.terrainlab.network.DeathPickingStatePacket.STREAM_CODEC,
                 com.terrainlab.network.DeathPickingStatePacket::handle
         );
+        registrar.playToClient(
+                com.terrainlab.network.DeathOptionsPacket.TYPE,
+                com.terrainlab.network.DeathOptionsPacket.STREAM_CODEC,
+                com.terrainlab.network.DeathOptionsPacket::handle
+        );
 
         // Client mirror of the heat source index (see HeatSourceSyncPacket).
         registrar.playToClient(

@@ -258,6 +258,7 @@
   "gui.terrainlab.death.respawn_at_conduit": "Respawn at Death Conduit",
   "gui.terrainlab.death.choose_respawn_location": "Choose Respawn Location",
   "gui.terrainlab.death.picking_prompt": "Choosing respawn point - press Attack to confirm (%ss left)",
+  "message.terrainlab.death.conduit_rescue": "The Death conduit pulls you back from the brink (−100 levels)",
 
   "item.terrainlab.breath_pearl": "Breath Pearl",
   "item.terrainlab.life_pearl": "Life Pearl",
@@ -439,5 +440,19 @@
   "gui.terrainlab.village_info.title.snow": "Snowy Village",
   "gui.terrainlab.village_info.title.taiga": "Taiga Village",
   "gui.terrainlab.village_info.title.jungle": "Jungle Village",
-  "gui.terrainlab.village_info.title.swamp": "Swamp Village"
+  "gui.terrainlab.village_info.title.swamp": "Swamp Village",
+
+  "menu.terrainlab.title_subtitle": "Survival Mode Extended",
+  "gameMode.hardcore": "Ultra-Hardcore Mode",
+  "options.difficulty.hardcore": "Ultra-Hardcore",
+  "selectWorld.gameMode.hardcore": "Ultra-Hardcore",
+  "selectWorld.gameMode.hardcore.info": "Survival Mode locked to 'Hard' difficulty. One life only, unless a Death conduit saves you at the cost of 100 levels.",
+  "selectWorld.gameMode.hardcore.line1": "Same as Survival Mode, locked at hardest",
+  "selectWorld.gameMode.hardcore.line2": "difficulty, one life (Death conduit: -100 levels)",
+  "editGamerule.inGame.disabled.hardcore.tooltip": "Cannot change game rules in an ultra-hardcore world.",
+  "mco.upload.hardcore": "Ultra-hardcore worlds can't be uploaded!",
+  "options.worldOptions.allow_commands.disabled.tooltip": "Cannot allow commands in an ultra-hardcore world.",
+  "options.worldOptions.difficulty.disabled.hardcore.tooltip": "Cannot change the difficulty in an ultra-hardcore world.",
+  "options.worldOptions.game_mode.disabled.tooltip": "Cannot change the game mode in an ultra-hardcore world.",
+  "options.worldOptions.guest.force_game_mode.off.hardcore.tooltip": "Cannot change this setting in an ultra-hardcore world."
 }
