@@ -446,7 +446,7 @@
   "gameMode.hardcore": "Ultra-Hardcore Mode",
   "options.difficulty.hardcore": "Ultra-Hardcore",
   "selectWorld.gameMode.hardcore": "Ultra-Hardcore",
-  "selectWorld.gameMode.hardcore.info": "Survival Mode locked to 'Hard' difficulty. One life only, unless a Death conduit saves you at the cost of 100 levels.",
+  "selectWorld.gameMode.hardcore.info": "Survival Mode locked to 'Hard' difficulty. One life only, unless a Death conduit saves you at the cost of 100 levels. Villages are rare and abandoned.",
   "selectWorld.gameMode.hardcore.line1": "Same as Survival Mode, locked at hardest",
   "selectWorld.gameMode.hardcore.line2": "difficulty, one life (Death conduit: -100 levels)",
   "editGamerule.inGame.disabled.hardcore.tooltip": "Cannot change game rules in an ultra-hardcore world.",

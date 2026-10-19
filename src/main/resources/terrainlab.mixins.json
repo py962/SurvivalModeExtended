@@ -40,6 +40,7 @@
     "StructurePlacementMixin",
     "StructureStartPlacementMixin",
     "StructureGenerationVetoMixin",
+    "JigsawStructureHardcoreVillageMixin",
     "BastionHousingSpawnMixin",
     "MineshaftHeightMixin",
     "AbstractBoatFlowingWaterSinkMixin",

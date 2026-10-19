@@ -76,9 +76,12 @@ public final class VillageDailyTickHandler {
                 VillageMembershipService.assignVillagersToNearestVillage(level, bells);
         long now = level.getGameTime();
         for (BlockPos bell : bells) {
-            // Every discovered village gets its food chest (placed once; re-placed if broken).
-            VillageChestService.ensureChest(level, bell);
             List<Villager> members = membership.getOrDefault(bell, List.of());
+            // Every discovered village gets its food chest (placed once; re-placed if broken). In
+            // ultra-hardcore, villages are abandoned: no chest until a villager lives there (e.g. cured).
+            if (!level.getServer().isHardcore() || !members.isEmpty()) {
+                VillageChestService.ensureChest(level, bell);
+            }
             if (!members.isEmpty()) {
                 saved.getOrCreate(new VillageId(level.dimension(), bell))
                         .addHappinessSample(VillageHappinessService.computeHappiness(members, now));
@@ -100,9 +103,11 @@ public final class VillageDailyTickHandler {
         for (BlockPos bell : bells) {
             VillageId id = new VillageId(level.dimension(), bell);
             VillageRecord record = saved.getOrCreate(id);
-            VillageChestService.ensureChest(level, bell);
+            List<Villager> members = membership.getOrDefault(bell, List.of());
+            if (!level.getServer().isHardcore() || !members.isEmpty()) {
+                VillageChestService.ensureChest(level, bell);
+            }
             if (record.getLastCheckedDay() != solarDay) {
-                List<Villager> members = membership.getOrDefault(bell, List.of());
                 VillageHungerService.runDailyCheck(level, id, members);
                 VillageTierService.runDailyCheck(level, id, members);
                 record.setLastCheckedDay(solarDay);
