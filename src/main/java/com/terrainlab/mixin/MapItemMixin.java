@@ -48,7 +48,7 @@ public abstract class MapItemMixin implements MapItemFluidStateAccessor {
         if (!player.isUsingItem() || !player.getUseItem().is(Items.SPYGLASS)) return;
 
         ItemStack offhand = player.getOffhandItem();
-        if (offhand.isEmpty() || !offhand.is(Items.FILLED_MAP)) return;
+        if (!SpyglassMapFillHandler.isScopeableMap(offhand)) return;
 
         MapItemSavedData offhandData = MapItem.getSavedData(offhand, level);
         if (offhandData != data) return; // this update() call wasn't for the offhand map

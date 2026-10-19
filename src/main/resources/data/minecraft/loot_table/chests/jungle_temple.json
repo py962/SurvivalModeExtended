@@ -157,7 +157,7 @@
             {
               "type": "minecraft:exploration_map",
               "destination": "#terrainlab:locate/ancient_city",
-              "decoration": "minecraft:red_x",
+              "decoration": "minecraft:ancient_city",
               "zoom": 2,
               "search_radius": 100,
               "skip_existing_chunks": true
@@ -187,7 +187,7 @@
               "target": "item_name"
             }
           ],
-          "name": "minecraft:filled_map",
+          "name": "minecraft:buried_ancient_city_map",
           "weight": 1
         }
       ],

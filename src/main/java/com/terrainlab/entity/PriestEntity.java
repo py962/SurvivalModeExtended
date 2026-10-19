@@ -47,7 +47,7 @@ public class PriestEntity extends AbstractTrailTraderEntity {
     private static final ItemLike[] RELICS = {
             Items.NETHERRACK,
             ModItems.NETHER_IDOL.get(),
-            Items.FILLED_MAP, // a found map, see AbstractTrailTraderEntity#isValidRelic
+            Items.FILLED_MAP, // the Piglin Map relic (no vanilla Nether fortress map), see AbstractTrailTraderEntity#isValidRelic
             Items.WITHER_SKELETON_SKULL,
     };
 

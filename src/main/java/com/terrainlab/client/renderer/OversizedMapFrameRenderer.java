@@ -37,6 +37,48 @@ public class OversizedMapFrameRenderer
         this.mapRenderer = context.getMapRenderer();
     }
 
+    /**
+     * Render state carrying the floor/ceiling orientation.
+     */
+    public static class OversizedMapFrameRenderState extends ItemFrameRenderState {
+        public Direction flatFacing = Direction.NORTH;
+    }
+
+    @Override
+    public ItemFrameRenderState createRenderState() {
+        return new OversizedMapFrameRenderState();
+    }
+
+    @Override
+    public void extractRenderState(
+            OversizedMapFrameEntity entity,
+            ItemFrameRenderState state,
+            float partialTicks
+    ) {
+        super.extractRenderState(entity, state, partialTicks);
+
+        if (state instanceof OversizedMapFrameRenderState oversized) {
+            oversized.flatFacing = entity.getFlatFacing();
+        }
+    }
+
+    /**
+     * Extra quarter turns (about the frame normal) so a floor/ceiling map
+     * reads upright for the player who placed it. Vanilla's rotation-0
+     * floor map has its top to the north and its ceiling map its top to
+     * the south, i.e. upright for a player facing north; each +90 degree
+     * local Z turn moves the top clockwise (floor: N->E, ceiling: S->E).
+     */
+    private static int flatQuarterTurns(Direction direction, Direction flatFacing) {
+        int facing2D = flatFacing.get2DDataValue(); // S=0 W=1 N=2 E=3
+
+        return switch (direction) {
+            case UP -> (facing2D + 2) & 3;   // map top points away from placer
+            case DOWN -> (2 - facing2D) & 3; // map top points back at placer
+            default -> 0;
+        };
+    }
+
     @Override
     public void submit(
             ItemFrameRenderState state,
@@ -45,11 +87,22 @@ public class OversizedMapFrameRenderer
             CameraRenderState camera
     ) {
         // Do not call super.submit(): it would render a second,
-        // normal-sized frame and its contents.
+        // normal-sized frame and its contents. Submit the name tag
+        // (renamed map) ourselves, as EntityRenderer#submit would,
+        // raised so it clears the top edge of a wall frame.
+        Direction direction = state.direction;
 
         poseStack.pushPose();
 
-        Direction direction = state.direction;
+        if (direction.getAxis().isHorizontal()) {
+            poseStack.translate(0.0F, (size - 1) * 0.5F, 0.0F);
+        }
+
+        submitNameDisplay(state, poseStack, submitNodeCollector, camera);
+        poseStack.popPose();
+
+        poseStack.pushPose();
+
         Vec3 renderOffset = getRenderOffset(state);
 
         poseStack.translate(
@@ -59,12 +112,11 @@ public class OversizedMapFrameRenderer
         );
 
         /*
-         * The entity's bounding box spans the full 2x2 / 3x3 footprint,
-         * so its position (the render origin) is already the visual
-         * centre of the frame for both sizes. No anchor shift is needed.
+         * The render origin is the entity position, which is the centre of
+         * its bounding box: the footprint centre (offset from the anchor
+         * block for 2x2), 0.46875 in front of the block layer's centre.
+         * Move to the block layer's centre plane, exactly as vanilla does.
          */
-
-        // Move the frame model just in front of the supporting wall.
         poseStack.translate(
                 direction.getStepX() * 0.46875F,
                 direction.getStepY() * 0.46875F,
@@ -87,10 +139,24 @@ public class OversizedMapFrameRenderer
         poseStack.rotateDegrees(Axis.XP, xRot);
         poseStack.rotateDegrees(Axis.YP, yRot);
 
-        // Render the enlarged frame model exactly once.
+        // Local frame now: X/Y span the footprint plane, +Z points into the
+        // supporting surface. Orient floor/ceiling frames for the placer.
+        Direction flatFacing = state instanceof OversizedMapFrameRenderState oversized
+                ? oversized.flatFacing
+                : Direction.NORTH;
+        int quarterTurns = flatQuarterTurns(direction, flatFacing);
+
+        if (quarterTurns != 0) {
+            poseStack.rotateDegrees(Axis.ZP, quarterTurns * 90.0F);
+        }
+
+        // Render the enlarged frame model exactly once: scaled across the
+        // footprint in-plane only (depth unscaled, so its back stays flush
+        // with the surface at local z = +0.5), then centred like vanilla.
         if (!state.frameModel.isEmpty()) {
             poseStack.pushPose();
-            poseStack.scale(size, size, size);
+            poseStack.scale(size, size, 1.0F);
+            poseStack.translate(-0.5F, -0.5F, -0.5F);
 
             state.frameModel.submitWithZOffset(
                     poseStack,
@@ -103,7 +169,7 @@ public class OversizedMapFrameRenderer
             poseStack.popPose();
         }
 
-        // Position the displayed item or map in front of the frame.
+        // Position the displayed item or map in front of the frame back.
         poseStack.translate(
                 0.0F,
                 0.0F,
@@ -119,16 +185,16 @@ public class OversizedMapFrameRenderer
 
         if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
             if (state.mapId != null) {
-                // One filled map enlarged across the entire frame.
+                // One filled map enlarged across the entire frame
+                // (in-plane only, matching the frame model).
                 poseStack.pushPose();
 
-                poseStack.scale(size, size, size);
+                poseStack.scale(size, size, 1.0F);
 
-                int rotation = (state.rotation % 4) * 2;
-
+                // Map frames rotate in steps of 2 (90 degrees per click).
                 poseStack.rotateDegrees(
                         Axis.ZP,
-                        rotation * 360.0F / 8.0F
+                        (state.rotation / 2) * 90.0F
                 );
 
                 poseStack.rotateDegrees(Axis.ZP, 180.0F);
@@ -157,9 +223,9 @@ public class OversizedMapFrameRenderer
                 poseStack.popPose();
             } else if (!state.item.isEmpty()) {
                 /*
-                 * Non-vanilla-map display items, including terrainlab:atlas,
-                 * are rendered through their item renderer and enlarged to
-                 * fit the oversized frame.
+                 * Display items without map data (e.g. a terrainlab:atlas
+                 * with no map yet) are rendered through their item renderer
+                 * and enlarged to fit the oversized frame.
                  */
                 poseStack.pushPose();
 

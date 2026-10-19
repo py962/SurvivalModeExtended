@@ -77,7 +77,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:filled_map",
+          "name": "minecraft:buried_trial_chambers_map",
           "weight": 1,
           "modifier": [
             {

@@ -36,7 +36,7 @@ public class ArcheologistEntity extends AbstractTrailTraderEntity {
     private static final ItemLike[] RELICS = {
             ModItems.ANCIENT_ARTEFACT.get(),
             Items.ENCHANTED_BOOK, // must carry Swift Sneak, see getRequiredRelicEnchantment
-            Items.FILLED_MAP, // a found map, see AbstractTrailTraderEntity#isValidRelic
+            Items.BURIED_ANCIENT_CITY_MAP, // the Temple Map relic, see AbstractTrailTraderEntity#isValidRelic
             Items.ECHO_SHARD,
     };
 

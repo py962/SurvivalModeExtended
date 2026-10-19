@@ -48,25 +48,15 @@ public class OversizedMapFrameItem extends ItemFrameItem {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
-        BlockPos wallAnchor = context.getClickedPos();
+        BlockPos clickedPos = context.getClickedPos();
         Direction facing = context.getClickedFace();
         Player player = context.getPlayer();
         ItemStack itemInHand = context.getItemInHand();
 
-        // Item frames must face horizontally away from a wall.
-        if (!facing.getAxis().isHorizontal()) {
-            return InteractionResult.FAIL;
-        }
-
-        // The clicked wall block is the anchor:
-        // 2x2 = bottom-left; 3x3 = centre.
-        BlockPos entityPos = wallAnchor.relative(facing);
-
-        // Vanilla ItemFrameItem checks: build height and mayUseItemAt.
-        if (player != null
-                && !mayPlace(player, facing, itemInHand, entityPos)) {
-            return InteractionResult.FAIL;
-        }
+        // The block in front of the clicked face is the anchor:
+        // 3x3 = centre; 2x2 = corner, growing to the placer's right and
+        // up (walls) or away from them (floors / ceilings).
+        BlockPos entityPos = clickedPos.relative(facing);
 
         OversizedMapFrameEntity frame = new OversizedMapFrameEntity(
                 entityTypeForSize(size),
@@ -75,13 +65,23 @@ public class OversizedMapFrameItem extends ItemFrameItem {
                 facing
         );
 
-        // The whole footprint must also be inside the build height.
-        int footprintStart = frame.getFootprintStart();
+        // Floor / ceiling frames are oriented by the placer's facing.
+        if (facing.getAxis().isVertical()) {
+            frame.setFlatFacing(context.getHorizontalDirection());
+        }
 
-        if (!level.isInsideBuildHeight(entityPos.above(footprintStart))
-                || !level.isInsideBuildHeight(
-                entityPos.above(footprintStart + size - 1))) {
-            return InteractionResult.FAIL;
+        // Vanilla ItemFrameItem checks (build height, mayUseItemAt) plus
+        // spawn protection / world border, for every footprint block.
+        for (BlockPos block : frame.getFootprint()) {
+            if (!level.isInsideBuildHeight(block)) {
+                return InteractionResult.FAIL;
+            }
+
+            if (player != null
+                    && (!mayPlace(player, facing, itemInHand, block)
+                    || !level.mayInteract(player, block))) {
+                return InteractionResult.FAIL;
+            }
         }
 
         // Copy custom name / entity data from the item, as vanilla does.
@@ -91,7 +91,7 @@ public class OversizedMapFrameItem extends ItemFrameItem {
                 player
         ).apply(frame);
 
-        // Checks the complete footprint, wall support and overlap.
+        // Checks the complete footprint, support and overlap.
         if (!frame.survives()) {
             return InteractionResult.FAIL;
         }

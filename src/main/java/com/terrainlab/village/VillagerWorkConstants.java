@@ -71,7 +71,7 @@ public final class VillagerWorkConstants {
     // ---------------------------------------------------------------- fisherman
 
     public static final int FISH_MIN_TICKS = 1800;
-    public static final int FISH_MAX_TICKS = 4200;
+    public static final int FISH_MAX_TICKS = 2400;
     /** Mean of the uniform wait above (documentation only). */
     public static final int FISH_MEAN_TICKS = (FISH_MIN_TICKS + FISH_MAX_TICKS) / 2;
     /** Catch items carried before the fisherman delivers to the chest. */
@@ -79,13 +79,13 @@ public final class VillagerWorkConstants {
     /** Catch items kept when the village has no chest; fishing stops at this many. */
     public static final int FISH_MAX_WITHOUT_CHEST = 16;
     /** Weights (percent) in temperate water: cod / salmon / dried kelp. */
-    public static final int FISH_COD_WEIGHT = 60;
-    public static final int FISH_SALMON_WEIGHT = 25;
-    public static final int FISH_KELP_WEIGHT = 15;
+    public static final int FISH_COD_WEIGHT = 40;
+    public static final int FISH_SALMON_WEIGHT = 35;
+    public static final int FISH_KELP_WEIGHT = 25;
     /** Weights in cold biomes (base temperature below {@link #FISH_COLD_TEMPERATURE}). */
     public static final int FISH_COLD_COD_WEIGHT = 35;
     public static final int FISH_COLD_SALMON_WEIGHT = 50;
     public static final float FISH_COLD_TEMPERATURE = 0.3F;
     /** Time between scans for open water after a scan found none. */
-    public static final int FISH_WATER_SCAN_INTERVAL_TICKS = 1200;
+    public static final int FISH_WATER_SCAN_INTERVAL_TICKS = 2400;
 }

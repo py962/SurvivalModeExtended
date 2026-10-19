@@ -34,7 +34,7 @@ public class RangerEntity extends AbstractTrailTraderEntity {
     private static final ItemLike[] RELICS = {
             ModItems.OMINOUS_BANNER.get(),
             Items.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE,
-            Items.FILLED_MAP, // a found map, see AbstractTrailTraderEntity#isValidRelic
+            Items.WOODLAND_MANSION_MAP, // the Pillager Map relic, see AbstractTrailTraderEntity#isValidRelic
             Items.TOTEM_OF_UNDYING,
     };
 

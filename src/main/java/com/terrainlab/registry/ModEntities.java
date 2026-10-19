@@ -37,8 +37,9 @@ public class ModEntities {
             DeferredRegister.create(Registries.ENTITY_TYPE, MODID);
 
 
-    // Physical entity remains the size of a normal wall-mounted item frame.
-// The renderer is responsible for displaying the enlarged frame and map.
+    // Oversized (2x2 / 3x3) map frames. The entity's bounding box spans the whole
+    // footprint on a wall, floor or ceiling (OversizedMapFrameEntity#calculateBoundingBox),
+    // so .sized() below is unused; the renderer draws one enlarged frame and map.
     public static final DeferredHolder<EntityType<?>, EntityType<OversizedMapFrameEntity>>
             LARGE_MAP_FRAME =
             ENTITY_TYPES.register("large_map_frame", id ->

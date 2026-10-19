@@ -36,7 +36,7 @@ public class MarinerEntity extends AbstractTrailTraderEntity {
     private static final ItemLike[] RELICS = {
             Items.TRIDENT,
             Items.ENCHANTED_BOOK, // must carry Loyalty, see getRequiredRelicEnchantment
-            Items.FILLED_MAP, // a found map, see AbstractTrailTraderEntity#isValidRelic
+            Items.BURIED_TRIAL_CHAMBERS_MAP, // the Sunken Chart relic, see AbstractTrailTraderEntity#isValidRelic
             Items.HEAVY_CORE,
     };
 

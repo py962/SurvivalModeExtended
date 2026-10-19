@@ -1,8 +1,11 @@
 package com.terrainlab.event;
 
 import com.terrainlab.TerrainLab;
+import com.terrainlab.item.AtlasItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.phys.Vec3;
@@ -16,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 /**
- * While a player scopes with a spyglass holding a filled map in the off hand, computes the
+ * While a player scopes with a spyglass holding a map (see {@link #isScopeableMap}) in the off hand, computes the
  * loaded chunks inside a narrow view cone (up to {@link #MAX_DIST} blocks) for
  * MapItemMixin to paint onto that map. The cone is recomputed every {@link #SCAN_INTERVAL_TICKS}
  * ticks, and each chunk is handed to the mixin once per scoping session.
@@ -44,6 +47,16 @@ public class SpyglassMapFillHandler {
         }
     }
 
+    /**
+     * Whether the spyglass fills in {@code stack}: any map item holding a map (filled maps,
+     * explorer maps, treasure maps, guide charts), but not the Atlas, which draws itself.
+     */
+    public static boolean isScopeableMap(ItemStack stack) {
+        return stack.getItem() instanceof MapItem
+                && !(stack.getItem() instanceof AtlasItem)
+                && stack.has(DataComponents.MAP_ID);
+    }
+
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
@@ -51,7 +64,7 @@ public class SpyglassMapFillHandler {
         if (player.level().isClientSide()) return;
 
         boolean usingSpyglass = player.isUsingItem() && player.getUseItem().is(net.minecraft.world.item.Items.SPYGLASS);
-        boolean hasMapInOffhand = player.getOffhandItem().is(net.minecraft.world.item.Items.FILLED_MAP);
+        boolean hasMapInOffhand = isScopeableMap(player.getOffhandItem());
 
         if (!usingSpyglass || !hasMapInOffhand) {
             FLAGGED_CACHE.remove(player);
