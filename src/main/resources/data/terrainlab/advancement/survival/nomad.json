@@ -1,0 +1,33 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "nomad": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "nomad"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:red_bed",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.nomad.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.nomad.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "nomad"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

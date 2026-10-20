@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
+import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.registry.ModSounds;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -21,6 +22,11 @@ import java.util.List;
 /**
  * Parrot-based scavenger that soars without flapping. Goals, highest priority first: scavenge dropped
  * rotten flesh, circle at altitude by day, and occasionally perch on a local hilltop.
+ *
+ * <p>Tamed vultures are bed-anchored pets (see {@link AnchoredPets}): they circle above the centre
+ * of their roaming zone (bed, or owner when unanchored), only scavenge and perch inside the zone,
+ * and none of these goals move them while they sit or while they are outside the zone
+ * (FlyTowardsHomeGoal brings them back first).
  */
 public class VultureEntity extends Parrot {
 
@@ -40,6 +46,9 @@ public class VultureEntity extends Parrot {
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        // Tamed birds never ride the owner's shoulder (the shoulder layer only draws parrots); they
+        // follow and perch nearby instead.
+        this.goalSelector.removeAllGoals(goal -> goal instanceof net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal);
         this.goalSelector.getAvailableGoals()
                 .removeIf(wrapped -> wrapped.getGoal() instanceof LandOnOwnersShoulderGoal);
         this.goalSelector.addGoal(1, new VultureScavengeGoal(this));
@@ -84,9 +93,11 @@ public class VultureEntity extends Parrot {
 
         @Override
         public boolean canUse() {
+            if (!AnchoredPets.mayWander(this.vulture)) return false;
             List<ItemEntity> nearby = this.vulture.level().getEntitiesOfClass(
                     ItemEntity.class, this.vulture.getBoundingBox().inflate(SCAVENGE_RANGE),
-                    item -> item.getItem().is(Items.ROTTEN_FLESH));
+                    item -> item.getItem().is(Items.ROTTEN_FLESH)
+                            && AnchoredPets.isAllowedTarget(this.vulture, item.blockPosition()));
             if (nearby.isEmpty()) return false;
             this.targetItem = nearby.get(0);
             return true;
@@ -94,7 +105,9 @@ public class VultureEntity extends Parrot {
 
         @Override
         public boolean canContinueToUse() {
-            return this.targetItem != null && this.targetItem.isAlive();
+            return this.targetItem != null && this.targetItem.isAlive()
+                    && AnchoredPets.mayWander(this.vulture)
+                    && AnchoredPets.isAllowedTarget(this.vulture, this.targetItem.blockPosition());
         }
 
         @Override
@@ -120,6 +133,8 @@ public class VultureEntity extends Parrot {
     /**
      * Daytime high-altitude circling. The orbit target advances steadily around the circle, always
      * slightly ahead of the vulture, so it glides continuously instead of stopping at waypoints.
+     * A tamed vulture circles above its home centre instead of wherever it happens to be, and only
+     * when that orbit lies inside its roaming zone.
      */
     private static class VultureCircleGoal extends Goal {
         private static final int CIRCLE_ALTITUDE = 28;
@@ -144,12 +159,38 @@ public class VultureEntity extends Parrot {
 
         @Override
         public boolean canUse() {
-            return isDayTime(this.vulture.level());
+            return shouldCircle();
         }
 
         @Override
         public boolean canContinueToUse() {
-            return isDayTime(this.vulture.level());
+            return shouldCircle();
+        }
+
+        private boolean shouldCircle() {
+            if (!isDayTime(this.vulture.level())) return false;
+            if (AnchoredPets.isSittingPet(this.vulture)) return false;
+            if (!this.vulture.isTame() || !this.vulture.hasHome()) return true;
+            return !AnchoredPets.isTameAndAwayFromHome(this.vulture) && homeOrbitCentre() != null;
+        }
+
+        /**
+         * Orbit centre for a tamed vulture: above its home centre, at least CIRCLE_ALTITUDE above
+         * the home and a few blocks clear of the ground there; null when that orbit would leave the
+         * roaming zone (e.g. a bed deep underground), in which case the vulture does not circle.
+         */
+        private BlockPos homeOrbitCentre() {
+            BlockPos home = this.vulture.getHomePosition();
+            Level level = this.vulture.level();
+            int y = home.getY() + CIRCLE_ALTITUDE;
+            if (level.hasChunkAt(home.getX(), home.getZ())) {
+                y = Math.max(y, level.getHeight(Heightmap.Types.MOTION_BLOCKING, home.getX(), home.getZ()) + 8);
+            }
+            y = Math.min(y, level.getMaxY() - 5);
+            BlockPos centre = new BlockPos(home.getX(), y, home.getZ());
+            // Farthest orbit point from home is CIRCLE_RADIUS out at this height.
+            BlockPos edge = centre.offset(CIRCLE_RADIUS, 0, 0);
+            return this.vulture.isWithinHome(edge) ? centre : null;
         }
 
         @Override
@@ -179,12 +220,24 @@ public class VultureEntity extends Parrot {
         }
 
         private void pickCenter() {
+            if (vulture.isTame() && vulture.hasHome()) {
+                BlockPos homeCentre = homeOrbitCentre();
+                if (homeCentre != null) {
+                    center = homeCentre;
+                    return;
+                }
+            }
             BlockPos ground = vulture.blockPosition();
             int y = Math.min(ground.getY() + CIRCLE_ALTITUDE, vulture.level().getMaxY() - 5);
             center = new BlockPos(ground.getX(), y, ground.getZ());
         }
 
         private void advanceOrbitPoint() {
+            if (vulture.isTame() && vulture.hasHome()
+                    && !center.atY(0).equals(vulture.getHomePosition().atY(0))) {
+                // Home moved (unanchored: it follows the owner) - re-centre straight away.
+                pickCenter();
+            }
             angle += ANGULAR_STEP * angularDirection;
             double x = center.getX() + Math.cos(angle) * CIRCLE_RADIUS;
             double z = center.getZ() + Math.sin(angle) * CIRCLE_RADIUS;
@@ -218,6 +271,7 @@ public class VultureEntity extends Parrot {
                 return false;
             }
             if (this.vulture.getRandom().nextInt(150) != 0) return false;
+            if (!AnchoredPets.mayWander(this.vulture)) return false;
 
             this.perchTarget = findNearbyHilltop();
             return this.perchTarget != null;
@@ -226,6 +280,7 @@ public class VultureEntity extends Parrot {
         @Override
         public boolean canContinueToUse() {
             if (this.perchTarget == null
+                    || !AnchoredPets.mayWander(this.vulture)
                     || this.travelTicks > GIVE_UP_TICKS
                     || this.vulture.getNavigation().isDone()) {
                 return false;
@@ -270,6 +325,7 @@ public class VultureEntity extends Parrot {
                 BlockPos candidate = new BlockPos(cx, candidateHeight, cz);
 
                 if (!level.canSeeSky(candidate.above())) continue;
+                if (!AnchoredPets.isAllowedTarget(this.vulture, candidate)) continue;
 
                 int higherThanCount = 0;
                 int[][] offsets = {{NEIGHBOR_OFFSET, 0}, {-NEIGHBOR_OFFSET, 0}, {0, NEIGHBOR_OFFSET}, {0, -NEIGHBOR_OFFSET}};

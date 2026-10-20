@@ -3,6 +3,7 @@ package com.terrainlab.event;
 import com.terrainlab.TerrainLab;
 import com.terrainlab.entity.ElephantEntity;
 import com.terrainlab.entity.HouseboatEntity;
+import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.registry.ModAttachments;
 import com.terrainlab.util.SafeSpotFinder;
 import net.minecraft.core.BlockPos;
@@ -18,7 +19,6 @@ import net.minecraft.world.entity.animal.equine.Donkey;
 import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.animal.happyghast.HappyGhast;
 import net.minecraft.world.entity.animal.wolf.Wolf;
-import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.EitherHolder;
@@ -113,7 +113,7 @@ public class GoatHornSummonHandler {
         }
 
         // Summoning resets bed-anchor - re-claims on the owner's next sleep.
-        if (nearest instanceof Wolf || nearest instanceof Cat) {
+        if (AnchoredPets.isAnchoredPet(nearest)) {
             nearest.setData(ModAttachments.ANCHOR_BED_POS.get(), Optional.empty());
             log("  cleared ANCHOR_BED_POS");
         }

@@ -40,6 +40,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  *                                     ConduitBlockEntityCelestialMixin (breath)
  *   beacon_weather                    BeaconMenuWeatherRodMixin
  *   piglin_cure                       PiglinWardUtil
+ *   pacifist                          EndReturnChallenges (End -&gt; Overworld, zero kills)
+ *   nomad                             EndReturnChallenges (End -&gt; Overworld, no chunk slept in twice)
+ *   survivor                          EndReturnChallenges (End -&gt; Overworld, never Creative, not hardcore)
+ *   ultimate_survivor                 EndReturnChallenges (End -&gt; Overworld, never Creative, hardcore)
  * </pre>
  * The golems use vanilla's minecraft:summoned_entity (ModGraniteGolemHandler
  * fires it for the granite golem).

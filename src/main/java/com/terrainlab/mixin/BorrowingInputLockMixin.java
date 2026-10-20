@@ -5,6 +5,7 @@ import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
@@ -22,6 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * passive observer: movement, player commands, player actions, item use, entity interaction, arm
  * swings and hotbar selection. Leaving bed, chat and client settings are not blocked, so the
  * player can always end a borrow by getting up.
+ * <p>
+ * Player input packets (held keys) are not blocked: their sneak state drives the borrow's
+ * sneak-to-switch control. Sneak has no effect on a sleeping player's pose and does not wake them.
  */
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class BorrowingInputLockMixin {
@@ -72,5 +76,14 @@ public abstract class BorrowingInputLockMixin {
     @Inject(method = "handleSetCarriedItem", at = @At("HEAD"), cancellable = true)
     private void terrainlab$blockSetCarriedItem(ServerboundSetCarriedItemPacket packet, CallbackInfo ci) {
         if (terrainlab$borrowingActive()) ci.cancel();
+    }
+
+    /** Feeds the sneak state to the borrow session. TAIL: runs on the server thread, after vanilla. */
+    @Inject(method = "handlePlayerInput", at = @At("TAIL"))
+    private void terrainlab$borrowShiftInput(ServerboundPlayerInputPacket packet, CallbackInfo ci) {
+        ServerGamePacketListenerImpl self = (ServerGamePacketListenerImpl) (Object) this;
+        if (self.player instanceof BorrowingAccess access) {
+            access.terrainlab$onClientShiftInput(packet.input().shift());
+        }
     }
 }

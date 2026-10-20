@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
+import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.registry.ModSounds;
 import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
 import net.minecraft.world.entity.EntityType;
@@ -22,6 +23,10 @@ import java.util.List;
  * Goose: a Parrot-based water bird that never perches on shoulders. Goals, by
  * priority: hiss-chase nearby players, return to water when far from it, rare
  * flock migration to a distant body of water, and short rests on water.
+ *
+ * <p>Tamed geese are bed-anchored pets (see {@link AnchoredPets}): they never migrate, only pick
+ * water inside their roaming zone, and none of these goals move them while they sit or while
+ * they are outside the zone (FlyTowardsHomeGoal brings them back first).
  */
 public class GooseEntity extends Parrot {
 
@@ -37,6 +42,9 @@ public class GooseEntity extends Parrot {
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        // Tamed birds never ride the owner's shoulder (the shoulder layer only draws parrots); they
+        // follow and perch nearby instead.
+        this.goalSelector.removeAllGoals(goal -> goal instanceof net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal);
         this.goalSelector.getAvailableGoals()
                 .removeIf(wrapped -> wrapped.getGoal() instanceof LandOnOwnersShoulderGoal);
         this.goalSelector.addGoal(1, new GooseHissGoal(this));
@@ -82,6 +90,7 @@ public class GooseEntity extends Parrot {
 
         @Override
         public boolean canUse() {
+            if (!AnchoredPets.mayWander(this.goose)) return false;
             List<Player> nearby = this.goose.level().getEntitiesOfClass(
                     Player.class, this.goose.getBoundingBox().inflate(HISS_RANGE));
             for (Player player : nearby) {
@@ -96,6 +105,7 @@ public class GooseEntity extends Parrot {
         @Override
         public boolean canContinueToUse() {
             return this.target != null && this.target.isAlive()
+                    && AnchoredPets.mayWander(this.goose)
                     && this.goose.distanceToSqr(this.target) <= HISS_RANGE * HISS_RANGE * 2;
         }
 
@@ -136,6 +146,7 @@ public class GooseEntity extends Parrot {
 
         @Override
         public boolean canUse() {
+            if (!AnchoredPets.mayWander(goose)) return false;
             long now = goose.level().getGameTime();
             if (now < nextSearchTime) return false;
             nextSearchTime = now + FAILED_SEARCH_COOLDOWN_TICKS / 4;
@@ -150,6 +161,7 @@ public class GooseEntity extends Parrot {
 
         @Override
         public boolean canContinueToUse() {
+            if (!AnchoredPets.mayWander(goose)) return false;
             if (isNearWater(NEARBY_CHECK_RADIUS)) return false;
 
             recheckTimer++;
@@ -202,7 +214,8 @@ public class GooseEntity extends Parrot {
                     for (int dy = -6; dy <= 6; dy++) {
                         BlockPos candidate = origin.offset(dx, dy, dz);
                         if (goose.level().getFluidState(candidate).is(FluidTags.WATER)
-                                && goose.level().getBlockState(candidate.above()).isAir()) {
+                                && goose.level().getBlockState(candidate.above()).isAir()
+                                && AnchoredPets.isAllowedTarget(goose, candidate)) {
                             double distSq = origin.distSqr(candidate);
                             if (distSq < closestDistSq) {
                                 closestDistSq = distSq;
@@ -218,7 +231,8 @@ public class GooseEntity extends Parrot {
 
     /**
      * Rare group relocation: picks a distant body of water and sends this goose
-     * and nearby geese towards it, each navigating independently.
+     * and nearby geese towards it, each navigating independently. Wild geese only: a tamed goose
+     * never starts a migration and is never swept along by a wild flock.
      */
     private static class GooseFlockMigrationGoal extends Goal {
         private static final int TRIGGER_CHANCE_DENOMINATOR = 6000; // 1-in-N per canUse check
@@ -238,6 +252,7 @@ public class GooseEntity extends Parrot {
 
         @Override
         public boolean canUse() {
+            if (goose.isTame()) return false;
             if (goose.getRandom().nextInt(TRIGGER_CHANCE_DENOMINATOR) != 0) return false;
 
             migrationTarget = findDistantWater();
@@ -258,7 +273,7 @@ public class GooseEntity extends Parrot {
 
             List<GooseEntity> nearbyFlock = goose.level().getEntitiesOfClass(
                     GooseEntity.class, goose.getBoundingBox().inflate(FLOCK_RADIUS),
-                    other -> other != goose);
+                    other -> other != goose && !other.isTame());
             for (GooseEntity flockMate : nearbyFlock) {
                 navigateTo(flockMate);
             }
@@ -331,6 +346,7 @@ public class GooseEntity extends Parrot {
                 return false;
             }
             if (this.goose.getRandom().nextInt(100) != 0) return false;
+            if (!AnchoredPets.mayWander(this.goose)) return false;
 
             this.restTarget = findNearbyWaterSurface();
             return this.restTarget != null;
@@ -339,6 +355,7 @@ public class GooseEntity extends Parrot {
         @Override
         public boolean canContinueToUse() {
             return this.restTarget != null
+                    && AnchoredPets.mayWander(this.goose)
                     && this.goose.distanceToSqr(
                     this.restTarget.getX() + 0.5, this.restTarget.getY(), this.restTarget.getZ() + 0.5) > 1.0;
         }
@@ -364,7 +381,8 @@ public class GooseEntity extends Parrot {
                     for (int dy = -3; dy <= 3; dy++) {
                         BlockPos candidate = origin.offset(dx, dy, dz);
                         if (this.goose.level().getFluidState(candidate).is(FluidTags.WATER)
-                                && this.goose.level().getBlockState(candidate.above()).isAir()) {
+                                && this.goose.level().getBlockState(candidate.above()).isAir()
+                                && AnchoredPets.isAllowedTarget(this.goose, candidate)) {
                             return candidate;
                         }
                     }

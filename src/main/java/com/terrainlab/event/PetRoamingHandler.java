@@ -1,14 +1,14 @@
 package com.terrainlab.event;
 
 import com.terrainlab.TerrainLab;
+import com.terrainlab.pet.AnchoredPets;
+import com.terrainlab.pet.FlyTowardsHomeGoal;
 import com.terrainlab.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
-import net.minecraft.world.entity.animal.feline.Cat;
-import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -17,13 +17,16 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import java.util.Optional;
 
 /**
- * Keeps tamed Wolves and Cats within {@link #ROAM_RADIUS} of a roaming centre: their bed
+ * Keeps tamed anchored pets (wolves, cats, geese, owls, vultures - see {@link AnchoredPets}) within {@link #ROAM_RADIUS} of a roaming centre: their bed
  * anchor if set, otherwise the owner's position. Uses the vanilla Mob home, refreshed about
  * once a second (leashing overwrites it, so leashed pets are skipped).
  *
  * <p>Vanilla home only biases where strolls go; {@link MoveTowardsRestrictionGoal} is added
  * on join so pets far outside the zone walk back (goals are not saved, so this runs on every
- * join). There is deliberately no teleport catch-up.
+ * join). The birds fly, and MoveTowardsRestrictionGoal never finds a target for flying navigation,
+ * so they get {@link FlyTowardsHomeGoal} instead, at a higher priority so their own wander goals
+ * (which also stand down while a tamed bird is outside its zone) do not keep pre-empting it.
+ * There is deliberately no teleport catch-up.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public class PetRoamingHandler {
@@ -36,17 +39,28 @@ public class PetRoamingHandler {
     private static final double OWNER_RECENTRE_DIST_SQ = 16.0;
 
     private static final int WALK_BACK_GOAL_PRIORITY = 7;
+    private static final int FLY_BACK_GOAL_PRIORITY = 1;
 
     private static final boolean DEBUG_LOGGING = false;
 
     private static boolean isRoamer(Object entity) {
-        return entity instanceof Wolf || entity instanceof Cat;
+        return AnchoredPets.isAnchoredPet(entity);
     }
 
     @SubscribeEvent
     public static void onJoin(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide()) return;
         if (!isRoamer(event.getEntity())) return;
+
+        if (AnchoredPets.isAnchoredBird(event.getEntity())) {
+            TamableAnimal bird = (TamableAnimal) event.getEntity();
+            boolean hasFlyBack = bird.goalSelector.getAvailableGoals().stream()
+                    .anyMatch(wrapped -> wrapped.getGoal() instanceof FlyTowardsHomeGoal);
+            if (!hasFlyBack) {
+                bird.goalSelector.addGoal(FLY_BACK_GOAL_PRIORITY, new FlyTowardsHomeGoal(bird, 1.2));
+            }
+            return;
+        }
 
         PathfinderMob mob = (PathfinderMob) event.getEntity();
         boolean alreadyHas = mob.goalSelector.getAvailableGoals().stream()

@@ -84,7 +84,8 @@
       "minecraft:patch_grass_meadow",
       "minecraft:patch_dead_bush",
       "minecraft:patch_waterlily",
-      "minecraft:seagrass_swamp"
+      "minecraft:seagrass_swamp",
+      "terrainlab:flower_allium_marsh"
     ],
     [
       "minecraft:freeze_top_layer"

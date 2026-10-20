@@ -1,0 +1,33 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "survivor": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "survivor"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:elytra",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.survivor.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.survivor.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "survivor"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

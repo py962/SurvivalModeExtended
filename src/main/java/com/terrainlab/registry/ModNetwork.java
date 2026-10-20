@@ -144,5 +144,12 @@ public class ModNetwork {
                 com.terrainlab.network.ReplicatorPulsePacket.STREAM_CODEC,
                 com.terrainlab.network.ReplicatorPulsePacket::handle
         );
+
+        // Accomplishment card shown after returning from the End (see AccomplishmentCards).
+        registrar.playToClient(
+                com.terrainlab.network.AccomplishmentCardPacket.TYPE,
+                com.terrainlab.network.AccomplishmentCardPacket.STREAM_CODEC,
+                com.terrainlab.network.AccomplishmentCardPacket::handle
+        );
     }
 }
