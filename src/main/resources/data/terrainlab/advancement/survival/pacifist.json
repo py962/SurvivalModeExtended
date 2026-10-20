@@ -1,0 +1,33 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "pacifist": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "pacifist"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:lily_of_the_valley",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.pacifist.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.pacifist.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "pacifist"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

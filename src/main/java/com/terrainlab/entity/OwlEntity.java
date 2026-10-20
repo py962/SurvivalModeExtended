@@ -2,6 +2,7 @@
 package com.terrainlab.entity;
 
 import com.terrainlab.TerrainLab;
+import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +32,11 @@ import net.minecraft.tags.BlockTags;
 
 import java.util.EnumSet;
 
+/**
+ * Owl: nocturnal Parrot-based bird. Tamed owls are bed-anchored pets (see {@link AnchoredPets}):
+ * they only roost and perch inside their roaming zone, never circle, and none of these goals
+ * move them while they sit or while they are outside the zone (FlyTowardsHomeGoal brings them back).
+ */
 public class OwlEntity extends Parrot {
 
     private static final boolean DEBUG_LOGGING = false;
@@ -59,6 +65,9 @@ public class OwlEntity extends Parrot {
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        // Tamed birds never ride the owner's shoulder (the shoulder layer only draws parrots); they
+        // follow and perch nearby instead.
+        this.goalSelector.removeAllGoals(goal -> goal instanceof net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal);
 
         this.goalSelector.getAvailableGoals()
                 .removeIf(wrapped ->
@@ -125,7 +134,8 @@ public class OwlEntity extends Parrot {
         @Override
         public boolean canUse() {
             if (!isDayTime(this.owl.level())
-                    || this.owl.isOrderedToSit()) {
+                    || this.owl.isOrderedToSit()
+                    || AnchoredPets.isTameAndAwayFromHome(this.owl)) {
                 return false;
             }
 
@@ -138,6 +148,7 @@ public class OwlEntity extends Parrot {
             return isDayTime(this.owl.level())
                     && !this.owl.isOrderedToSit()
                     && this.restPos != null
+                    && AnchoredPets.isAllowedTarget(this.owl, this.restPos)
                     && isValidRestPosition(this.restPos);
         }
 
@@ -231,7 +242,8 @@ public class OwlEntity extends Parrot {
                     for (int dz = -SEARCH_RADIUS; dz <= SEARCH_RADIUS; dz++) {
                         BlockPos candidate = origin.offset(dx, dy, dz);
 
-                        if (!isValidRestPosition(candidate)) {
+                        if (!isValidRestPosition(candidate)
+                                || !AnchoredPets.isAllowedTarget(this.owl, candidate)) {
                             continue;
                         }
 
@@ -463,6 +475,10 @@ public class OwlEntity extends Parrot {
                 return false;
             }
 
+            if (!AnchoredPets.mayWander(this.owl)) {
+                return false;
+            }
+
             this.perchTarget = findNearbyFenceTop();
 
             if (this.perchTarget == null) {
@@ -475,6 +491,7 @@ public class OwlEntity extends Parrot {
         @Override
         public boolean canContinueToUse() {
             return this.perchTarget != null
+                    && AnchoredPets.mayWander(this.owl)
                     && this.owl.distanceToSqr(
                     this.perchTarget.getX() + 0.5,
                     this.perchTarget.getY(),
@@ -528,7 +545,8 @@ public class OwlEntity extends Parrot {
 
                         if (state.is(BlockTags.FENCES)
                                 && this.owl.level()
-                                .getBlockState(candidate.above()).isAir()) {
+                                .getBlockState(candidate.above()).isAir()
+                                && AnchoredPets.isAllowedTarget(this.owl, candidate)) {
                             return candidate;
                         }
                     }
@@ -550,7 +568,8 @@ public class OwlEntity extends Parrot {
 
                         if (state.is(BlockTags.LEAVES)
                                 && this.owl.level()
-                                .getBlockState(candidate.above()).isAir()) {
+                                .getBlockState(candidate.above()).isAir()
+                                && AnchoredPets.isAllowedTarget(this.owl, candidate)) {
                             return candidate;
                         }
                     }

@@ -7,7 +7,7 @@
   "min_cost": { "base": 5, "per_level_above_first": 7 },
   "max_cost": { "base": 25, "per_level_above_first": 7 },
   "anvil_cost": 2,
-  "slots": ["saddle", "body"],
+  "slots": ["saddle", "body", "feet"],
   "effects": {
     "minecraft:attributes": [
       {

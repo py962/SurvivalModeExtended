@@ -1,8 +1,11 @@
 package com.terrainlab.registry;
 
 import com.terrainlab.celestial.CelestialVariant;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -80,6 +83,9 @@ public class ModCreativeTabContents {
 
         } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             // The mod's Ominous Banner is already here: vanilla's own slot builds it (RaidOminousBannerMixin).
+            // Vanilla's fletching table is replaced by the mod's (uncraftable, not a job site, swapped
+            // out of structures), so only the mod's table is listed.
+            event.remove(new ItemStack(Items.FLETCHING_TABLE), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             event.accept(ModItems.FLETCHING_TABLE_ITEM);
             event.accept(ModItems.CELESTIAL_FORGE_ITEM);
             event.accept(ModItems.PINE_SIGN);
@@ -90,9 +96,11 @@ public class ModCreativeTabContents {
             event.accept(ModItems.ENDERWOOD_HANGING_SIGN);
             event.accept(ModItems.LARGE_ITEM_FRAME);
             event.accept(ModItems.EXTRA_LARGE_ITEM_FRAME);
+            // Vanilla's Conduit is the Conduit of Breath: move it out of its vanilla slot so all eight
+            // celestial conduits sit together.
+            event.remove(new ItemStack(Items.CONDUIT), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             for (CelestialVariant variant : CelestialVariant.values()) {
-                if (variant.usesVanillaConduit()) continue; // vanilla Conduit is already in this tab
-                event.accept(ModItems.CELESTIAL_CONDUIT_ITEMS.get(variant));
+                event.accept(ModItems.conduitItemFor(variant));
             }
 
         } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
@@ -112,6 +120,8 @@ public class ModCreativeTabContents {
             }
 
         } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            // Vanilla's Shield is replaced by the mod's Oak Shield (its recipe is disabled).
+            event.remove(new ItemStack(Items.SHIELD), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             event.accept(ModItems.VULTURE_TIERED_ARROW);
             event.accept(ModItems.GOOSE_TIERED_ARROW);
             event.accept(ModItems.NORMAL_TIERED_ARROW);

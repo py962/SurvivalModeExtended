@@ -3,6 +3,7 @@ package com.terrainlab.event;
 import com.terrainlab.TerrainLab;
 import com.terrainlab.entity.ElephantEntity;
 import com.terrainlab.entity.HouseboatEntity;
+import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -11,8 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.animal.wolf.Wolf;
-import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -23,7 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * When a player sets their spawn, anchors each of their nearby tamed Wolves and Cats to that
+ * When a player sets their spawn, anchors each of their nearby tamed anchored pets (wolves, cats,
+ * geese, owls, vultures - see {@link AnchoredPets}) to that
  * position (one-time claim; already-anchored pets are left alone). Temporary beds neither set
  * the spawn nor anchor pets: the houseboat/howdah phantom beds (the player is still riding the
  * vehicle when the event fires) and any block in the {@code terrainlab:temporary_beds} tag.
@@ -69,12 +69,12 @@ public class PetBedAnchorHandler {
         List<TamableAnimal> pets = level.getEntitiesOfClass(
                 TamableAnimal.class,
                 player.getBoundingBox().inflate(CLAIM_RADIUS),
-                pet -> (pet instanceof Wolf || pet instanceof Cat)
+                pet -> AnchoredPets.isAnchoredPet(pet)
                         && pet.isTame()
                         && pet.isOwnedBy(player));
 
         if (DEBUG_LOGGING) {
-            // TerrainLab.LOGGER.info("[PET_ANCHOR] real bed at {}: {} owned Wolf/Cat within {} blocks",
+            // TerrainLab.LOGGER.info("[PET_ANCHOR] real bed at {}: {} owned anchored pets within {} blocks",
                     // bedPos, pets.size(), CLAIM_RADIUS);
         }
 

@@ -1,0 +1,33 @@
+{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "ultimate_survivor": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "ultimate_survivor"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:dragon_egg",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.ultimate_survivor.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.ultimate_survivor.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "ultimate_survivor"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

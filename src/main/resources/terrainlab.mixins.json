@@ -23,6 +23,7 @@
     "AzureBluetSnowMixin",
     "FallingBlockEntityAccessor",
     "FlowerStewEffectMixin",
+    "MushroomCowStewMixin",
     "LivingTravelEffectsMixin",
     "EnderDragonRelentlessMixin",
     "GripClimbMixin",
@@ -100,7 +101,11 @@
     "PiglinLuckBarterMixin",
     "LlamaCaribouMateMixin",
     "HealOrHarmStatFlashMixin",
-    "AbsorptionStatFlashMixin"
+    "AbsorptionStatFlashMixin",
+    "OffhandWeaponBreakMixin",
+    "MinecraftServerDifficultyMixin",
+    "LootTableLuckBonusMixin",
+    "LootPoolLuckBonusMixin"
   ],
   "client": [
     "SkyRendererAccessor",
@@ -117,7 +122,9 @@
     "SpectralVisionGlowMixin",
     "VillagerHeatTintMixin",
     "BoatHandsFreeMixin",
-    "HudStatFlashMixin"
+    "HudStatFlashMixin",
+    "MultiPlayerGameModeInvoker",
+    "OffhandStrikeUseItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

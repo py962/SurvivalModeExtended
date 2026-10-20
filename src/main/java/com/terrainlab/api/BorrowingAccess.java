@@ -12,4 +12,10 @@ public interface BorrowingAccess {
 
     /** Sets the Borrowing state; also cleared by BorrowingEffectExpiryHandler when the effect expires mid-sleep. */
     void terrainlab$setBorrowing(boolean borrowing);
+
+    /**
+     * Called with the sneak state of every player input packet. A press (released to held) while
+     * borrowing drifts to another creature, or ends the borrow after the last one.
+     */
+    void terrainlab$onClientShiftInput(boolean shift);
 }

@@ -1,18 +1,17 @@
 package com.terrainlab.event;
 
 import com.terrainlab.TerrainLab;
+import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.util.SafeSpotFinder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.animal.wolf.Wolf;
-import net.minecraft.world.entity.animal.feline.Cat;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 /**
- * Safety net for tamed Wolves and Cats: on fire, drowning or freezing damage the pet is
+ * Safety net for tamed anchored pets (wolves, cats, geese, owls, vultures): on fire, drowning or freezing damage the pet is
  * teleported to the nearest safe spot.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
@@ -23,7 +22,7 @@ public class PetSafetyTeleportHandler {
     @SubscribeEvent
     public static void onLivingDamage(LivingDamageEvent.Post event) {
         if (!(event.getEntity() instanceof TamableAnimal pet)) return;
-        if (!(pet instanceof Wolf) && !(pet instanceof Cat)) return;
+        if (!AnchoredPets.isAnchoredPet(pet)) return;
         if (!pet.isTame()) return;
 
         boolean isHazard = event.getSource().is(DamageTypeTags.IS_FIRE)

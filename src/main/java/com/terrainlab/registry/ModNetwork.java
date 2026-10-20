@@ -131,11 +131,25 @@ public class ModNetwork {
                 com.terrainlab.network.StatFlashPacket::handle
         );
 
+        // Dual wielding: right-click off-hand strike (see DualWield).
+        registrar.playToServer(
+                com.terrainlab.network.OffhandStrikePacket.TYPE,
+                com.terrainlab.network.OffhandStrikePacket.STREAM_CODEC,
+                com.terrainlab.network.OffhandStrikePacket::handle
+        );
+
         // Replicator: the GUI button counts as one redstone pulse.
         registrar.playToServer(
                 com.terrainlab.network.ReplicatorPulsePacket.TYPE,
                 com.terrainlab.network.ReplicatorPulsePacket.STREAM_CODEC,
                 com.terrainlab.network.ReplicatorPulsePacket::handle
+        );
+
+        // Accomplishment card shown after returning from the End (see AccomplishmentCards).
+        registrar.playToClient(
+                com.terrainlab.network.AccomplishmentCardPacket.TYPE,
+                com.terrainlab.network.AccomplishmentCardPacket.STREAM_CODEC,
+                com.terrainlab.network.AccomplishmentCardPacket::handle
         );
     }
 }

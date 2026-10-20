@@ -121,6 +121,11 @@ public final class ShieldCombatEvents {
             return;
         }
 
+        // A crouch-bypassed melee hit went past the shield, so it takes knockback as if unshielded.
+        if (ShieldBypass.wasBypassedThisTick(entity)) {
+            return;
+        }
+
         float multiplier = stats.knockbackMultiplier();
         if (multiplier != 1.0f) {
             event.setStrength(event.getStrength() * multiplier);
@@ -140,8 +145,18 @@ public final class ShieldCombatEvents {
             return;
         }
 
+        boolean crouchBypass = ShieldBypass.isCrouchBypass(source, entity);
+
         if (isBlockingWithShield(entity)) {
+            if (crouchBypass) {
+                ShieldBypass.markBypassed(entity);
+            }
             applyFireImmunity(event, entity, source);
+            return;
+        }
+
+        // A crouching melee attacker slips past autoblock as well as a raised shield.
+        if (crouchBypass) {
             return;
         }
 
@@ -150,7 +165,8 @@ public final class ShieldCombatEvents {
 
     /**
      * A raised shield that blocks a melee hit shoves the attacker and deals thorns
-     * damage. Autoblocks never reach this event, so they trigger neither.
+     * damage. Autoblocks never reach this event, so they trigger neither. Crouch-bypassed hits
+     * are already unblocked by {@link ShieldBypass} at HIGHEST priority, so they trigger neither.
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onShieldBash(LivingShieldBlockEvent event) {

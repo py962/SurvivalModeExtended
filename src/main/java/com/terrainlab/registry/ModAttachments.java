@@ -56,6 +56,11 @@ public class ModAttachments {
                             .serialize(Codec.FLOAT.fieldOf("player_energy"))
                             .build());
 
+    // Dual wielding: off-hand attack ticker and last-seen hand stacks. Both logical sides; transient.
+    public static final Supplier<AttachmentType<com.terrainlab.combat.DualWield.State>> DUAL_WIELD =
+            ATTACHMENT_TYPES.register("dual_wield", () ->
+                    AttachmentType.builder(com.terrainlab.combat.DualWield.State::new).build());
+
     // Raw client-reported jump/attack key state.
     public static final Supplier<AttachmentType<Boolean>> PLAYER_WANTS_JUMP =
             ATTACHMENT_TYPES.register("player_wants_jump", () ->
@@ -416,6 +421,38 @@ public class ModAttachments {
                     AttachmentType.builder(() -> net.minecraft.world.item.ItemStack.EMPTY)
                             .serialize(net.minecraft.world.item.ItemStack.OPTIONAL_CODEC.fieldOf("lead"), stack -> !stack.isEmpty())
                             .build());
+
+    // Challenge advancements (ChallengeEligibility): bitmask of disqualifiers ever seen (cheats,
+    // Creative, Easy, Peaceful). Never clears. Serialized, copied on death.
+    public static final Supplier<AttachmentType<Integer>> CHALLENGE_DISQUALIFIED =
+            ATTACHMENT_TYPES.register("challenge_disqualified", () ->
+                    AttachmentType.builder(() -> 0)
+                            .serialize(Codec.INT.fieldOf("challenge_disqualified"), flags -> flags != 0)
+                            .copyOnDeath()
+                            .build());
+
+    // Nomad challenge (NomadSleepTracker): chunks of completed sleeps per dimension and whether one
+    // was repeated. Serialized, copied on death.
+    public static final Supplier<AttachmentType<com.terrainlab.advancement.NomadSleepRecord>> NOMAD_SLEEP_RECORD =
+            ATTACHMENT_TYPES.register("nomad_sleep_record", () ->
+                    AttachmentType.builder(() -> com.terrainlab.advancement.NomadSleepRecord.EMPTY)
+                            .serialize(com.terrainlab.advancement.NomadSleepRecord.MAP_CODEC, r -> !r.isEmpty())
+                            .copyOnDeath()
+                            .build());
+
+    // Accomplishment card (AccomplishmentCards): the most recent card, re-shown by /accomplishments.
+    // Serialized, copied on death.
+    public static final Supplier<AttachmentType<com.terrainlab.advancement.AccomplishmentCard>> ACCOMPLISHMENT_CARD =
+            ATTACHMENT_TYPES.register("accomplishment_card", () ->
+                    AttachmentType.builder(() -> com.terrainlab.advancement.AccomplishmentCard.EMPTY)
+                            .serialize(com.terrainlab.advancement.AccomplishmentCard.MAP_CODEC, c -> !c.isEmpty())
+                            .copyOnDeath()
+                            .build());
+
+    // Previous-tick sleeping state, to warn once per lie-down (NomadSleepTracker). Transient.
+    public static final Supplier<AttachmentType<Boolean>> NOMAD_WAS_SLEEPING =
+            ATTACHMENT_TYPES.register("nomad_was_sleeping", () ->
+                    AttachmentType.builder(() -> false).build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
