@@ -4,6 +4,7 @@ import com.terrainlab.registry.ModEntities;
 import com.terrainlab.registry.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -12,6 +13,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -20,6 +22,7 @@ import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -35,8 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A 2x2 or 3x3 item frame that displays one map enlarged across its
- * whole footprint.
+ * A 2x2 or 3x3 item frame that displays one item enlarged across its
+ * whole footprint. 2x2 frames take any item; 3x3 frames only maps,
+ * paintings and banners (see {@link #canDisplay}).
  *
  * Footprint convention (entity block pos = block in front of the clicked face):
  * <ul>
@@ -221,6 +225,37 @@ public class OversizedMapFrameEntity extends ItemFrame {
     }
 
     /**
+     * Keep the client's packet position base on the anchor corner, the
+     * same position the server tracks and sends ({@link #trackingPosition}).
+     *
+     * ItemFrame#recalculateBoundingBox (final) re-bases the codec on the
+     * entity centre. Move packets carry deltas against the server base
+     * (the anchor corner), so the client decoded them against the centre
+     * instead and passed the centre to BlockAttachedEntity#setPos, which
+     * takes BlockPos.containing(centre) as the new anchor. For a 3x3 frame
+     * the centre lies inside the anchor block, but for a 2x2 frame it sits
+     * exactly on the block boundary (+0.5 right, +0.5 up from the anchor
+     * centre), so the client anchor jumped one block up (and one block
+     * right on south/west walls, sideways on floors/ceilings). The server
+     * sends such a packet as soon as the frame is tracked (needsSync is
+     * set, tickCount 0 % 60 == 0) and with later data updates.
+     */
+    @Override
+    public void syncPacketPositionCodec(double x, double y, double z) {
+        BlockPos anchor = getPos();
+
+        if (anchor != null) {
+            super.syncPacketPositionCodec(
+                    anchor.getX(),
+                    anchor.getY(),
+                    anchor.getZ()
+            );
+        } else {
+            super.syncPacketPositionCodec(x, y, z);
+        }
+    }
+
+    /**
      * Vanilla ItemFrame packs only the facing into the spawn packet. Also
      * pack the flat facing (data % 6 stays the 3D facing, so ItemFrame's
      * own decoding is unaffected).
@@ -352,9 +387,33 @@ public class OversizedMapFrameEntity extends ItemFrame {
         return fixedFrame || !hurtClient(damageSources().generic());
     }
 
-    private static boolean isSupportedDisplayItem(ItemStack stack) {
-        // Includes terrainlab:atlas (AtlasItem extends MapItem).
-        return !stack.isEmpty() && stack.getItem() instanceof MapItem;
+    /**
+     * Map-like items: every MapItem (filled maps, all explorer / treasure
+     * maps, trail trader charts and relic maps, terrainlab:atlas) and any
+     * stack carrying a map id.
+     */
+    private static boolean isMapLike(ItemStack stack) {
+        return stack.getItem() instanceof MapItem
+                || stack.has(DataComponents.MAP_ID);
+    }
+
+    /**
+     * 2x2 frames accept any item, like a vanilla frame. 3x3 frames only
+     * take pictorial items: maps (see {@link #isMapLike}), paintings and
+     * banners.
+     */
+    public boolean canDisplay(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+
+        if (getFrameSize() == 2) {
+            return true;
+        }
+
+        return isMapLike(stack)
+                || stack.is(Items.PAINTING)
+                || stack.is(ItemTags.BANNERS);
     }
 
     @Override
@@ -389,12 +448,17 @@ public class OversizedMapFrameEntity extends ItemFrame {
                 return InteractionResult.SUCCESS;
             }
 
-            // Otherwise rotate the map by 90 degrees per click.
+            // Otherwise rotate: maps by 90 degrees per click (as the
+            // renderer draws maps at rotation / 2 quarter turns), other
+            // items by 45 degrees like vanilla.
             if (!level().isClientSide()
                     && !isRemoved()
                     && mayInteractWithFootprint(player)) {
                 playSound(getRotateItemSound(), 1.0F, 1.0F);
-                setRotation((getRotation() + 2) % NUM_ROTATIONS);
+                int rotation = getFramedMapId(getItem()) != null
+                        ? (getRotation() / 2 + 1) * 2
+                        : getRotation() + 1;
+                setRotation(rotation % NUM_ROTATIONS);
                 updateFootprintOutputSignal();
                 gameEvent(GameEvent.BLOCK_CHANGE, player);
             }
@@ -402,8 +466,8 @@ public class OversizedMapFrameEntity extends ItemFrame {
             return InteractionResult.SUCCESS;
         }
 
-        // Only accept maps (incl. the Atlas). PASS lets the other hand try.
-        if (!isSupportedDisplayItem(held)) {
+        // Refused items PASS so the other hand can try.
+        if (!canDisplay(held)) {
             return InteractionResult.PASS;
         }
 

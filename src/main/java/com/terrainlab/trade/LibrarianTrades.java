@@ -33,25 +33,25 @@ public final class LibrarianTrades {
 
     // Enchanted Book 1 (Expert). Levels roll from I up to the enchantment's maximum.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOOK_1_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(ranged(Enchantments.FLAME, 1, 1)),
-            VillagerType.SAVANNA, List.of(ranged(Enchantments.RESPIRATION, 1, 3)),
-            VillagerType.TAIGA, List.of(ranged(Enchantments.FIRE_ASPECT, 1, 2)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.FIRE_PROTECTION, 1, 4)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.FROST_WALKER, 1, 2)),
-            VillagerType.SWAMP, List.of(ranged(Enchantments.AQUA_AFFINITY, 1, 1)),
+            VillagerType.PLAINS, List.of(ranged(Enchantments.LUNGE, 1, 3)),
+            VillagerType.SAVANNA, List.of(ranged(Enchantments.FIRE_ASPECT, 1, 2)),
+            VillagerType.TAIGA, List.of(ranged(ModEnchantments.CLEAVE, 1, 3)),
+            VillagerType.DESERT, List.of(ranged(Enchantments.SWEEPING_EDGE, 1, 3)),
+            VillagerType.SNOW, List.of(ranged(Enchantments.FLAME, 1, 1)),
+            VillagerType.SWAMP, List.of(ranged(Enchantments.RESPIRATION, 1, 3)),
             VillagerType.JUNGLE, List.of(ranged(Enchantments.BANE_OF_ARTHROPODS, 1, 5))
     );
     // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> BOOK_1_FALLBACK =
-            List.of(ranged(Enchantments.FLAME, 1, 1));
+            List.of(ranged(Enchantments.LUNGE, 1, 3));
 
     // Enchanted Book 2 (Master). Levels roll from I up to the enchantment's maximum.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOOK_2_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(ranged(Enchantments.SMITE, 1, 5)),
             VillagerType.SAVANNA, List.of(ranged(Enchantments.IMPALING, 1, 5)),
             VillagerType.TAIGA, List.of(ranged(Enchantments.BREACH, 1, 4)),
-            VillagerType.DESERT, List.of(ranged(Enchantments.FORTUNE, 1, 3)),
-            VillagerType.SNOW, List.of(ranged(Enchantments.LOOTING, 1, 3)),
+            VillagerType.DESERT, List.of(ranged(Enchantments.LOOTING, 1, 3)),
+            VillagerType.SNOW, List.of(ranged(Enchantments.FORTUNE, 1, 3)),
             VillagerType.SWAMP, List.of(ranged(Enchantments.MENDING, 1, 1)),
             VillagerType.JUNGLE, List.of(ranged(RECALL, 1, 1))
     );

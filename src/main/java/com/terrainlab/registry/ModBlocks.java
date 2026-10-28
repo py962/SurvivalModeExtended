@@ -240,6 +240,14 @@ public class ModBlocks {
                                     .noLootTable()
                                     .pushReaction(PushReaction.BLOCK)));
 
+    // Cauldron holding 1-3 poured potions (potion mixing); drops a plain cauldron.
+    public static final DeferredBlock<com.terrainlab.block.PotionCauldronBlock> POTION_CAULDRON =
+            BLOCKS.register("potion_cauldron", id ->
+                    new com.terrainlab.block.PotionCauldronBlock(
+                            BlockBehaviour.Properties.ofLegacyCopy(Blocks.CAULDRON)
+                                    .setId(net.minecraft.resources.ResourceKey.create(
+                                            net.minecraft.core.registries.Registries.BLOCK, id))));
+
     // Sandstorm sand layers. Properties mirror vanilla's snow layer (replaceable, never solid so the
     // motion-blocking heightmap looks through them, shovel for drops).
     public static final DeferredBlock<com.terrainlab.block.SandLayerBlock> SAND_LAYER =

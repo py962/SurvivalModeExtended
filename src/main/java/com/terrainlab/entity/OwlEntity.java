@@ -62,6 +62,11 @@ public class OwlEntity extends Parrot {
     private static final float GLIDE_FACTOR = 2.5F;
     private float owlNextFlap = 1.0F;
 
+    private long daytimeCircleUntil = 0L;
+
+    private boolean isDaytimeCircleFallbackActive() {
+        return level().getGameTime() < daytimeCircleUntil;
+    }
     @Override
     protected void registerGoals() {
         super.registerGoals();
@@ -116,7 +121,7 @@ public class OwlEntity extends Parrot {
      */
     private static class OwlNocturnalGoal extends Goal {
         private static final int SEARCH_RADIUS = 16;
-        private static final int SEARCH_VERTICAL = 8;
+        private static final int SEARCH_VERTICAL = 16;
         private static final double REST_SPEED = 1.0D;
         private static final double ARRIVAL_DISTANCE = 0.45D;
 
@@ -133,14 +138,21 @@ public class OwlEntity extends Parrot {
 
         @Override
         public boolean canUse() {
-            if (!isDayTime(this.owl.level())
-                    || this.owl.isOrderedToSit()
-                    || AnchoredPets.isTameAndAwayFromHome(this.owl)) {
+            if (!isDayTime(owl.level())
+                    || owl.isOrderedToSit()
+                    || AnchoredPets.isTameAndAwayFromHome(owl)
+                    || owl.isDaytimeCircleFallbackActive()) {
                 return false;
             }
 
-            this.restPos = findRestPosition();
-            return this.restPos != null;
+            restPos = findRestPosition();
+
+            if (restPos == null) {
+                owl.daytimeCircleUntil = owl.level().getGameTime() + 600L;
+                return false;
+            }
+
+            return true;
         }
 
         @Override
@@ -293,9 +305,10 @@ public class OwlEntity extends Parrot {
         }
 
         private boolean shouldCircle() {
-            return !isDayTime(this.owl.level())
-                    && !this.owl.isTame()
-                    && !this.owl.isOrderedToSit();
+            return (!isDayTime(owl.level())
+                    || owl.isDaytimeCircleFallbackActive())
+                    && !owl.isTame()
+                    && !owl.isOrderedToSit();
         }
 
         @Override

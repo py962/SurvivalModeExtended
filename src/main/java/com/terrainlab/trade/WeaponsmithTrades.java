@@ -20,8 +20,8 @@ import com.terrainlab.registry.ModEnchantments;
 
 /**
  * Replaces the vanilla Weaponsmith trade table. Planks and wood-variant shields follow the
- * villager's biome type, and the enchanted diamond weapons share a biome-specific
- * enchantment set (fixed levels) whose Snow row is weapon-specific.
+ * villager's biome type, and the enchanted iron weapons share a biome-specific
+ * enchantment set (fixed levels).
  */
 public final class WeaponsmithTrades {
 
@@ -36,42 +36,42 @@ public final class WeaponsmithTrades {
     }
 
 
-    // Enchanted Diamond Sword (Master). All levels are fixed; Snow (Tundra) gets Sweeping Edge.
+    // Enchanted Iron Sword (Master). All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> SWORD_ENCHANT_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
             VillagerType.SAVANNA, List.of(fixed(REACH, 3)),
             VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
             VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
-            VillagerType.SNOW, List.of(fixed(Enchantments.SWEEPING_EDGE, 3)),
-            VillagerType.SWAMP, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(QUICKSTRIKE, 2)),
             VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
     // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> SWORD_ENCHANT_FALLBACK =
             List.of(fixed(Enchantments.UNBREAKING, 3));
 
-    // Enchanted Diamond Spear (Expert). All levels are fixed; Snow (Tundra) gets Lunge.
+    // Enchanted Iron Spear (Expert). All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> SPEAR_ENCHANT_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
             VillagerType.SAVANNA, List.of(fixed(REACH, 3)),
             VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
             VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
-            VillagerType.SNOW, List.of(fixed(Enchantments.LUNGE, 3)),
-            VillagerType.SWAMP, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(QUICKSTRIKE, 2)),
             VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
     // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> SPEAR_ENCHANT_FALLBACK =
             List.of(fixed(Enchantments.UNBREAKING, 3));
 
-    // Enchanted Diamond Axe (Expert). All levels are fixed; Snow (Tundra) gets Cleave.
+    // Enchanted Iron Axe (Expert). All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> AXE_ENCHANT_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
             VillagerType.SAVANNA, List.of(fixed(REACH, 3)),
             VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
             VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
-            VillagerType.SNOW, List.of(fixed(CLEAVE, 3)),
-            VillagerType.SWAMP, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.SHARPNESS, 5)),
+            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(QUICKSTRIKE, 2)),
             VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
     // Plains set.
@@ -152,21 +152,21 @@ public final class WeaponsmithTrades {
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.ANVIL, 1, 7, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.ANVIL, 1, 9, JOURNEYMAN_MAX_USES, 5));
 
-        // Expert (level 4): Enchanted Diamond Axe (villager type), Enchanted Diamond Spear (villager type) - 10 XP/trade
+        // Expert (level 4): Enchanted Iron Axe (villager type), Enchanted Iron Spear (villager type) - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.DIAMOND_AXE, 1, 10, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_AXE, 1, 5, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.DIAMOND_AXE, AXE_ENCHANT_BY_TYPE, AXE_ENCHANT_FALLBACK, 16, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.DIAMOND_SPEAR, 1, 10, EXPERT_MAX_USES, 10));
+                Items.IRON_AXE, AXE_ENCHANT_BY_TYPE, AXE_ENCHANT_FALLBACK, 11, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SPEAR, 1, 6, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.DIAMOND_SPEAR, SPEAR_ENCHANT_BY_TYPE, SPEAR_ENCHANT_FALLBACK, 16, EXPERT_MAX_USES, 10));
+                Items.IRON_SPEAR, SPEAR_ENCHANT_BY_TYPE, SPEAR_ENCHANT_FALLBACK, 12, EXPERT_MAX_USES, 10));
 
-        // Master (level 5): Enchanted Diamond Sword (villager type). XP 0: no level above Master.
+        // Master (level 5): Enchanted Iron Sword (villager type). XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.DIAMOND_SWORD, 1, 14, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SWORD, 1, 8, MASTER_MAX_USES, 0));
         master.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.DIAMOND_SWORD, SWORD_ENCHANT_BY_TYPE, SWORD_ENCHANT_FALLBACK, 20, MASTER_MAX_USES, 0));
+                Items.IRON_SWORD, SWORD_ENCHANT_BY_TYPE, SWORD_ENCHANT_FALLBACK, 14, MASTER_MAX_USES, 0));
     }
 }

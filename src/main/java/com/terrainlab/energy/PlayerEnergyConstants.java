@@ -33,9 +33,9 @@ public final class PlayerEnergyConstants {
     public static final int MIN_HUNGER_FOR_HEALTH_REST = 4;
     public static final int MIN_HUNGER_FOR_ENERGY_REST = 8;
 
-    // Simulated daytime covering a full night's sleep (dusk ~12542 to dawn ~23859, rounded);
+    // Daytime covering a full night's sleep (8pm-4am bed window);
     // sleeping less scales the reward down proportionally.
-    public static final int FULL_NIGHT_WINDOW_TICKS = 12000;
+    public static final int FULL_NIGHT_WINDOW_TICKS = 8000;
     // Hunger-point conversions granted for a full night (fraction 1.0).
     public static final int MAX_HUNGER_CONVERSIONS_PER_NIGHT = 4;
 

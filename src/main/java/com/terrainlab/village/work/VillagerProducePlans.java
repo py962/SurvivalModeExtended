@@ -39,14 +39,19 @@ public final class VillagerProducePlans {
     // ---------------------------------------------------------------- farmer
 
     /**
-     * Farmer: all wheat (half of it baked 3:1 into bread), potatoes and carrots above the replanting
-     * reserve, beetroot in sixes as beetroot soup, and all pumpkins, melon slices and sugar cane. Seeds
-     * are never delivered.
+     * Farmer: all wheat, potatoes and carrots above the replanting reserve, beetroot in sixes as
+     * beetroot soup, and all pumpkins, melon slices and sugar cane. Seeds are never delivered.
+     * <p>
+     * Wheat: over time exactly half of all wheat goes in as bread. Each delivery sets aside half of
+     * the newly brought wheat (odd remainders carry over via the running tally in
+     * {@link VillagerWorkState}), bakes one loaf per {@link VillagerWorkConstants#WHEAT_PER_BREAD}
+     * set-aside wheat and delivers the other half as wheat. Set-aside wheat short of a loaf stays in
+     * the farmer's inventory for the next delivery (and does not by itself prompt a trip).
      */
     public static final DepositProduceBehavior.ProducePlan FARMER = new DepositProduceBehavior.ProducePlan() {
         @Override
         public boolean wantsTrip(Villager body, VillagerWorkState state, long now) {
-            int amount = farmerDeliverable(body.getInventory());
+            int amount = farmerDeliverable(body.getInventory(), state);
             // "Filling" needs a worthwhile load, or a farmer with many crop types would shuttle constantly.
             return amount > 0 && (intervalDue(state, now)
                     || (filling(body.getInventory()) && amount >= VillagerWorkConstants.FILLING_MIN_ITEMS));
@@ -57,10 +62,7 @@ public final class VillagerProducePlans {
             SimpleContainer inv = body.getInventory();
             List<ItemStack> out = new ArrayList<>();
 
-            int wheat = VillagerWork.remove(inv, s -> s.is(Items.WHEAT), Integer.MAX_VALUE);
-            int bread = (wheat / 2) / VillagerWorkConstants.WHEAT_PER_BREAD;
-            addStacks(out, Items.BREAD, bread);
-            addStacks(out, Items.WHEAT, wheat - bread * VillagerWorkConstants.WHEAT_PER_BREAD);
+            extractWheat(body, out);
 
             for (Item crop : new Item[]{Items.POTATO, Items.CARROT}) {
                 int excess = inv.countItem(crop) - VillagerWorkConstants.SEED_CROP_RESERVE;
@@ -82,8 +84,37 @@ public final class VillagerProducePlans {
         }
     };
 
-    static int farmerDeliverable(SimpleContainer inv) {
-        int total = inv.countItem(Items.WHEAT)
+    /**
+     * Wheat part of a farmer delivery (see {@link #FARMER}): updates the farmer's baking tally, removes
+     * the delivered wheat from its inventory and adds bread and wheat to {@code out}.
+     */
+    private static void extractWheat(Villager body, List<ItemStack> out) {
+        SimpleContainer inv = body.getInventory();
+        VillagerWorkState state = VillagerWork.state(body);
+        int perLoaf = VillagerWorkConstants.WHEAT_PER_BREAD;
+        long delivered = state.wheatDelivered();
+        long baked = state.wheatBaked();
+        int held = state.wheatSetAside();
+        int carried = inv.countItem(Items.WHEAT);
+        if (carried < held) {
+            // Some set-aside wheat is gone (shared or picked from the inventory): write it off.
+            baked += held - carried;
+            held = carried;
+        }
+        delivered += carried - held; // only the newly brought wheat counts as delivered
+        int setAside = (int) Math.max(0L, delivered / 2L - baked);
+        int loaves = setAside / perLoaf;
+        baked += (long) loaves * perLoaf;
+        int keep = setAside - loaves * perLoaf; // short of a loaf: stays with the farmer
+        int removed = VillagerWork.remove(inv, s -> s.is(Items.WHEAT), Math.max(0, carried - keep));
+        addStacks(out, Items.BREAD, loaves);
+        addStacks(out, Items.WHEAT, removed - loaves * perLoaf);
+        VillagerWork.setState(body, state.withWheatTally(delivered, baked));
+    }
+
+    /** What a farmer would deliver now; wheat set aside for the next loaf does not count. */
+    static int farmerDeliverable(SimpleContainer inv, VillagerWorkState state) {
+        int total = Math.max(0, inv.countItem(Items.WHEAT) - state.wheatSetAside())
                 + Math.max(0, inv.countItem(Items.POTATO) - VillagerWorkConstants.SEED_CROP_RESERVE)
                 + Math.max(0, inv.countItem(Items.CARROT) - VillagerWorkConstants.SEED_CROP_RESERVE)
                 + inv.countItem(Items.PUMPKIN) + inv.countItem(Items.MELON_SLICE) + inv.countItem(Items.SUGAR_CANE);

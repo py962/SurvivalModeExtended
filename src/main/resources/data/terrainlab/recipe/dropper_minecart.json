@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:dropper",
+    "minecraft:minecart"
+  ],
+  "result": {
+    "count": 1,
+    "id": "terrainlab:dropper_minecart"
+  }
+}

@@ -48,6 +48,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import com.terrainlab.screen.FletchingTableScreen;
 import com.terrainlab.client.renderer.TieredArrowRenderer;
+import com.terrainlab.client.renderer.DispensingMinecartRenderer;
 import com.terrainlab.client.model.GooseModel;
 import com.terrainlab.client.model.VultureModel;
 import com.terrainlab.client.renderer.GooseRenderer;
@@ -226,6 +227,11 @@ public class TerrainLabClient {
         event.registerEntityRenderer(ModEntities.VOID_GLASS_FALLING.get(),
                 net.minecraft.client.renderer.entity.FallingBlockRenderer::new);
         event.registerEntityRenderer(ModEntities.TIERED_ARROW.get(), TieredArrowRenderer::new);
+        // Vanilla minecart model (the hopper minecart's layer is the plain minecart body).
+        event.registerEntityRenderer(ModEntities.DISPENSER_MINECART.get(),
+                context -> new DispensingMinecartRenderer(context, net.minecraft.client.model.geom.ModelLayers.HOPPER_MINECART));
+        event.registerEntityRenderer(ModEntities.DROPPER_MINECART.get(),
+                context -> new DispensingMinecartRenderer(context, net.minecraft.client.model.geom.ModelLayers.HOPPER_MINECART));
         event.registerEntityRenderer(ModEntities.FROSTBITTEN.get(),
                 FrostbittenRenderer::new);
         event.registerEntityRenderer(ModEntities.CARIBOU.get(),

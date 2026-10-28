@@ -2,6 +2,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/item_frame"
+    "layer0": "terrainlab:item/extra_large_item_frame"
   }
 }

@@ -18,7 +18,8 @@ import java.util.Map;
  * Daily village cycle.
  * <ul>
  *   <li>Hourly while the sun is up: a happiness sample per village, and the village food chest
- *       is ensured next to each bell (also at sunset; see VillageChestService).</li>
+ *       is ensured next to each bell (also at sunset; see VillageChestService). Villages with no
+ *       usable chest (just discovered, or chest broken) are re-checked every 10 seconds.</li>
  *   <li>At solar sunset: the hunger and tier checks (using the day's
  *       average happiness), then the nightly bonus for the top two tiers
  *       is banked and all banked bell XP is released at the bell.</li>
@@ -31,6 +32,12 @@ public final class VillageDailyTickHandler {
     /** Solar day whose sunset has already been handled, per dimension. */
     private static final Map<ResourceKey<Level>, Long> LAST_SUNSET = new HashMap<>();
 
+    /**
+     * How often villages without a usable chest (newly discovered, or chest broken/replaced) are
+     * checked, day and night, so they get one promptly rather than at the next hourly sample.
+     */
+    private static final int CHEST_CHECK_INTERVAL_TICKS = 200;
+
     private VillageDailyTickHandler() {
     }
 
@@ -38,6 +45,7 @@ public final class VillageDailyTickHandler {
     public static void onServerTick(ServerTickEvent.Post event) {
         int tick = event.getServer().getTickCount();
         boolean sampleTick = tick % VillageConstants.HAPPINESS_SAMPLE_INTERVAL_TICKS == 0;
+        boolean chestTick = tick % CHEST_CHECK_INTERVAL_TICKS == 0;
 
         for (ServerLevel level : event.getServer().getAllLevels()) {
             boolean day = SolarTime.isSolarDay(level);
@@ -51,6 +59,36 @@ public final class VillageDailyTickHandler {
                 }
             } else if (sampleTick) {
                 sampleHappiness(level);
+                continue; // the sample already ensured every chest
+            }
+            if (chestTick) {
+                ensureMissingChests(level);
+            }
+        }
+    }
+
+    /**
+     * Places (or adopts) a chest for every nearby village that has none usable: newly discovered
+     * villages and ones whose chest was broken or replaced. In ultra-hardcore only once a living
+     * villager is a member, as in {@link #sampleHappiness}.
+     */
+    private static void ensureMissingChests(ServerLevel level) {
+        List<BlockPos> bells = VillageDiscoveryService.discoverBellPositions(level);
+        List<BlockPos> missing = new java.util.ArrayList<>();
+        for (BlockPos bell : bells) {
+            if (VillageChestService.needsChest(level, bell)) {
+                missing.add(bell);
+            }
+        }
+        if (missing.isEmpty()) {
+            return;
+        }
+        Map<BlockPos, List<Villager>> membership = level.getServer().isHardcore()
+                ? VillageMembershipService.assignVillagersToNearestVillage(level, bells)
+                : Map.of();
+        for (BlockPos bell : missing) {
+            if (!level.getServer().isHardcore() || !membership.getOrDefault(bell, List.of()).isEmpty()) {
+                VillageChestService.ensureChest(level, bell);
             }
         }
     }

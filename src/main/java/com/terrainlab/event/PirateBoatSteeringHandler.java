@@ -7,13 +7,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.vehicle.boat.Boat;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.raid.Raid;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /**
  * Steers vanilla boats carrying a {@link PirateRaiderEntity} toward that pirate's attack
- * target, holding at crossbow range instead of ramming.
+ * target, holding at crossbow range instead of ramming. Raid pirates with no target sail
+ * toward the raided village.
  * <p>
  * Boats have no autonomous movement (paddling is player-input driven), so the boat is
  * driven server-side by setting its velocity directly each tick. Velocity comes from the
@@ -40,7 +43,14 @@ public class PirateBoatSteeringHandler {
 
             LivingEntity target = findTarget(boat);
             if (target != null) {
-                steerTowards(boat, target);
+                steerTowards(boat, target.getX(), target.getZ(), MAX_CHASE_RANGE);
+            } else {
+                // Raid pirates with nothing to shoot head for the village; the shore stops them.
+                Raid raid = findRaid(boat);
+                if (raid != null) {
+                    BlockPos centre = raid.getCenter();
+                    steerTowards(boat, centre.getX() + 0.5, centre.getZ() + 0.5, Double.MAX_VALUE);
+                }
             }
         }
     }
@@ -55,11 +65,21 @@ public class PirateBoatSteeringHandler {
         return null;
     }
 
-    private static void steerTowards(Boat boat, LivingEntity target) {
-        double dx = target.getX() - boat.getX();
-        double dz = target.getZ() - boat.getZ();
+    /** The raid of a pirate aboard, if it is still going. */
+    private static Raid findRaid(Boat boat) {
+        for (Entity passenger : boat.getPassengers()) {
+            if (passenger instanceof PirateRaiderEntity pirate && pirate.hasActiveRaid()) {
+                return pirate.getCurrentRaid();
+            }
+        }
+        return null;
+    }
+
+    private static void steerTowards(Boat boat, double targetX, double targetZ, double maxRange) {
+        double dx = targetX - boat.getX();
+        double dz = targetZ - boat.getZ();
         double distance = Math.sqrt(dx * dx + dz * dz);
-        if (distance > MAX_CHASE_RANGE || distance < 1.0e-4) return;
+        if (distance > maxRange || distance < 1.0e-4) return;
 
         // Visual facing only; movement below does not depend on it.
         float desiredYaw = (float) Math.toDegrees(Math.atan2(-dx, dz));

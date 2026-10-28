@@ -86,14 +86,6 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:shears"
-        },
-        {
-          "type": "minecraft:item",
           "functions": [
             {
               "add": false,

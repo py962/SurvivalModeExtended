@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Dual wielding: a melee weapon (tag {@code #terrainlab:enchantable/quickstrike_group}) in both
+ * Dual wielding: a melee weapon (tag {@code #terrainlab:dual_wield_weapons}: swords, axes, spears, trident, mace) in both
  * hands gives the off hand its own attack cooldown, so the two hands can strike alternately.
  *
  * <p>The main hand is untouched vanilla (left-click, {@code attackStrengthTicker}). The off hand
@@ -70,7 +70,7 @@ public final class DualWield {
 
     /** Melee weapons that can be dual wielded: swords, axes and spears (shared with Quickstrike). */
     public static final TagKey<Item> MELEE_WEAPONS = TagKey.create(Registries.ITEM,
-            Identifier.fromNamespaceAndPath(TerrainLab.MODID, "enchantable/quickstrike_group"));
+            Identifier.fromNamespaceAndPath(TerrainLab.MODID, "dual_wield_weapons"));
 
     /** Vanilla's server-side attack range leeway ({@code handleAttack} uses 3.0). */
     private static final double SERVER_RANGE_BUFFER = 3.0;

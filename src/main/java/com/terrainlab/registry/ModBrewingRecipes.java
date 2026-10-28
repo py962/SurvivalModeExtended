@@ -44,5 +44,9 @@ public class ModBrewingRecipes {
         builder.addMix(ModPotions.LONG_PHASING.getDelegate(), Items.FERMENTED_SPIDER_EYE, ModPotions.LONG_PHASE_BLOCKING.getDelegate());
         builder.addMix(ModPotions.LONG_GRIP.getDelegate(), Items.FERMENTED_SPIDER_EYE, ModPotions.LONG_SLIPPERY.getDelegate());
         builder.addMix(ModPotions.LONG_WARMTH.getDelegate(), Items.FERMENTED_SPIDER_EYE, ModPotions.LONG_FREEZING.getDelegate());
+
+        // Cauldron-mixed Custom Potions keep their effects/colour/name through splash and lingering.
+        builder.addRecipe(new com.terrainlab.recipe.CustomPotionBrewingRecipe(Items.POTION, Items.GUNPOWDER, Items.SPLASH_POTION));
+        builder.addRecipe(new com.terrainlab.recipe.CustomPotionBrewingRecipe(Items.SPLASH_POTION, Items.DRAGON_BREATH, Items.LINGERING_POTION));
     }
 }

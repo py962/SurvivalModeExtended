@@ -1,16 +1,6 @@
 {
   "type": "minecraft:ruined_portal",
-  "biomes": [
-    "minecraft:old_growth_birch_forest",
-    "minecraft:dark_forest",
-    "minecraft:taiga",
-    "minecraft:snowy_taiga",
-    "minecraft:old_growth_pine_taiga",
-    "minecraft:old_growth_spruce_taiga",
-    "minecraft:mangrove_swamp",
-    "minecraft:grove",
-    "terrainlab:marsh"
-  ],
+  "biomes": [],
   "setups": [
     {
       "air_pocket_probability": 1.0,

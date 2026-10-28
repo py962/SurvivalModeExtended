@@ -56,10 +56,6 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:smooth_stone"
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:emerald"
         }
       ],
       "rolls": {

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "terrainlab:diamond_upgrade_smithing_template"
+        }
+      ]
+    }
+  ]
+}

@@ -20,27 +20,16 @@ public final class FarmerTrades {
 
     private FarmerTrades() {}
 
-    private static final Map<ResourceKey<VillagerType>, Item> APPLE_OR_BEETROOT = Map.of(
-            VillagerType.PLAINS, Items.BEETROOT,
-            VillagerType.SAVANNA, Items.APPLE,
-            VillagerType.DESERT, Items.BEETROOT,
-            VillagerType.TAIGA, Items.BEETROOT,
-            VillagerType.SNOW, Items.BEETROOT,
-            VillagerType.SWAMP, Items.APPLE,
-            VillagerType.JUNGLE, Items.APPLE
-    );
-    private static final Item APPLE_OR_BEETROOT_FALLBACK = Items.BEETROOT;
-
-    private static final Map<ResourceKey<VillagerType>, Item> MELON_OR_PUMPKIN = Map.of(
+    private static final Map<ResourceKey<VillagerType>, Item> EXPERT_PRODUCE = Map.of(
             VillagerType.PLAINS, Items.PUMPKIN,
             VillagerType.SAVANNA, Items.MELON_SLICE,
             VillagerType.DESERT, Items.MELON_SLICE,
-            VillagerType.TAIGA, Items.PUMPKIN,
+            VillagerType.TAIGA, Items.APPLE,
             VillagerType.SNOW, Items.PUMPKIN,
-            VillagerType.SWAMP, Items.PUMPKIN,
+            VillagerType.SWAMP, Items.APPLE,
             VillagerType.JUNGLE, Items.MELON_SLICE
     );
-    private static final Item MELON_OR_PUMPKIN_FALLBACK = Items.PUMPKIN;
+    private static final Item EXPERT_PRODUCE_FALLBACK = Items.PUMPKIN;
 
     // Restock limits shrink with level: common trades restock often, valuable ones are scarcer.
     private static final int NOVICE_MAX_USES = 16;
@@ -65,13 +54,13 @@ public final class FarmerTrades {
         novice.add(TradeListings.SimpleTradeListing.buying(Items.CARROT, 18, 1, NOVICE_MAX_USES, 1));
         novice.add(TradeListings.SimpleTradeListing.selling(Items.CARROT, 14, 1, NOVICE_MAX_USES, 1));
 
-        // Apprentice (level 2): Potato, Apple-or-Beetroot (villager type) - 2 XP/trade
+        // Apprentice (level 2): Potato, Beetroot - 2 XP/trade
         List<VillagerTrades.ItemListing> apprentice = trades.get(2);
         apprentice.clear();
         apprentice.add(TradeListings.SimpleTradeListing.buying(Items.POTATO, 18, 1, APPRENTICE_MAX_USES, 2));
         apprentice.add(TradeListings.SimpleTradeListing.selling(Items.POTATO, 14, 1, APPRENTICE_MAX_USES, 2));
-        apprentice.add(TradeListings.VillagerTypeVariantTradeListing.buying(APPLE_OR_BEETROOT, APPLE_OR_BEETROOT_FALLBACK, 9, 1, APPRENTICE_MAX_USES, 2));
-        apprentice.add(TradeListings.VillagerTypeVariantTradeListing.selling(APPLE_OR_BEETROOT, APPLE_OR_BEETROOT_FALLBACK, 7, 1, APPRENTICE_MAX_USES, 2));
+        apprentice.add(TradeListings.SimpleTradeListing.buying(Items.BEETROOT, 9, 1, APPRENTICE_MAX_USES, 2));
+        apprentice.add(TradeListings.SimpleTradeListing.selling(Items.BEETROOT, 7, 1, APPRENTICE_MAX_USES, 2));
 
         // Journeyman (level 3): Bread, Brown Mushroom - 5 XP/trade
         List<VillagerTrades.ItemListing> journeyman = trades.get(3);
@@ -81,13 +70,13 @@ public final class FarmerTrades {
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.BROWN_MUSHROOM, 9, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.BROWN_MUSHROOM, 7, 1, JOURNEYMAN_MAX_USES, 5));
 
-        // Expert (level 4): Red Mushroom, Melon-or-Pumpkin (villager type) - 10 XP/trade
+        // Expert (level 4): Red Mushroom, Apple, Melon or Pumpkin (villager type) - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
         expert.add(TradeListings.SimpleTradeListing.buying(Items.RED_MUSHROOM, 9, 1, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.selling(Items.RED_MUSHROOM, 7, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.VillagerTypeVariantTradeListing.buying(MELON_OR_PUMPKIN, MELON_OR_PUMPKIN_FALLBACK, 5, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.VillagerTypeVariantTradeListing.selling(MELON_OR_PUMPKIN, MELON_OR_PUMPKIN_FALLBACK, 3, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.VillagerTypeVariantTradeListing.buying(EXPERT_PRODUCE, EXPERT_PRODUCE_FALLBACK, 5, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.VillagerTypeVariantTradeListing.selling(EXPERT_PRODUCE, EXPERT_PRODUCE_FALLBACK, 3, 1, EXPERT_MAX_USES, 10));
 
         // Master (level 5): Honey Bottle. XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);

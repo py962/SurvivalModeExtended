@@ -28,7 +28,7 @@ public final class ButcherTrades {
             VillagerType.PLAINS, Items.BEEF,
             VillagerType.SAVANNA, Items.BEEF,
             VillagerType.DESERT, Items.BEEF,
-            VillagerType.TAIGA, ModItems.VENISON.get(),
+            VillagerType.TAIGA, Items.BEEF,
             VillagerType.SNOW, ModItems.VENISON.get(),
             VillagerType.SWAMP, Items.BEEF,
             VillagerType.JUNGLE, Items.BEEF
@@ -39,7 +39,7 @@ public final class ButcherTrades {
             VillagerType.PLAINS, Items.COOKED_BEEF,
             VillagerType.SAVANNA, Items.COOKED_BEEF,
             VillagerType.DESERT, Items.COOKED_BEEF,
-            VillagerType.TAIGA, ModItems.COOKED_VENISON.get(),
+            VillagerType.TAIGA, Items.COOKED_BEEF,
             VillagerType.SNOW, ModItems.COOKED_VENISON.get(),
             VillagerType.SWAMP, Items.COOKED_BEEF,
             VillagerType.JUNGLE, Items.COOKED_BEEF

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "terrainlab:seasonal_apples"
+    "terrainlab:seasonal_apples",
+    "terrainlab:diamond_upgrade_smithing_template"
   ]
 }

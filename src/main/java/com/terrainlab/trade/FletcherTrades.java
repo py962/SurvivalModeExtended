@@ -57,9 +57,9 @@ public final class FletcherTrades {
     // Enchanted Bow (Master). All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOW_ENCHANT_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(fixed(Enchantments.PUNCH, 2)),
-            VillagerType.SAVANNA, List.of(fixed(Enchantments.UNBREAKING, 3)),
-            VillagerType.TAIGA, List.of(fixed(Enchantments.PUNCH, 1), fixed(Enchantments.UNBREAKING, 2)),
-            VillagerType.DESERT, List.of(fixed(Enchantments.POWER, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.SAVANNA, List.of(fixed(Enchantments.POWER, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.DESERT, List.of(fixed(Enchantments.PUNCH, 1), fixed(Enchantments.UNBREAKING, 2)),
             VillagerType.SNOW, List.of(fixed(Enchantments.PUNCH, 1), fixed(Enchantments.POWER, 2)),
             VillagerType.SWAMP, List.of(fixed(Enchantments.POWER, 5)),
             VillagerType.JUNGLE, List.of(fixed(Enchantments.INFINITY, 1))
@@ -70,8 +70,8 @@ public final class FletcherTrades {
 
     // Enchanted Crossbow (Expert). All levels are fixed.
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> CROSSBOW_ENCHANT_BY_TYPE = Map.of(
-            VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
-            VillagerType.SAVANNA, List.of(fixed(Enchantments.MULTISHOT, 1)),
+            VillagerType.PLAINS, List.of(fixed(Enchantments.MULTISHOT, 1)),
+            VillagerType.SAVANNA, List.of(fixed(Enchantments.UNBREAKING, 3)),
             VillagerType.TAIGA, List.of(fixed(Enchantments.QUICK_CHARGE, 2), fixed(Enchantments.UNBREAKING, 2)),
             VillagerType.DESERT, List.of(fixed(Enchantments.QUICK_CHARGE, 3)),
             VillagerType.SNOW, List.of(fixed(Enchantments.PIERCING, 2), fixed(Enchantments.QUICK_CHARGE, 2)),
@@ -80,7 +80,7 @@ public final class FletcherTrades {
     );
     // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> CROSSBOW_ENCHANT_FALLBACK =
-            List.of(fixed(Enchantments.UNBREAKING, 3));
+            List.of(fixed(Enchantments.MULTISHOT, 1));
 
     // Special Feather: bird species per villager type.
     private static final Map<ResourceKey<VillagerType>, Item> FEATHER_BY_TYPE = Map.of(

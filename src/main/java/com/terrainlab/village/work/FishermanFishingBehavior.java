@@ -23,8 +23,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Fisherman: finds open water in the work area (a 3×3 patch of water source blocks open to the sky),
- * walks to a standable block on its edge, faces the water holding a fishing rod (display only,
- * restored afterwards) and fishes: after a uniform {@link VillagerWorkConstants#FISH_MIN_TICKS}–
+ * walks to a standable block on its edge, faces the water holding a fishing rod (display only, see
+ * {@link FishermanRod}; held only in the FISH phase and put away whenever the run stops) and fishes:
+ * after a uniform {@link VillagerWorkConstants#FISH_MIN_TICKS}–
  * {@link VillagerWorkConstants#FISH_MAX_TICKS} wait, a splash at the bobber point and one catch into
  * its inventory (cod / salmon / dried kelp; salmon likelier in cold biomes; never tropical fish).
  * Recasts until it carries {@link VillagerWorkConstants#FISH_DELIVER_AT} items (then
@@ -41,6 +42,7 @@ public class FishermanFishingBehavior extends AbstractVillagerWorkBehavior {
     private @Nullable Vec3 bobber;
     private long biteAt;
     private long nextScan;
+    private float savedHandDropChance = net.minecraft.world.entity.DropChances.DEFAULT_EQUIPMENT_DROP_CHANCE;
 
     public FishermanFishingBehavior() {
         super(VillagerProfession.FISHERMAN, Activity.WORK);
@@ -233,12 +235,13 @@ public class FishermanFishingBehavior extends AbstractVillagerWorkBehavior {
             }
             case FISH -> {
                 if (body.position().distanceToSqr(standCentre) > 3.0D * 3.0D) {
+                    FishermanRod.putAway(body, savedHandDropChance);
                     phase = Phase.WALK; // pushed away: walk back, then recast
                     beginLeg(now);
                     return;
                 }
                 stayAndLook(body, bobber);
-                holdItem(body, new ItemStack(Items.FISHING_ROD));
+                holdRod(body);
                 if (now % 40 == 0) {
                     level.sendParticles(ParticleTypes.FISHING, bobber.x, bobber.y, bobber.z, 2, 0.05D, 0.0D, 0.05D, 0.0D);
                 }
@@ -255,8 +258,17 @@ public class FishermanFishingBehavior extends AbstractVillagerWorkBehavior {
         }
     }
 
+    private void holdRod(Villager body) {
+        savedHandDropChance = FishermanRod.hold(body, savedHandDropChance);
+    }
+
+    @Override
+    protected void cleanup(ServerLevel level, Villager body, long now) {
+        FishermanRod.putAway(body, savedHandDropChance);
+    }
+
     private void cast(ServerLevel level, Villager body, long now) {
-        holdItem(body, new ItemStack(Items.FISHING_ROD));
+        holdRod(body);
         body.swing(InteractionHand.MAIN_HAND);
         level.playSound(null, body.getX(), body.getY(), body.getZ(), SoundEvents.FISHING_BOBBER_THROW,
                 SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));

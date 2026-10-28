@@ -52,6 +52,30 @@ public final class LuckLootBonus {
         return DEPTH.get()[0] == 1 && ACTIVE.get()[0] ? 1 : 0;
     }
 
+    private static final String VILLAGE_PREFIX = "chests/village/";
+
+    /**
+     * With Luck, village house chests roll their unmodified vanilla table (kept as
+     * terrainlab:chests/village_vanilla/...) instead of the mod's low-value one. Only for the outermost
+     * table; the substitute then gets the usual Luck bonus roll as the outermost table itself.
+     */
+    public static @Nullable LootTable luckySubstitute(LootTable table, LootContext context) {
+        if (DEPTH.get()[0] != 0) return null;
+        net.minecraft.resources.Identifier id;
+        try {
+            id = table.getLootTableId();
+        } catch (NullPointerException e) {
+            return null;
+        }
+        if (!id.getNamespace().equals("minecraft") || !id.getPath().startsWith(VILLAGE_PREFIX)) return null;
+        if (!qualifies(table, context)) return null;
+        var key = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE,
+                net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID,
+                        "chests/village_vanilla/" + id.getPath().substring(VILLAGE_PREFIX.length())));
+        LootTable substitute = context.getLevel().getServer().reloadableRegistries().getLootTable(key);
+        return substitute == LootTable.EMPTY ? null : substitute;
+    }
+
     private static boolean qualifies(LootTable table, LootContext context) {
         ContextKeySet set = table.getParamSet();
         if (set != LootContextParamSets.CHEST && set != LootContextParamSets.VAULT

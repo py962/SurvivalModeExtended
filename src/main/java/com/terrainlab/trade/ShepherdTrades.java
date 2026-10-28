@@ -27,46 +27,46 @@ public final class ShepherdTrades {
 
     // Per-biome colour theme shared by beds, banners and carpets.
     private static final Map<ResourceKey<VillagerType>, Item> BED_BY_TYPE = Map.of(
-            VillagerType.PLAINS, Items.BLUE_BED,
+            VillagerType.PLAINS, Items.LIGHT_GRAY_BED,
             VillagerType.SAVANNA, Items.LIME_BED,
             VillagerType.DESERT, Items.PINK_BED,
-            VillagerType.TAIGA, Items.RED_BED,
-            VillagerType.SNOW, Items.PURPLE_BED,
-            VillagerType.SWAMP, Items.MAGENTA_BED,
+            VillagerType.TAIGA, Items.PURPLE_BED,
+            VillagerType.SNOW, Items.MAGENTA_BED,
+            VillagerType.SWAMP, Items.BLUE_BED,
             VillagerType.JUNGLE, Items.BROWN_BED
     );
 
     private static final Map<ResourceKey<VillagerType>, Item> BANNER_BY_TYPE = Map.of(
-            VillagerType.PLAINS, Items.BLUE_BANNER,
+            VillagerType.PLAINS, Items.LIGHT_GRAY_BANNER,
             VillagerType.SAVANNA, Items.LIME_BANNER,
             VillagerType.DESERT, Items.PINK_BANNER,
-            VillagerType.TAIGA, Items.RED_BANNER,
-            VillagerType.SNOW, Items.PURPLE_BANNER,
-            VillagerType.SWAMP, Items.MAGENTA_BANNER,
+            VillagerType.TAIGA, Items.PURPLE_BANNER,
+            VillagerType.SNOW, Items.MAGENTA_BANNER,
+            VillagerType.SWAMP, Items.BLUE_BANNER,
             VillagerType.JUNGLE, Items.BROWN_BANNER
     );
 
     // TODO: confirm carpets should follow the biome colour theme rather than a fixed or random colour.
     private static final Map<ResourceKey<VillagerType>, Item> CARPET_BY_TYPE = Map.of(
-            VillagerType.PLAINS, Items.BLUE_CARPET,
+            VillagerType.PLAINS, Items.LIGHT_GRAY_CARPET,
             VillagerType.SAVANNA, Items.LIME_CARPET,
             VillagerType.DESERT, Items.PINK_CARPET,
-            VillagerType.TAIGA, Items.RED_CARPET,
-            VillagerType.SNOW, Items.PURPLE_CARPET,
-            VillagerType.SWAMP, Items.MAGENTA_CARPET,
+            VillagerType.TAIGA, Items.PURPLE_CARPET,
+            VillagerType.SNOW, Items.MAGENTA_CARPET,
+            VillagerType.SWAMP, Items.BLUE_CARPET,
             VillagerType.JUNGLE, Items.BROWN_CARPET
     );
 
     private static final Map<ResourceKey<VillagerType>, Item> LOCAL_DYE_SOURCE_2 = Map.of(
-            VillagerType.PLAINS, Items.CORNFLOWER,
+            VillagerType.PLAINS, Items.OXEYE_DAISY,
             VillagerType.SAVANNA, Items.SEA_PICKLE,
             VillagerType.DESERT, Items.CACTUS_FLOWER,
-            VillagerType.TAIGA, Items.POPPY,
-            VillagerType.SNOW, Items.SWEET_BERRIES,
-            VillagerType.SWAMP, Items.LILAC,
+            VillagerType.TAIGA, Items.SWEET_BERRIES,
+            VillagerType.SNOW, Items.ALLIUM,
+            VillagerType.SWAMP, Items.BLUE_ORCHID,
             VillagerType.JUNGLE, Items.COCOA_BEANS
     );
-    private static final Item LOCAL_DYE_SOURCE_2_FALLBACK = Items.CORNFLOWER;
+    private static final Item LOCAL_DYE_SOURCE_2_FALLBACK = Items.OXEYE_DAISY;
 
     private static final Map<ResourceKey<VillagerType>, Item> GOAT_OR_CARIBOU_FUR = Map.of(
             VillagerType.PLAINS, ModItems.GOAT_FUR.get(),

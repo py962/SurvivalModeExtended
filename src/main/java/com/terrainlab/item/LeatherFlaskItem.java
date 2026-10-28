@@ -4,7 +4,6 @@ import com.terrainlab.TerrainLab;
 import com.terrainlab.registry.ModDataComponents;
 import com.terrainlab.temperature.PlayerInternalTemperature;
 import com.terrainlab.temperature.PlayerTemperatureConstants;
-import com.terrainlab.temperature.WaterDrinkHandler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -23,7 +22,7 @@ import net.minecraft.world.phys.HitResult;
 
 /**
  * Refillable water flask holding {@link LeatherFlaskConstants#MAX_CHARGES} charges; each drink applies
- * the same cooling push as other cooling drinks. Right-clicking a small body of water refills it,
+ * the same cooling push as other cooling drinks. Right-clicking running (flowing) water or a water cauldron refills it,
  * right-clicking elsewhere drinks one charge. A missing charge component reads as full.
  * <p>
  * Overrides {@code use} rather than {@code useOn} because the default block raycast ignores fluids.
@@ -62,21 +61,27 @@ public class LeatherFlaskItem extends Item {
         }
     }
 
+    /** Refills one flask of the stack to full (used by the water-cauldron interaction). */
+    public static void refillOne(ItemStack stack, Player player) {
+        setChargesOnOne(stack, LeatherFlaskConstants.MAX_CHARGES, player);
+    }
+
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         // TerrainLab.LOGGER.info("[LeatherFlask] use() called, clientSide={}, hand={}", level.isClientSide(), hand);
 
-        BlockHitResult hitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
+        BlockHitResult hitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
         // TerrainLab.LOGGER.info("[LeatherFlask] raycast hit type: {}", hitResult.getType());
 
         if (hitResult.getType() == HitResult.Type.BLOCK) {
             var pos = hitResult.getBlockPos();
-            boolean isWater = level.getFluidState(pos).is(FluidTags.WATER);
-            boolean isLargeBody = isWater && WaterDrinkHandler.isLargeBodyOfWater(level, pos);
-            // TerrainLab.LOGGER.info("[LeatherFlask] hit block at {}, isWater={}, isLargeBody={}", pos, isWater, isLargeBody);
+            // Only running water refills (flowing, not a source block); water cauldrons are handled by
+            // the cauldron interaction (PotionCauldronInteractions).
+            var fluid = level.getFluidState(pos);
+            boolean isRunningWater = fluid.is(FluidTags.WATER) && !fluid.isSource();
 
-            if (isWater && !isLargeBody) {
+            if (isRunningWater) {
                 if (!level.isClientSide()) {
                     setChargesOnOne(stack, LeatherFlaskConstants.MAX_CHARGES, player);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),

@@ -51,6 +51,10 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:music_disc_relic"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "terrainlab:diamond_upgrade_smithing_template"
         }
       ],
       "rolls": 1.0

@@ -30,11 +30,11 @@ public final class FishermanTrades {
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> FISHING_ROD_ENCHANTMENTS_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(fixed(Enchantments.LURE, 3)),
             VillagerType.SAVANNA, List.of(fixed(Enchantments.LUCK_OF_THE_SEA, 3)),
-            VillagerType.TAIGA, List.of(fixed(Enchantments.UNBREAKING, 3)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.LUCK_OF_THE_SEA, 2), fixed(Enchantments.UNBREAKING, 2)),
             VillagerType.DESERT, List.of(fixed(Enchantments.LURE, 2), fixed(Enchantments.LUCK_OF_THE_SEA, 2)),
             VillagerType.SNOW, List.of(fixed(Enchantments.LURE, 2), fixed(Enchantments.UNBREAKING, 2)),
             VillagerType.SWAMP, List.of(fixed(Enchantments.LURE, 2), fixed(Enchantments.LUCK_OF_THE_SEA, 2)),
-            VillagerType.JUNGLE, List.of(fixed(Enchantments.LUCK_OF_THE_SEA, 2), fixed(Enchantments.UNBREAKING, 2))
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.UNBREAKING, 3))
     );
     // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> FISHING_ROD_ENCHANTMENTS_FALLBACK =

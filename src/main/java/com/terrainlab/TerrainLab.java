@@ -136,6 +136,7 @@ public class TerrainLab {
         NeoForge.EVENT_BUS.register(com.terrainlab.event.VillageEconomyHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.PlayerMilestoneHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.StructureStatsCommand.class);
+        NeoForge.EVENT_BUS.register(com.terrainlab.event.BiomeStatsCommand.class);
 
         // Custom trade tables replacing every vanilla profession's trade pool.
         NeoForge.EVENT_BUS.register(com.terrainlab.trade.FarmerTrades.class);

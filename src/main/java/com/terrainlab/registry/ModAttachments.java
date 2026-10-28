@@ -207,6 +207,19 @@ public class ModAttachments {
                             .serialize(BlockPos.CODEC.optionalFieldOf("pos"))
                             .build());
 
+    // Carpet a tamed wolf was sent to sleep on while its owner sleeps (WolfCarpetSleepHandler). Transient: a
+    // reloaded wolf is always awake.
+    public static final Supplier<AttachmentType<Optional<BlockPos>>> WOLF_SLEEP_CARPET =
+            ATTACHMENT_TYPES.register("wolf_sleep_carpet", () ->
+                    AttachmentType.builder(Optional::<BlockPos>empty).build());
+
+    // True once that wolf has reached its carpet and lain down. Transient; synced for the lying-down pose.
+    public static final Supplier<AttachmentType<Boolean>> WOLF_CARPET_ASLEEP =
+            ATTACHMENT_TYPES.register("wolf_carpet_asleep", () ->
+                    AttachmentType.builder(() -> false)
+                            .sync(ByteBufCodecs.BOOL)
+                            .build());
+
     // Owner of a camel, elephant, strider or happy ghast (the player who fitted its saddle/howdah/harness).
     // Read by GoatHornSummonHandler. Serialized; empty = unowned.
     public static final Supplier<AttachmentType<Optional<UUID>>> MOUNT_OWNER =
@@ -373,6 +386,15 @@ public class ModAttachments {
                             .serialize(net.minecraft.world.item.ItemStack.OPTIONAL_CODEC.fieldOf("lead"), stack -> !stack.isEmpty())
                             .build());
 
+    // True while a fisherman is fishing (FishermanFishingBehavior) and holding its display rod. Transient (a
+    // reloaded villager is never fishing; FishermanRod clears a saved rod) and synced so the client renders
+    // the rod as held (VillagerFishingRodClient) instead of as a crossed-arms trade item.
+    public static final Supplier<AttachmentType<Boolean>> VILLAGER_FISHING =
+            ATTACHMENT_TYPES.register("villager_fishing", () ->
+                    AttachmentType.builder(() -> false)
+                            .sync(ByteBufCodecs.BOOL)
+                            .build());
+
     // Villager health and chest meals (VillagerHealthService, VillagerChestMealService). All serialized.
     // Remaining heal-over-time from chest food.
     public static final Supplier<AttachmentType<com.terrainlab.village.VillagerPendingHeal>> VILLAGER_PENDING_HEAL =
@@ -423,11 +445,21 @@ public class ModAttachments {
                     AttachmentType.builder(() -> false).build());
 
     // Challenge advancements (ChallengeEligibility): bitmask of disqualifiers ever seen (cheats,
-    // Creative, Easy, Peaceful). Never clears. Serialized, copied on death.
+    // Creative, Easy, Peaceful, game rules). Never clears. Serialized, copied on death.
     public static final Supplier<AttachmentType<Integer>> CHALLENGE_DISQUALIFIED =
             ATTACHMENT_TYPES.register("challenge_disqualified", () ->
                     AttachmentType.builder(() -> 0)
                             .serialize(Codec.INT.fieldOf("challenge_disqualified"), flags -> flags != 0)
+                            .copyOnDeath()
+                            .build());
+
+    // Challenge advancements (ChallengeEligibility): ids of the game rules (e.g. "keep_inventory")
+    // ever seen at an easier value, in the order first seen; each is announced once. Immutable list,
+    // replaced on change. Never clears. Serialized when non-empty, copied on death.
+    public static final Supplier<AttachmentType<List<String>>> CHALLENGE_GAME_RULES =
+            ATTACHMENT_TYPES.register("challenge_game_rules", () ->
+                    AttachmentType.<List<String>>builder(() -> List.of())
+                            .serialize(Codec.STRING.listOf().fieldOf("challenge_game_rules"), rules -> !rules.isEmpty())
                             .copyOnDeath()
                             .build());
 

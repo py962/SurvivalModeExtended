@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 /**
  * Tracks loot-table nesting depth and, for the outermost table only, whether the Luck-effect bonus
- * roll applies (see {@link LuckLootBonus}). getRandomItemsRaw(LootContext, Consumer) is the single
+ * roll applies (see {@link LuckLootBonus}). With Luck, village house chests swap to their vanilla table. getRandomItemsRaw(LootContext, Consumer) is the single
  * funnel for fill(), getRandomItems(...) and nested loot_table entries.
  */
 @Mixin(LootTable.class)
@@ -20,6 +20,11 @@ public abstract class LootTableLuckBonusMixin {
 
     @WrapMethod(method = "getRandomItemsRaw(Lnet/minecraft/world/level/storage/loot/LootContext;Ljava/util/function/Consumer;)V", require = 1)
     private void terrainlab$luckBonusScope(LootContext context, Consumer<ItemStack> output, Operation<Void> original) {
+        LootTable lucky = LuckLootBonus.luckySubstitute((LootTable) (Object) this, context);
+        if (lucky != null) {
+            lucky.getRandomItemsRaw(context, output);
+            return;
+        }
         boolean previous = LuckLootBonus.enter((LootTable) (Object) this, context);
         try {
             original.call(context, output);

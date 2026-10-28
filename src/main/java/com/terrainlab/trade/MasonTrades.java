@@ -28,7 +28,7 @@ public final class MasonTrades {
             VillagerType.TAIGA, Items.MOSSY_COBBLESTONE,
             VillagerType.SNOW, Items.PACKED_ICE,
             VillagerType.SWAMP, Items.PACKED_MUD,
-            VillagerType.JUNGLE, Items.CALCITE
+            VillagerType.JUNGLE, Items.DRIPSTONE_BLOCK
     );
     private static final Item LOCAL_STONE_FALLBACK = Items.CLAY;
 
@@ -70,18 +70,18 @@ public final class MasonTrades {
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.DIORITE, 18, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.DIORITE, 14, 1, JOURNEYMAN_MAX_USES, 5));
 
-        // Expert (level 4): Granite, Dripstone - 10 XP/trade
+        // Expert (level 4): Granite, Basalt - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
         expert.add(TradeListings.SimpleTradeListing.buying(Items.GRANITE, 9, 1, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.selling(Items.GRANITE, 7, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.DRIPSTONE_BLOCK, 9, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.selling(Items.DRIPSTONE_BLOCK, 7, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.BASALT, 9, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.selling(Items.BASALT, 7, 1, EXPERT_MAX_USES, 10));
 
-        // Master (level 5): Basalt. XP 0: no level above Master.
+        // Master (level 5): Diamond. XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.BASALT, 9, 1, MASTER_MAX_USES, 0));
-        master.add(TradeListings.SimpleTradeListing.selling(Items.BASALT, 7, 1, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.DIAMOND, 1, 1, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.selling(Items.DIAMOND, 1, 3, MASTER_MAX_USES, 0));
     }
 }

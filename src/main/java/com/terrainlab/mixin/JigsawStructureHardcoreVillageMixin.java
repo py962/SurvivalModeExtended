@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.Optional;
 
 /**
- * Ultra-hardcore villages (see {@link HardcoreVillageRules}): rejects ~3 in 4 village start positions
+ * Isolation and Ultra-hardcore villages (see {@link HardcoreVillageRules}): rejects ~3 in 4 village start positions
  * and hands JigsawPlacement#addPieces a zombie-only copy of the start pool, so the town centre (and,
  * through its own jigsaws, the houses, streets and zombie villagers) is always the abandoned variant.
  * A village whose start pool has no zombie elements does not generate. findGenerationPoint backs both

@@ -72,7 +72,10 @@ public class FrostbittenEntity extends Zombie {
                                                      net.minecraft.util.RandomSource random) {
         boolean groundOk = level.getBlockState(pos.below()).blocksMotion();
         int brightness = level.getRawBrightness(pos, level.getSkyDarken());
-        boolean result = groundOk && brightness <= 7;
+        boolean result = level.getLevel().getDifficulty()
+                != net.minecraft.world.Difficulty.PEACEFUL
+                && groundOk
+                && brightness <= 7;
         if (DEBUG_LOG_SPAWN_CHECKS) {
             // com.terrainlab.TerrainLab.LOGGER.info(
                     // "Frostbitten spawn check at {}: groundOk={}, brightness={}, result={}",

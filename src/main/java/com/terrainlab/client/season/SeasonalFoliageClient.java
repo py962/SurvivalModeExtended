@@ -3,7 +3,9 @@ package com.terrainlab.client.season;
 import com.terrainlab.TerrainLab;
 import com.terrainlab.client.season.SeasonalLeaves.Look;
 import com.terrainlab.client.season.SeasonalLeaves.Tree;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
@@ -44,11 +46,15 @@ public final class SeasonalFoliageClient {
     private SeasonalFoliageClient() {
     }
 
-    /** Oak in its brown seasons: multiplied onto the greyscale oak texture, giving a russet brown. */
-    private static final int OAK_BROWN = 0xFFC07838;
+    /**
+     * Oak in its brown seasons, multiplied onto the greyscale oak texture; indexed by
+     * {@link SeasonalLeaves#shadeAt}: russet brown (base), lighter tan/ochre, deep russet red-brown.
+     */
+    private static final int[] OAK_BROWN = {0xFFC07838, 0xFFD4A04E, 0xFF9C4426};
     /** Birch particle tints for looks whose block texture is pre-coloured. */
     private static final int BIRCH_FROSTY = 0xFFE4ECF2;
-    private static final int BIRCH_YELLOW = 0xFFF2CC3A;
+    /** Per shade, matching the gold, lemon and amber textures. */
+    private static final int[] BIRCH_YELLOW = {0xFFF2CC3A, 0xFFF6E05A, 0xFFDC8C24};
 
     /** Vanilla's leaf tints (BlockColors.createDefault), used outside the seasonal looks. */
     private static final int VANILLA_BIRCH = -8345771;
@@ -57,6 +63,8 @@ public final class SeasonalFoliageClient {
     private static final StandaloneModelKey<BlockModelPart> BIRCH_FROSTY_MODEL = key("birch_leaves_frosty");
     private static final StandaloneModelKey<BlockModelPart> BIRCH_FLOWERING_MODEL = key("birch_leaves_flowering");
     private static final StandaloneModelKey<BlockModelPart> BIRCH_YELLOW_MODEL = key("birch_leaves_yellow");
+    private static final StandaloneModelKey<BlockModelPart> BIRCH_LEMON_MODEL = key("birch_leaves_lemon");
+    private static final StandaloneModelKey<BlockModelPart> BIRCH_AMBER_MODEL = key("birch_leaves_amber");
     private static final StandaloneModelKey<BlockModelPart> CHERRY_CRIMSON_MODEL = key("cherry_leaves_crimson");
 
     private static StandaloneModelKey<BlockModelPart> key(String name) {
@@ -84,6 +92,8 @@ public final class SeasonalFoliageClient {
         register(event, BIRCH_FROSTY_MODEL, seasonalModel("birch_leaves_frosty"));
         register(event, BIRCH_FLOWERING_MODEL, seasonalModel("birch_leaves_flowering"));
         register(event, BIRCH_YELLOW_MODEL, seasonalModel("birch_leaves_yellow"));
+        register(event, BIRCH_LEMON_MODEL, seasonalModel("birch_leaves_lemon"));
+        register(event, BIRCH_AMBER_MODEL, seasonalModel("birch_leaves_amber"));
         register(event, CHERRY_CRIMSON_MODEL, seasonalModel("cherry_leaves_crimson"));
     }
 
@@ -96,27 +106,35 @@ public final class SeasonalFoliageClient {
         var baked = event.getBakingResult().standaloneModels();
         Map<BlockState, BlockStateModel> models = event.getBakingResult().blockStateModels();
 
-        Map<Look, BlockModelPart> birch = new EnumMap<>(Look.class);
+        Map<Look, BlockModelPart[]> birch = new EnumMap<>(Look.class);
         put(birch, Look.FROSTY, baked.get(BIRCH_FROSTY_MODEL));
         put(birch, Look.FLOWERING, baked.get(BIRCH_FLOWERING_MODEL));
-        put(birch, Look.YELLOW, baked.get(BIRCH_YELLOW_MODEL));
+        // Shade order follows SeasonalLeaves.shadeAt: base, lighter, deeper.
+        put(birch, Look.YELLOW, baked.get(BIRCH_YELLOW_MODEL), baked.get(BIRCH_LEMON_MODEL), baked.get(BIRCH_AMBER_MODEL));
         wrap(models, Blocks.BIRCH_LEAVES, Tree.BIRCH, birch);
 
-        Map<Look, BlockModelPart> cherry = new EnumMap<>(Look.class);
+        Map<Look, BlockModelPart[]> cherry = new EnumMap<>(Look.class);
         put(cherry, Look.CRIMSON, baked.get(CHERRY_CRIMSON_MODEL));
         wrap(models, Blocks.CHERRY_LEAVES, Tree.CHERRY, cherry);
-        // Oak needs no texture swap: its seasonal look is purely a tint.
+        // Oak needs no texture swap: its seasonal look is purely a tint (shaded per block).
     }
 
-    private static void put(Map<Look, BlockModelPart> map, Look look, @Nullable BlockModelPart part) {
-        if (part != null) {
-            map.put(look, part);
-        } else {
-            TerrainLab.LOGGER.warn("Seasonal leaves: missing baked model for {}", look);
+    /** One part for a plain look, or one per shade (base, lighter, deeper) for a shaded autumn look. */
+    private static void put(Map<Look, BlockModelPart[]> map, Look look, @Nullable BlockModelPart... parts) {
+        List<BlockModelPart> found = new ArrayList<>(parts.length);
+        for (BlockModelPart part : parts) {
+            if (part != null) {
+                found.add(part);
+            } else {
+                TerrainLab.LOGGER.warn("Seasonal leaves: missing baked model for {}", look);
+            }
+        }
+        if (!found.isEmpty()) {
+            map.put(look, found.toArray(BlockModelPart[]::new));
         }
     }
 
-    private static void wrap(Map<BlockState, BlockStateModel> models, Block block, Tree tree, Map<Look, BlockModelPart> variants) {
+    private static void wrap(Map<BlockState, BlockStateModel> models, Block block, Tree tree, Map<Look, BlockModelPart[]> variants) {
         if (variants.isEmpty()) {
             return;
         }
@@ -149,12 +167,12 @@ public final class SeasonalFoliageClient {
             Look look = SeasonalLeaves.lookAt(level, pos, this.tree);
             switch (look) {
                 case BROWN:
-                    return OAK_BROWN;
+                    return OAK_BROWN[pos != null ? SeasonalLeaves.shadeAt(pos) : 0];
                 case FROSTY:
                     if (this.tree == Tree.BIRCH) return BIRCH_FROSTY;
                     break;
                 case YELLOW:
-                    return BIRCH_YELLOW;
+                    return BIRCH_YELLOW[pos != null ? SeasonalLeaves.shadeAt(pos) : 0];
                 default:
                     break;
             }

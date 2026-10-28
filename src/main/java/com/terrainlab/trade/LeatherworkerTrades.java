@@ -38,11 +38,11 @@ public final class LeatherworkerTrades {
     private static final Map<ResourceKey<VillagerType>, List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance>> BOOTS_ENCHANTMENTS_BY_TYPE = Map.of(
             VillagerType.PLAINS, List.of(fixed(Enchantments.UNBREAKING, 3)),
             VillagerType.SAVANNA, List.of(fixed(Enchantments.DEPTH_STRIDER, 2), fixed(Enchantments.UNBREAKING, 2)),
-            VillagerType.TAIGA, List.of(fixed(Enchantments.FEATHER_FALLING, 2), fixed(Enchantments.UNBREAKING, 2)),
+            VillagerType.TAIGA, List.of(fixed(Enchantments.FEATHER_FALLING, 2), fixed(AGILITY, 2)),
             VillagerType.DESERT, List.of(fixed(AGILITY, 3)),
-            VillagerType.SNOW, List.of(fixed(Enchantments.FEATHER_FALLING, 4)),
+            VillagerType.SNOW, List.of(fixed(Enchantments.FROST_WALKER, 2)),
             VillagerType.SWAMP, List.of(fixed(Enchantments.DEPTH_STRIDER, 3)),
-            VillagerType.JUNGLE, List.of(fixed(AGILITY, 2), fixed(Enchantments.FEATHER_FALLING, 2))
+            VillagerType.JUNGLE, List.of(fixed(Enchantments.FEATHER_FALLING, 4))
     );
     // Plains set.
     private static final List<TradeListings.VillagerTypeEnchantedSellListing.EnchantmentInstance> BOOTS_ENCHANTMENTS_FALLBACK =
@@ -62,15 +62,15 @@ public final class LeatherworkerTrades {
     );
 
     private static final Map<ResourceKey<VillagerType>, Item> LOCAL_DYE_SOURCE = Map.of(
-            VillagerType.PLAINS, Items.OXEYE_DAISY,
+            VillagerType.PLAINS, Items.CORNFLOWER,
             VillagerType.SAVANNA, Items.DANDELION,
             VillagerType.DESERT, Items.CACTUS,
-            VillagerType.TAIGA, Items.LILY_OF_THE_VALLEY,
-            VillagerType.SNOW, Items.ORANGE_TULIP,
-            VillagerType.SWAMP, Items.BLUE_ORCHID,
+            VillagerType.TAIGA, Items.ROSE_BUSH,
+            VillagerType.SNOW, Items.AZURE_BLUET,
+            VillagerType.SWAMP, Items.LILY_OF_THE_VALLEY,
             VillagerType.JUNGLE, Items.FERN
     );
-    private static final Item LOCAL_DYE_SOURCE_FALLBACK = Items.OXEYE_DAISY;
+    private static final Item LOCAL_DYE_SOURCE_FALLBACK = Items.CORNFLOWER;
 
     private static final int NOVICE_MAX_USES = 16;
     private static final int APPRENTICE_MAX_USES = 12;

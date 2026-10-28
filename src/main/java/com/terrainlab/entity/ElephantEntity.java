@@ -511,10 +511,7 @@ public class ElephantEntity extends Camel {
             return;
         }
 
-        long dayTime = level.getDayTime() % 24000;
-        boolean isNight = dayTime >= 12000 && dayTime < 24000;
-
-        if (!isNight && !level.isThundering()) {
+        if (!com.terrainlab.season.SolarTime.isBedTime(level)) {
             player.displayClientMessage(
                     Component.literal("You can only sleep at night."),
                     true

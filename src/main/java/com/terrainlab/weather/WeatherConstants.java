@@ -81,7 +81,7 @@ public final class WeatherConstants {
     public static final double THUNDERSTORM_PERCENT = 20.0;
 
     /** Below this ambient Celsius temperature, precipitation is snow; otherwise it is rain. */
-    public static final double SNOW_TEMPERATURE_THRESHOLD_C = 0.0;
+    public static final double SNOW_TEMPERATURE_THRESHOLD_C = 3.5;
 
     // =========================================================
     // SANDSTORMS

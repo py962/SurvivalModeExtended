@@ -16,14 +16,15 @@ import org.jspecify.annotations.Nullable;
 /**
  * Wraps a vanilla leaves block-state model and swaps in a seasonal texture variant when
  * {@link SeasonalLeaves#lookAt} asks for one. Looks with no entry in {@code variants} (VANILLA, and
- * tint-only looks such as oak BROWN) render the vanilla model.
+ * tint-only looks such as oak BROWN) render the vanilla model. A look with several parts is a shaded autumn
+ * look: the part is picked by {@link SeasonalLeaves#shadeAt}, a position hash, so it costs nothing per frame.
  */
 final class SeasonalLeavesModel extends DelegateBlockStateModel {
 
     private final SeasonalLeaves.Tree tree;
-    private final Map<SeasonalLeaves.Look, BlockModelPart> variants;
+    private final Map<SeasonalLeaves.Look, BlockModelPart[]> variants;
 
-    SeasonalLeavesModel(BlockStateModel delegate, SeasonalLeaves.Tree tree, Map<SeasonalLeaves.Look, BlockModelPart> variants) {
+    SeasonalLeavesModel(BlockStateModel delegate, SeasonalLeaves.Tree tree, Map<SeasonalLeaves.Look, BlockModelPart[]> variants) {
         super(delegate);
         this.tree = tree;
         this.variants = variants.isEmpty() ? Map.of() : new EnumMap<>(variants);
@@ -33,7 +34,11 @@ final class SeasonalLeavesModel extends DelegateBlockStateModel {
         if (this.variants.isEmpty()) {
             return null;
         }
-        return this.variants.get(SeasonalLeaves.lookAt(level, pos, this.tree));
+        BlockModelPart[] parts = this.variants.get(SeasonalLeaves.lookAt(level, pos, this.tree));
+        if (parts == null) {
+            return null;
+        }
+        return parts.length == 1 ? parts[0] : parts[SeasonalLeaves.shadeAt(pos) % parts.length];
     }
 
     @Override
