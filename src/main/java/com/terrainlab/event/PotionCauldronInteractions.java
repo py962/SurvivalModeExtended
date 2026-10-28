@@ -66,7 +66,9 @@ public final class PotionCauldronInteractions {
         event.register(water, ModItems.LEATHER_FLASK.get(), PotionCauldronInteractions::fillFlaskFromWater);
 
         // Wrap the existing empty-cauldron potion interaction (water bottle -> water cauldron).
-        CauldronInteraction previous = CauldronInteractions.EMPTY.get(new ItemStack(Items.POTION));
+        // Read from the item map: building an ItemStack here crashes (item components aren't bound yet).
+        CauldronInteraction previous = ((com.terrainlab.mixin.CauldronDispatcherAccessor) (Object) CauldronInteractions.EMPTY)
+                .terrainlab$items().getOrDefault(Items.POTION, (state, level, pos, player, hand, stack) -> InteractionResult.TRY_WITH_EMPTY_HAND);
         event.register(empty, Items.POTION, (state, level, pos, player, hand, stack) ->
                 PotionMixing.canPour(stack)
                         ? pourPotion(state, level, pos, player, hand, stack)

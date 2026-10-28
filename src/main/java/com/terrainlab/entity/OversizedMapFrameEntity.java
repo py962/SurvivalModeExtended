@@ -290,10 +290,23 @@ public class OversizedMapFrameEntity extends ItemFrame {
     // ------------------------------------------------------------------
 
     /**
-     * Fixed frames always survive (as vanilla). Otherwise every block
-     * behind the footprint (wall, floor below or ceiling above) must have a
-     * sturdy face towards the frame, the footprint must be clear, and no
-     * other hanging entity facing the same way may overlap it.
+     * Placement check: the block the frame is placed against (behind the anchor) must have a sturdy
+     * face towards the frame; the rest of the footprint needs no support. The footprint must also be
+     * clear (see {@link #isClear()}).
+     */
+    public boolean canPlace() {
+        if (fixedFrame) {
+            return true;
+        }
+        Direction facing = getDirection();
+        BlockPos target = getPos().relative(facing.getOpposite());
+        return level().getBlockState(target).isFaceSturdy(level(), target, facing) && isClear();
+    }
+
+    /**
+     * Fixed frames always survive (as vanilla). Otherwise the frame stays up while at least one block
+     * behind its footprint (wall, floor below or ceiling above) still has a sturdy face towards it, so
+     * it only drops once every supporting block is gone. The footprint must also stay clear.
      */
     @Override
     public boolean survives() {
@@ -302,16 +315,25 @@ public class OversizedMapFrameEntity extends ItemFrame {
         }
 
         Direction facing = getDirection();
+        boolean supported = false;
 
         for (BlockPos block : getFootprint()) {
             BlockPos support = block.relative(facing.getOpposite());
 
-            if (!level().getBlockState(support)
-                    .isFaceSturdy(level(), support, facing)) {
-                return false;
+            if (level().getBlockState(support).isFaceSturdy(level(), support, facing)) {
+                supported = true;
+                break;
             }
         }
 
+        return supported && isClear();
+    }
+
+    /**
+     * The footprint holds no blocks, and no other hanging entity facing the same way overlaps it.
+     */
+    private boolean isClear() {
+        Direction facing = getDirection();
         AABB footprint = getPopBox();
 
         if (hasLevelCollision(footprint)) {

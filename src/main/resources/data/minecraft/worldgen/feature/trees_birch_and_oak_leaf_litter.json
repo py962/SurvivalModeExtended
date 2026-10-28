@@ -7,11 +7,11 @@
       "feature": "minecraft:fallen_birch_tree"
     },
     {
-      "chance": 0.2,
+      "chance": 0.25,
       "feature": "minecraft:birch_bees_0002_leaf_litter"
     },
   {
-      "chance": 0.2,
+      "chance": 0.15,
       "feature": "minecraft:cherry_bees_005"
     },
     {

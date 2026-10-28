@@ -112,6 +112,7 @@
     "MobCountsAccessor",
     "LocalMobCapOverCapMixin",
     "SpawnStateGlobalCapMixin",
+    "CauldronDispatcherAccessor",
     "PiglinLuckBarterMixin",
     "LlamaCaribouMateMixin",
     "HealOrHarmStatFlashMixin",

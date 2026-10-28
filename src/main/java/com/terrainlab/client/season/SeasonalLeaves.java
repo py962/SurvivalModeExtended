@@ -25,8 +25,8 @@ import org.jspecify.annotations.Nullable;
  * when a chunk section is meshed, by {@link SeasonalLeavesModel} (texture swaps) and the tint sources in
  * {@link SeasonalFoliageClient} (colour), and {@link SeasonalLeafRerender} re-meshes sections as trees change.
  * <p>
- * Stagger: at a season boundary each tree keeps the previous season's look for a delay of 0..3 days, hashed
- * from the 5x5-block cell its leaves sit in, so a forest turns gradually rather than all at once.
+ * Stagger: at a season boundary each leaf block keeps the previous season's look for its own delay of
+ * 0..3 days, hashed from its position, so trees turn gradually, leaf by leaf, rather than all at once.
  * <p>
  * Called from chunk-meshing worker threads, so the season clock is a volatile snapshot taken on the client
  * tick, and the biome check goes through a registered {@link ColorResolver} (the only biome access a
@@ -37,10 +37,7 @@ public final class SeasonalLeaves {
     private SeasonalLeaves() {
     }
 
-    /** Leaves of one tree mostly share a cell of this many blocks on X and Z. */
-    public static final int CELL_SIZE = 5;
-
-    /** Trees change look at a hashed moment within this many ticks after a season boundary (3 days). */
+    /** Each leaf block changes look at a hashed moment within this many ticks after a season boundary (3 days). */
     public static final int STAGGER_TICKS = 72_000;
 
     public enum Tree { OAK, BIRCH, CHERRY, POPLAR }
@@ -68,9 +65,9 @@ public final class SeasonalLeaves {
     private static final Look[] OAK_LOOKS = {
             Look.BROWN, Look.VANILLA, Look.VANILLA, Look.VANILLA, Look.BROWN, Look.BROWN};
     private static final Look[] BIRCH_LOOKS = {
-            Look.FROSTY, Look.FLOWERING, Look.FLOWERING, Look.VANILLA, Look.YELLOW, Look.YELLOW};
+            Look.YELLOW, Look.FLOWERING, Look.FLOWERING, Look.VANILLA, Look.VANILLA, Look.YELLOW};
     private static final Look[] CHERRY_LOOKS = {
-            Look.VANILLA, Look.VANILLA, Look.VANILLA, Look.CRIMSON, Look.CRIMSON, Look.CRIMSON};
+            Look.CRIMSON, Look.VANILLA, Look.VANILLA, Look.VANILLA, Look.CRIMSON, Look.CRIMSON};
     private static final Look[] POPLAR_LOOKS = {
             Look.FROSTY, Look.FROSTY, Look.GREEN, Look.GREEN, Look.ORANGE, Look.ORANGE};
 
@@ -156,7 +153,7 @@ public final class SeasonalLeaves {
         if (!clockValid || level == BlockAndTintGetter.EMPTY || !isSeasonalBiome(level, pos)) {
             return Look.VANILLA;
         }
-        return looksFor(tree)[effectiveSeason(yearTick, pos.getX(), pos.getZ()).ordinal()];
+        return looksFor(tree)[effectiveSeason(yearTick, pos).ordinal()];
     }
 
     public static boolean isSeasonalBiome(BlockAndTintGetter level, BlockPos pos) {
@@ -174,11 +171,11 @@ public final class SeasonalLeaves {
         };
     }
 
-    /** The calendar state a tree at (x, z) currently shows: the previous one until its stagger delay passes. */
-    static Season effectiveSeason(long yearTick, int x, int z) {
+    /** The calendar state the leaf block at pos currently shows: the previous one until its stagger delay passes. */
+    static Season effectiveSeason(long yearTick, BlockPos pos) {
         Season season = Season.fromYearTick(yearTick);
         long into = Season.ticksIntoCurrentState(yearTick);
-        if (into < cellDelay(Math.floorDiv(x, CELL_SIZE), Math.floorDiv(z, CELL_SIZE))) {
+        if (into < blockDelay(pos)) {
             return previous(season);
         }
         return season;
@@ -188,9 +185,9 @@ public final class SeasonalLeaves {
         return Season.values()[(season.ordinal() + Season.STATE_COUNT - 1) % Season.STATE_COUNT];
     }
 
-    /** Ticks after a season boundary at which the trees in this cell switch: 0..STAGGER_TICKS-1. */
-    static int cellDelay(int cellX, int cellZ) {
-        long h = cellX * 0x9E3779B97F4A7C15L ^ cellZ * 0xC2B2AE3D27D4EB4FL;
+    /** Ticks after a season boundary at which this leaf block switches: 0..STAGGER_TICKS-1. */
+    static int blockDelay(BlockPos pos) {
+        long h = pos.getX() * 0x9E3779B97F4A7C15L ^ pos.getY() * 0x632BE59BD9B4E019L ^ pos.getZ() * 0xC2B2AE3D27D4EB4FL;
         h ^= h >>> 33;
         h *= 0xFF51AFD7ED558CCDL;
         h ^= h >>> 33;
