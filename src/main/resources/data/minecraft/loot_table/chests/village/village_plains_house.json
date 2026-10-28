@@ -65,24 +65,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:book"
-        },
-        {
-          "type": "minecraft:item",
           "name": "minecraft:feather"
-        },
-        {
-          "type": "minecraft:item",
-          "modifier": {
-            "type": "minecraft:set_count",
-            "count": {
-              "type": "minecraft:uniform",
-              "max": 4,
-              "min": 1
-            }
-          },
-          "name": "minecraft:emerald",
-          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -103,23 +86,6 @@
         "max": 8,
         "min": 3
       }
-    },
-    {
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "modifier": {
-            "type": "minecraft:set_count",
-            "count": 1
-          },
-          "name": "minecraft:bundle"
-        },
-        {
-          "type": "minecraft:empty",
-          "weight": 2
-        }
-      ],
-      "rolls": 1
     }
   ],
   "random_sequence": "minecraft:chests/village/village_plains_house"

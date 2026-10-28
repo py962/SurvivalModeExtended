@@ -5,7 +5,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 /**
- * The four end-of-game accomplishments shown on the accomplishment card, highest rank first.
+ * The five end-of-game accomplishments shown on the accomplishment card, highest rank first.
  * Each is a challenge advancement data/terrainlab/advancement/survival/&lt;id&gt;.json awarded through
  * the terrainlab:event trigger with the same event name. The icons mirror the advancement JSON.
  */
@@ -13,7 +13,8 @@ public enum Accomplishment {
     ULTIMATE_SURVIVOR("ultimate_survivor", "dragon_egg"),
     SURVIVOR("survivor", "elytra"),
     NOMAD("nomad", "red_bed"),
-    PACIFIST("pacifist", "lily_of_the_valley");
+    PACIFIST("pacifist", "lily_of_the_valley"),
+    HERMIT("hermit", "moss_block");
 
     private final String id;
     private final String icon;

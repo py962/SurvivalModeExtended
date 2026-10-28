@@ -18,6 +18,8 @@ import com.terrainlab.entity.PriestEntity;
 import com.terrainlab.entity.PirateRaiderEntity;
 import com.terrainlab.entity.OutlawRaiderEntity;
 import com.terrainlab.entity.TrapperRaiderEntity;
+import com.terrainlab.entity.DispenserMinecart;
+import com.terrainlab.entity.DropperMinecart;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -129,6 +131,25 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(net.minecraft.resources.ResourceKey.create(
                                     Registries.ENTITY_TYPE, id)));
+
+    // Container minecarts that fire on powered activator rails; sized like vanilla's hopper minecart.
+    public static final DeferredHolder<EntityType<?>, EntityType<DispenserMinecart>> DISPENSER_MINECART =
+            ENTITY_TYPES.register("dispenser_minecart", id ->
+                    EntityType.Builder.<DispenserMinecart>of(DispenserMinecart::new, MobCategory.MISC)
+                            .noLootTable()
+                            .sized(0.98F, 0.7F)
+                            .passengerAttachments(0.1875F)
+                            .clientTrackingRange(8)
+                            .build(net.minecraft.resources.ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DropperMinecart>> DROPPER_MINECART =
+            ENTITY_TYPES.register("dropper_minecart", id ->
+                    EntityType.Builder.<DropperMinecart>of(DropperMinecart::new, MobCategory.MISC)
+                            .noLootTable()
+                            .sized(0.98F, 0.7F)
+                            .passengerAttachments(0.1875F)
+                            .clientTrackingRange(8)
+                            .build(net.minecraft.resources.ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
     // Hitboxes below match each mob's vanilla parent unless noted.
 

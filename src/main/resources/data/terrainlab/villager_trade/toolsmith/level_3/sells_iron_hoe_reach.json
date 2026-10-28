@@ -1,0 +1,27 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 8
+  },
+  "gives": {
+    "id": "minecraft:iron_hoe"
+  },
+  "max_uses": 8,
+  "xp": 5,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:savanna"
+      }
+    }
+  },
+  "given_item_modifier": {
+    "type": "minecraft:set_enchantments",
+    "enchantments": {
+      "terrainlab:reach": 3
+    }
+  }
+}

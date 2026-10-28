@@ -2,6 +2,7 @@ package com.terrainlab.registry;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.item.HouseboatItem;
+import com.terrainlab.item.DispensingMinecartItem;
 import com.terrainlab.item.CalendarItem;
 import com.terrainlab.item.ThermometerItem;
 import com.terrainlab.item.LeatherFlaskItem;
@@ -208,6 +209,20 @@ public class ModItems {
                                     net.minecraft.core.registries.Registries.ITEM, id))
                             .stacksTo(1)));
 
+    public static final DeferredItem<DispensingMinecartItem> DISPENSER_MINECART =
+            ITEMS.register("dispenser_minecart", id ->
+                    new DispensingMinecartItem(ModEntities.DISPENSER_MINECART.get(), new Item.Properties()
+                            .setId(net.minecraft.resources.ResourceKey.create(
+                                    net.minecraft.core.registries.Registries.ITEM, id))
+                            .stacksTo(1)));
+
+    public static final DeferredItem<DispensingMinecartItem> DROPPER_MINECART =
+            ITEMS.register("dropper_minecart", id ->
+                    new DispensingMinecartItem(ModEntities.DROPPER_MINECART.get(), new Item.Properties()
+                            .setId(net.minecraft.resources.ResourceKey.create(
+                                    net.minecraft.core.registries.Registries.ITEM, id))
+                            .stacksTo(1)));
+
     // Registry id for the raid-captain ominous banner (trades, loot, /give). Places as a plain
     // white banner; use OminousBannerItem.createStack(...) for the patterned stack.
     public static final DeferredItem<OminousBannerItem> OMINOUS_BANNER =
@@ -217,6 +232,12 @@ public class ModItems {
                                     net.minecraft.core.registries.Registries.ITEM, id))
                             .stacksTo(16)
                             .rarity(Rarity.UNCOMMON)));
+
+    // Iron equipment + diamond -> diamond equipment at the smithing table (recipes in data/terrainlab/recipe).
+    public static final DeferredItem<net.minecraft.world.item.SmithingTemplateItem> DIAMOND_UPGRADE_SMITHING_TEMPLATE =
+            ITEMS.registerItem("diamond_upgrade_smithing_template",
+                    com.terrainlab.item.DiamondUpgradeSmithingTemplate::create,
+                    p -> p.rarity(Rarity.UNCOMMON));
 
     public static final DeferredItem<BlockItem> FLETCHING_TABLE_ITEM =
             ITEMS.registerSimpleBlockItem("fletching_table", ModBlocks.FLETCHING_TABLE);

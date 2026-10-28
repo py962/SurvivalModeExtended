@@ -1,0 +1,27 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 9
+  },
+  "gives": {
+    "id": "minecraft:iron_boots"
+  },
+  "max_uses": 8,
+  "xp": 5,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:taiga"
+      }
+    }
+  },
+  "given_item_modifier": {
+    "type": "minecraft:set_enchantments",
+    "enchantments": {
+      "minecraft:blast_protection": 4
+    }
+  }
+}

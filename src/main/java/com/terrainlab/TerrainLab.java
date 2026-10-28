@@ -136,6 +136,7 @@ public class TerrainLab {
         NeoForge.EVENT_BUS.register(com.terrainlab.event.VillageEconomyHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.PlayerMilestoneHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.StructureStatsCommand.class);
+        NeoForge.EVENT_BUS.register(com.terrainlab.event.BiomeStatsCommand.class);
 
         // Villager and wandering trader trades are data-driven: data/minecraft/trade_set overrides
         // point at the terrainlab villager_trade tags (see data/terrainlab/villager_trade).

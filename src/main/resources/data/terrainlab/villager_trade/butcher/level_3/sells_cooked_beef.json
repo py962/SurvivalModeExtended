@@ -18,11 +18,12 @@
         "predicate": {
           "minecraft:predicates": {
             "minecraft:villager/variant": [
-              "minecraft:desert",
-              "minecraft:jungle",
               "minecraft:plains",
               "minecraft:savanna",
-              "minecraft:swamp"
+              "minecraft:taiga",
+              "minecraft:desert",
+              "minecraft:swamp",
+              "minecraft:jungle"
             ]
           }
         }

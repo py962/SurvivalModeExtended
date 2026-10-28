@@ -63,7 +63,6 @@
             "type": "minecraft:enchant_randomly",
             "options": [
               "minecraft:channeling",
-              "minecraft:impaling",
               "minecraft:riptide"
             ]
           },

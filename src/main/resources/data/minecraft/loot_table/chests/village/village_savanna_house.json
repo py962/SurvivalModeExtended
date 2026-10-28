@@ -57,29 +57,12 @@
             "type": "minecraft:set_count",
             "count": {
               "type": "minecraft:uniform",
-              "max": 4,
-              "min": 1
-            }
-          },
-          "name": "minecraft:emerald",
-          "weight": 2
-        },
-        {
-          "type": "minecraft:item",
-          "modifier": {
-            "type": "minecraft:set_count",
-            "count": {
-              "type": "minecraft:uniform",
               "max": 2,
               "min": 1
             }
           },
           "name": "minecraft:acacia_sapling",
           "weight": 10
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:saddle"
         },
         {
           "type": "minecraft:item",
@@ -92,10 +75,6 @@
             }
           },
           "name": "minecraft:torch"
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:bucket"
         }
       ],
       "rolls": {
@@ -103,23 +82,6 @@
         "max": 8,
         "min": 3
       }
-    },
-    {
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "modifier": {
-            "type": "minecraft:set_count",
-            "count": 1
-          },
-          "name": "minecraft:bundle"
-        },
-        {
-          "type": "minecraft:empty",
-          "weight": 2
-        }
-      ],
-      "rolls": 1
     }
   ],
   "random_sequence": "minecraft:chests/village/village_savanna_house"

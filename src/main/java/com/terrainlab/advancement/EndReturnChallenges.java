@@ -14,14 +14,14 @@ import java.util.Set;
 /**
  * The accomplishments judged when a living player returns from the End to the Overworld.
  * <ul>
- *   <li><b>Survivor</b> - non-hardcore world; in Survival or Adventure now and never in Creative
- *   (any difficulty, cheats allowed).</li>
+ *   <li><b>Survivor</b> - non-hardcore world; in Survival or Adventure now; never cheats, Creative
+ *   or an easier game rule (any difficulty).</li>
  *   <li><b>Ultimate Survivor</b> - the same in a hardcore ("Ultra-Hardcore") world, replacing
  *   Survivor there.</li>
- *   <li><b>Pacifist</b> - vanilla mob_kills and player_kills both zero; never cheats, Creative or
- *   Easy (Peaceful allowed).</li>
+ *   <li><b>Pacifist</b> - vanilla mob_kills and player_kills both zero; never cheats, Creative,
+ *   an easier game rule or Easy (Peaceful allowed).</li>
  *   <li><b>Nomad</b> - never completed a sleep twice in the same chunk (NomadSleepTracker); never
- *   cheats, Creative, Easy or Peaceful.</li>
+ *   cheats, Creative, an easier game rule, Easy or Peaceful.</li>
  * </ul>
  * If at least one of them is newly earned, AccomplishmentCards sends the accomplishment card.
  * <p>
@@ -37,10 +37,10 @@ import java.util.Set;
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class EndReturnChallenges {
 
-    static final int PACIFIST_FORBIDDEN =
-            ChallengeEligibility.CHEATS | ChallengeEligibility.CREATIVE | ChallengeEligibility.EASY;
+    static final int SURVIVOR_FORBIDDEN =
+            ChallengeEligibility.CHEATS | ChallengeEligibility.CREATIVE | ChallengeEligibility.GAME_RULES;
+    static final int PACIFIST_FORBIDDEN = SURVIVOR_FORBIDDEN | ChallengeEligibility.EASY;
     static final int NOMAD_FORBIDDEN = PACIFIST_FORBIDDEN | ChallengeEligibility.PEACEFUL;
-    static final int SURVIVOR_FORBIDDEN = ChallengeEligibility.CHEATS | ChallengeEligibility.CREATIVE;
 
     private EndReturnChallenges() {
     }

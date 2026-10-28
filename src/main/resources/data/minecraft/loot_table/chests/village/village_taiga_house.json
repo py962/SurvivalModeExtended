@@ -9,7 +9,7 @@
             "type": "minecraft:set_count",
             "count": {
               "type": "minecraft:uniform",
-              "max": 5,
+              "max": 3,
               "min": 1
             }
           },
@@ -87,19 +87,6 @@
             "type": "minecraft:set_count",
             "count": {
               "type": "minecraft:uniform",
-              "max": 4,
-              "min": 1
-            }
-          },
-          "name": "minecraft:emerald",
-          "weight": 2
-        },
-        {
-          "type": "minecraft:item",
-          "modifier": {
-            "type": "minecraft:set_count",
-            "count": {
-              "type": "minecraft:uniform",
               "max": 5,
               "min": 1
             }
@@ -130,23 +117,6 @@
         "max": 8,
         "min": 3
       }
-    },
-    {
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "modifier": {
-            "type": "minecraft:set_count",
-            "count": 1
-          },
-          "name": "minecraft:bundle"
-        },
-        {
-          "type": "minecraft:empty",
-          "weight": 2
-        }
-      ],
-      "rolls": 1
     }
   ],
   "random_sequence": "minecraft:chests/village/village_taiga_house"

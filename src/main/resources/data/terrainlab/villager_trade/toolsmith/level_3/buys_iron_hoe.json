@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:iron_hoe"
+  },
+  "gives": {
+    "id": "minecraft:emerald",
+    "count": 2
+  },
+  "max_uses": 8,
+  "xp": 5,
+  "reputation_discount": 0.05
+}

@@ -30,6 +30,18 @@ public abstract class VillagerModelMoodMixin {
     @Shadow @Final private ModelPart leftLeg;
     @Shadow @Final private ModelPart arms;
 
+    /** A fishing fisherman lifts its arms slightly, holding the rod out (CrossedArmsItemLayerFishingMixin). */
+    @Inject(
+            method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/VillagerRenderState;)V",
+            at = @At("TAIL"),
+            require = 1
+    )
+    private void terrainlab$fishingArms(VillagerRenderState state, CallbackInfo ci) {
+        if (Boolean.TRUE.equals(state.getRenderData(com.terrainlab.client.VillagerFishingRodClient.FISHING))) {
+            this.arms.xRot += com.terrainlab.client.VillagerFishingRodClient.ARMS_RAISE;
+        }
+    }
+
     @Inject(
             method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/VillagerRenderState;)V",
             at = @At("TAIL"),

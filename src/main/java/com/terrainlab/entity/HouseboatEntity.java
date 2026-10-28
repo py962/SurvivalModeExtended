@@ -337,9 +337,7 @@ public class HouseboatEntity extends Boat {
             return;
         }
 
-        long dayTime = level.getOverworldClockTime() % 24000;
-        boolean isNight = dayTime >= 12000 && dayTime < 24000;
-        if (!isNight && !level.isThundering()) {
+        if (!com.terrainlab.season.SolarTime.isBedTime(level)) {
             player.sendOverlayMessage(Component.literal("You can only sleep at night."));
             return;
         }

@@ -7,7 +7,45 @@
         "sound": "minecraft:music.overworld.dripstone_caves"
       }
     },
-    "minecraft:visual/sky_color": "#78a7ff"
+    "minecraft:visual/sky_color": "#78a7ff",
+    "minecraft:gameplay/natural_mob_spawns": {
+      "argument": {
+        "spawn_costs": {},
+        "spawns_by_category": {
+          "ambient": [
+            {
+              "type": "minecraft:bat",
+              "count": 8,
+              "weight": 10
+            }
+          ],
+          "monster": [
+            {
+              "type": "minecraft:skeleton",
+              "count": 4,
+              "weight": 50
+            },
+            {
+              "type": "minecraft:cave_spider",
+              "count": 1,
+              "weight": 20
+            }
+          ],
+          "underground_water_creature": [
+            {
+              "type": "minecraft:glow_squid",
+              "count": {
+                "type": "minecraft:uniform",
+                "max_inclusive": 6,
+                "min_inclusive": 4
+              },
+              "weight": 10
+            }
+          ]
+        }
+      },
+      "modifier": "overlay"
+    }
   },
   "carvers": [
     "minecraft:cave",
@@ -22,10 +60,9 @@
     [],
     [
       "minecraft:lake_lava_underground"
-   
     ],
     [
-       "minecraft:large_dripstone"
+      "minecraft:large_dripstone"
     ],
     [
       "minecraft:monster_room",
@@ -87,42 +124,5 @@
     ]
   ],
   "has_precipitation": true,
-  "spawn_costs": {},
-  "spawners": {
-    "ambient": [
-      {
-        "type": "minecraft:bat",
-        "maxCount": 8,
-        "minCount": 8,
-        "weight": 10
-      }
-    ],
-    "axolotls": [],
-    "creature": [],
-    "misc": [],
-    "monster": [
-      {
-        "type": "minecraft:skeleton",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 50
-      } ,
-    {
-              "type": "minecraft:cave_spider",
-              "count": 1,
-              "weight": 20
-            }  
-    ],
-    "underground_water_creature": [
-      {
-        "type": "minecraft:glow_squid",
-        "maxCount": 6,
-        "minCount": 4,
-        "weight": 10
-      }
-    ],
-    "water_ambient": [],
-    "water_creature": []
-  },
   "temperature": 0.8
 }

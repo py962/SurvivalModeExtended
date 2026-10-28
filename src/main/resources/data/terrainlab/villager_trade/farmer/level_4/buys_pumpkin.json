@@ -19,9 +19,7 @@
           "minecraft:predicates": {
             "minecraft:villager/variant": [
               "minecraft:plains",
-              "minecraft:snow",
-              "minecraft:swamp",
-              "minecraft:taiga"
+              "minecraft:snow"
             ]
           }
         }

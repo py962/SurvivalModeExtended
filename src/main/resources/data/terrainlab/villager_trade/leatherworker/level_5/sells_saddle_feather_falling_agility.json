@@ -1,0 +1,28 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 11
+  },
+  "gives": {
+    "id": "minecraft:saddle"
+  },
+  "max_uses": 2,
+  "xp": 0,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+      "minecraft:predicates": {
+        "minecraft:villager/variant": "minecraft:taiga"
+      }
+    }
+  },
+  "given_item_modifier": {
+    "type": "minecraft:set_enchantments",
+    "enchantments": {
+      "minecraft:feather_falling": 2,
+      "terrainlab:agility": 2
+    }
+  }
+}

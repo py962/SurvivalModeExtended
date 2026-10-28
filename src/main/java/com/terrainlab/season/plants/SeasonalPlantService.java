@@ -16,8 +16,11 @@ import net.minecraft.core.QuartPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -37,7 +40,9 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,6 +63,15 @@ import java.util.Map;
  * when it closes, and in full after a time jump. Only the surface layer (top motion-blocking non-leaf
  * block, which catches pumpkins) and the block above it (flowers, litter, mushrooms, tall-flower lower
  * halves) are read per column; plants under overhangs or roofs are ignored.
+ * <p>
+ * In-season boost: when a category is in season at a chunk (judged at the chunk centre's effective season)
+ * and the chunk has not been boosted in this in-season run, about as many extra plants as the chunk's
+ * natural ones of that category (present plus dormant, excluding earlier extras and player-placed plants)
+ * are picked on free surface spots of the chunk, copying the states found there. They are recorded as
+ * dormant entries flagged as extras, so the normal restore puts them in the world (each at its own stagger
+ * delay, with the usual free-spot and survival checks), a limited number per tick. From then on they are
+ * natural plants (dormant out of season, back in season) that never count toward the next boost; each new
+ * run only tops the extras back up to the natural count.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class SeasonalPlantService {
@@ -87,6 +101,15 @@ public final class SeasonalPlantService {
     private static final int BONEMEAL_DOWN = 3;
     private static final int BONEMEAL_UP = 3;
 
+    /** Boost extras put into the world per tick, across all chunks of a level. */
+    private static final int EXTRA_PLACEMENTS_PER_TICK = 24;
+    /** Upper bound on the extras of one category in one chunk. */
+    private static final int MAX_EXTRAS_PER_CATEGORY = 48;
+    /** Distinct sample states kept per category while scanning a chunk. */
+    private static final int MAX_SAMPLES = 32;
+    /** Minimum sky light on the spot for flowers and pumpkins. */
+    private static final int MIN_OPEN_SKY_LIGHT = 13;
+
     private static final class LevelState {
         final LongOpenHashSet loaded = new LongOpenHashSet();
         final LongLinkedOpenHashSet loadQueue = new LongLinkedOpenHashSet();
@@ -94,6 +117,9 @@ public final class SeasonalPlantService {
         long lastGameTime = Long.MIN_VALUE;
         long lastSweepAt = Long.MIN_VALUE;
         long closingSweepState = Long.MIN_VALUE;
+        /** Chunks to process again next tick (boost extras waiting for placement budget). */
+        final LongOpenHashSet retry = new LongOpenHashSet();
+        int extraBudget;
     }
 
     private static final Map<ServerLevel, LevelState> STATES = new IdentityHashMap<>();
@@ -130,6 +156,7 @@ public final class SeasonalPlantService {
             st.loaded.remove(key);
             st.loadQueue.remove(key);
             st.sweepQueue.remove(key);
+            st.retry.remove(key);
         }
     }
 
@@ -176,6 +203,12 @@ public final class SeasonalPlantService {
             refill(st, gameTime);
         }
 
+        if (!st.retry.isEmpty()) {
+            st.sweepQueue.addAll(st.retry);
+            st.retry.clear();
+        }
+        st.extraBudget = EXTRA_PLACEMENTS_PER_TICK;
+
         int budget = CHUNKS_PER_TICK;
         while (budget > 0) {
             long key;
@@ -188,7 +221,7 @@ public final class SeasonalPlantService {
             }
             LevelChunk chunk = level.getChunkSource().getChunkNow(ChunkPos.getX(key), ChunkPos.getZ(key));
             if (chunk != null) {
-                processChunk(level, chunk, yearTick);
+                processChunk(level, st, chunk, total);
                 budget--;
             }
         }
@@ -212,16 +245,43 @@ public final class SeasonalPlantService {
         return Season.fromYearTick(Math.floorMod(yearTick - delayTicks(packedPos), Season.YEAR_LENGTH_TICKS));
     }
 
+    private static Season seasonOfState(long absState) {
+        return Season.values()[(int) Math.floorMod(absState, (long) Season.STATE_COUNT)];
+    }
+
+    /**
+     * The in-season run of {@code category} at a position: the absolute index of the first calendar state
+     * of the current contiguous in-season stretch (at the position's effective time), or
+     * {@code Long.MIN_VALUE} when the category is out of season there.
+     */
+    static long inSeasonRun(SeasonalPlantCategory category, long packedPos, long total) {
+        long abs = Math.floorDiv(total - delayTicks(packedPos), Season.STATE_LENGTH_TICKS);
+        if (!category.isInSeason(seasonOfState(abs))) {
+            return Long.MIN_VALUE;
+        }
+        for (int i = 0; i < Season.STATE_COUNT && category.isInSeason(seasonOfState(abs - 1)); i++) {
+            abs--;
+        }
+        return abs;
+    }
+
     // ---------------------------------------------------------------- chunk processing
 
-    private static void processChunk(ServerLevel level, LevelChunk chunk, long yearTick) {
+    private static void processChunk(ServerLevel level, LevelState st, LevelChunk chunk, long total) {
+        long yearTick = Math.floorMod(total, Season.YEAR_LENGTH_TICKS);
         SeasonalPlantChunkData data = chunk.getExistingDataOrNull(ModAttachments.SEASONAL_PLANTS.get());
         boolean changed = false;
 
         if (data != null) {
-            changed |= restoreDormant(level, chunk, data, yearTick);
+            changed |= restoreDormant(level, st, chunk, data, yearTick);
             changed |= pruneStalePlayerPlaced(chunk, data);
+            changed |= pruneStaleExtras(chunk, data);
         }
+
+        // Natural (non-player, non-extra) in-season plants seen on the surface, per category, for the boost.
+        int[] naturalCount = new int[CATEGORIES.length];
+        @SuppressWarnings("unchecked")
+        List<BlockState>[] samples = new List[CATEGORIES.length];
 
         int minX = chunk.getPos().getMinBlockX();
         int minZ = chunk.getPos().getMinBlockZ();
@@ -248,14 +308,194 @@ public final class SeasonalPlantService {
                     }
                     if (makeDormantIfOutOfSeason(level, chunk, data, cursor.immutable(), state, category, yearTick)) {
                         changed = true;
+                    } else if (!isUncountedHalf(state) && !data.isPlayerPlaced(cursor.asLong())
+                            && !data.extras.contains(cursor.asLong()) && isAffectedBiome(chunk, cursor)) {
+                        naturalCount[category.ordinal()]++;
+                        addSample(samples, category, state);
                     }
                 }
             }
         }
 
+        if (data != null && boost(level, st, chunk, data, total, naturalCount, samples)) {
+            changed = true;
+        }
+
         if (changed) {
             chunk.markUnsaved();
         }
+    }
+
+    private static final SeasonalPlantCategory[] CATEGORIES = SeasonalPlantCategory.values();
+
+    /** Upper halves of tall flowers are counted through their lower half. */
+    private static boolean isUncountedHalf(BlockState state) {
+        return state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
+                && state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER;
+    }
+
+    private static boolean isAffectedBiome(LevelChunk chunk, BlockPos pos) {
+        return chunk.getNoiseBiome(QuartPos.fromBlock(pos.getX()), QuartPos.fromBlock(pos.getY()),
+                QuartPos.fromBlock(pos.getZ())).is(SeasonalPlantCategory.AFFECTED_BIOMES);
+    }
+
+    private static void addSample(List<BlockState>[] samples, SeasonalPlantCategory category, BlockState state) {
+        List<BlockState> list = samples[category.ordinal()];
+        if (list == null) {
+            list = new ArrayList<>();
+            samples[category.ordinal()] = list;
+        }
+        // Repeats are kept (up to the cap) so common variants are picked more often.
+        if (list.size() < MAX_SAMPLES) {
+            list.add(state);
+        }
+    }
+
+    // ---------------------------------------------------------------- in-season boost
+
+    /**
+     * Tops each in-season category's extras in this chunk up to its natural count, once per in-season run.
+     * New extras become dormant entries; {@link #restoreDormant} places them. Returns true if data changed.
+     */
+    private static boolean boost(ServerLevel level, LevelState st, LevelChunk chunk, SeasonalPlantChunkData data,
+                                 long total, int[] naturalPresent, List<BlockState>[] samples) {
+        ChunkPos chunkPos = chunk.getPos();
+        long centre = BlockPos.asLong(chunkPos.getMiddleBlockX(), 0, chunkPos.getMiddleBlockZ());
+        boolean changed = false;
+        for (SeasonalPlantCategory category : CATEGORIES) {
+            long run = inSeasonRun(category, centre, total);
+            if (run == Long.MIN_VALUE || data.boostedRun(category) == run) {
+                continue;
+            }
+            int natural = naturalPresent[category.ordinal()];
+            int extras = 0;
+            for (Long2ObjectMap.Entry<BlockState> entry : data.dormant.long2ObjectEntrySet()) {
+                if (SeasonalPlantCategory.of(entry.getValue()) != category) {
+                    continue;
+                }
+                if (data.extras.contains(entry.getLongKey())) {
+                    extras++;
+                } else {
+                    natural++;
+                    addSample(samples, category, entry.getValue());
+                }
+            }
+            if (natural == 0) {
+                continue; // nothing natural of this kind here: nothing to double, and nothing to record
+            }
+            BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+            LongIterator it = data.extras.iterator();
+            while (it.hasNext()) {
+                long packed = it.nextLong();
+                if (!data.dormant.containsKey(packed)
+                        && SeasonalPlantCategory.of(chunk.getBlockState(cursor.set(packed))) == category) {
+                    extras++;
+                }
+            }
+            data.setBoostedRun(category, run);
+            changed = true;
+            int wanted = Math.min(natural, MAX_EXTRAS_PER_CATEGORY) - extras;
+            List<BlockState> pool = samples[category.ordinal()];
+            if (wanted > 0 && pool != null && !pool.isEmpty()
+                    && pickExtras(level, chunk, data, category, wanted, pool, run) > 0) {
+                st.retry.add(chunkPos.pack());
+            }
+        }
+        return changed;
+    }
+
+    /** Records up to {@code wanted} extras as dormant on valid surface spots; returns how many. */
+    private static int pickExtras(ServerLevel level, LevelChunk chunk, SeasonalPlantChunkData data,
+                                  SeasonalPlantCategory category, int wanted, List<BlockState> pool, long run) {
+        ChunkPos chunkPos = chunk.getPos();
+        RandomSource random = RandomSource.create(chunkPos.pack() * 0x9E3779B97F4A7C15L ^ run * 31L ^ category.ordinal());
+        int[] columns = new int[256];
+        for (int i = 0; i < columns.length; i++) {
+            columns[i] = i;
+        }
+        for (int i = columns.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            int t = columns[i];
+            columns[i] = columns[j];
+            columns[j] = t;
+        }
+        int minX = chunkPos.getMinBlockX();
+        int minZ = chunkPos.getMinBlockZ();
+        int placed = 0;
+        BlockPos.MutableBlockPos ground = new BlockPos.MutableBlockPos();
+        for (int column : columns) {
+            if (placed >= wanted) {
+                break;
+            }
+            int dx = column & 15;
+            int dz = column >> 4;
+            int top = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, dx, dz);
+            if (top < chunk.getMinY() || top + 2 > chunk.getMaxY()) {
+                continue;
+            }
+            boolean canopy = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, dx, dz) > top;
+            ground.set(minX + dx, top, minZ + dz);
+            BlockPos spot = ground.above();
+            long packed = spot.asLong();
+            if (!chunk.getBlockState(spot).isAir() || data.dormant.containsKey(packed)
+                    || data.isPlayerPlaced(packed) || data.extras.contains(packed)) {
+                continue;
+            }
+            BlockState groundState = chunk.getBlockState(ground);
+            if (!groundSuits(level, category, groundState, spot, canopy) || !isAffectedBiome(chunk, spot)) {
+                continue;
+            }
+            BlockState state = pool.get(random.nextInt(pool.size()));
+            if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+                state = state.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random));
+            }
+            if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)) {
+                state = state.setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.LOWER);
+                if (!chunk.getBlockState(spot.above()).isAir()) {
+                    continue;
+                }
+            }
+            if (!state.canSurvive(level, spot)) {
+                continue;
+            }
+            data.dormant.put(packed, state);
+            data.extras.add(packed);
+            placed++;
+        }
+        return placed;
+    }
+
+    /**
+     * Worldgen-like spot rules: flowers and pumpkins in the open (pumpkins on grass), leaf litter and
+     * mushrooms under a leaf canopy; always on natural soil. Mushrooms' own light rule is left to canSurvive.
+     */
+    private static boolean groundSuits(ServerLevel level, SeasonalPlantCategory category, BlockState ground,
+                                       BlockPos spot, boolean canopy) {
+        return switch (category) {
+            case FLOWERS -> !canopy && ground.is(BlockTags.DIRT)
+                    && level.getBrightness(LightLayer.SKY, spot) >= MIN_OPEN_SKY_LIGHT;
+            case PUMPKINS -> !canopy && ground.is(Blocks.GRASS_BLOCK)
+                    && level.getBrightness(LightLayer.SKY, spot) >= MIN_OPEN_SKY_LIGHT;
+            case LEAF_LITTER, MUSHROOMS -> canopy && ground.is(BlockTags.DIRT);
+        };
+    }
+
+    /** Drops extra records whose plant is gone (and not dormant): broken, washed away, replaced. */
+    private static boolean pruneStaleExtras(LevelChunk chunk, SeasonalPlantChunkData data) {
+        if (data.extras.isEmpty()) {
+            return false;
+        }
+        boolean changed = false;
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        LongIterator it = data.extras.iterator();
+        while (it.hasNext()) {
+            long packed = it.nextLong();
+            if (!data.dormant.containsKey(packed) && SeasonalPlantCategory.of(chunk.getBlockState(cursor.set(packed))) == null) {
+                it.remove();
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     /** Returns true if the plant was removed and recorded. */
@@ -317,7 +557,8 @@ public final class SeasonalPlantService {
 
     private enum RestoreResult { RESTORED, DEFER, DROP }
 
-    private static boolean restoreDormant(ServerLevel level, LevelChunk chunk, SeasonalPlantChunkData data, long yearTick) {
+    private static boolean restoreDormant(ServerLevel level, LevelState st, LevelChunk chunk, SeasonalPlantChunkData data,
+                                          long yearTick) {
         if (data.dormant.isEmpty()) {
             return false;
         }
@@ -332,10 +573,22 @@ public final class SeasonalPlantService {
             if (category != null && !category.isInSeason(effectiveSeason(packed, yearTick))) {
                 continue;
             }
+            boolean extra = data.extras.contains(packed);
+            if (extra && st.extraBudget <= 0) {
+                st.retry.add(chunk.getPos().pack()); // spread boost placements over ticks
+                continue;
+            }
             RestoreResult result = tryRestore(level, chunk, BlockPos.of(packed), state);
             if (result != RestoreResult.DEFER) {
                 it.remove();
                 changed = true;
+                if (extra) {
+                    if (result == RestoreResult.RESTORED) {
+                        st.extraBudget--;
+                    } else {
+                        data.extras.remove(packed);
+                    }
+                }
             }
         }
         return changed;
@@ -416,7 +669,8 @@ public final class SeasonalPlantService {
         LevelChunk chunk = level.getChunkAt(lower);
         if (SeasonalPlantCategory.of(placed) != null) {
             SeasonalPlantChunkData data = chunk.getData(ModAttachments.SEASONAL_PLANTS.get());
-            if (data.playerPlaced.add(lower.asLong()) | data.dormant.remove(lower.asLong()) != null) {
+            if (data.playerPlaced.add(lower.asLong()) | data.dormant.remove(lower.asLong()) != null
+                    | data.extras.remove(lower.asLong())) {
                 chunk.markUnsaved();
             }
         } else {
@@ -436,7 +690,7 @@ public final class SeasonalPlantService {
 
     private static void forget(LevelChunk chunk, long packed) {
         SeasonalPlantChunkData data = chunk.getExistingDataOrNull(ModAttachments.SEASONAL_PLANTS.get());
-        if (data != null && data.playerPlaced.remove(packed)) {
+        if (data != null && (data.playerPlaced.remove(packed) | data.extras.remove(packed))) {
             chunk.markUnsaved();
         }
     }

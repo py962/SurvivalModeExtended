@@ -64,6 +64,10 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.phys.Vec3;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +143,44 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
     private static final double BOND_TELEPORT_MAX_DISTANCE = 80.0D;
 
     private static final int BOND_TELEPORT_ATTEMPTS = 16;
+
+    /** The player must stay out of range this long (ticks) before the follow goal teleports the guide. */
+    private static final int BOND_TELEPORT_GRACE_TICKS = 40;
+
+    /** After a bond teleport, no further one for this long (ticks). */
+    private static final int BOND_TELEPORT_COOLDOWN_TICKS = 60;
+
+    /** After a bond teleport found no safe ground, wait this long (ticks) before searching again. */
+    private static final int BOND_TELEPORT_RETRY_TICKS = 100;
+
+    /**
+     * Last-resort search around the player when the 16-80 block ring has no safe ground: block
+     * offsets (dx, dy, dz) within 8 blocks horizontally and from 2 above to 16 below the player's
+     * feet, nearest first. Offsets closer than 2 blocks horizontally are left out so the guide
+     * never lands inside the player.
+     */
+    private static final int[][] GROUND_NEAR_PLAYER_OFFSETS = buildGroundNearPlayerOffsets();
+
+    private static int[][] buildGroundNearPlayerOffsets() {
+        List<int[]> offsets = new ArrayList<>();
+
+        for (int dx = -8; dx <= 8; dx++) {
+            for (int dz = -8; dz <= 8; dz++) {
+                if (dx * dx + dz * dz < 4) {
+                    continue;
+                }
+
+                for (int dy = 2; dy >= -16; dy--) {
+                    offsets.add(new int[]{dx, dy, dz});
+                }
+            }
+        }
+
+        offsets.sort(java.util.Comparator.comparingInt(
+                o -> o[0] * o[0] + o[1] * o[1] + o[2] * o[2]));
+
+        return offsets.toArray(new int[0][]);
+    }
 
     private int tradeTier = 1;
     private boolean tradesInitialized = false;
@@ -217,8 +259,26 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         );
     }
 
-    /** No bond teleport attempts before this tick (set when every spot near the player is too close to a guide destination). */
-    private int bondTeleportBlockedUntil;
+    /**
+     * No bond teleport before this game time: set after every bond teleport (cooldown) and after a
+     * search that found no safe ground (retry delay). Game time rather than tickCount, since the
+     * recall watchdog also teleports guides whose chunk is not ticking.
+     */
+    private long bondTeleportBlockedUntil;
+
+    /**
+     * Squared distance for the follow / teleport trigger: horizontal distance, plus the height
+     * difference only while the guide is above the player (so guides still follow a player
+     * underground). A player raised above the guide - on a pillar, scaffolding, a mount, flying -
+     * doesn't count, or a guide standing on the ground below would re-teleport again and again.
+     */
+    private double bondDistanceSqr(Entity player) {
+        double dx = player.getX() - this.getX();
+        double dz = player.getZ() - this.getZ();
+        double dy = Math.max(0.0D, this.getY() - player.getY());
+
+        return dx * dx + dy * dy + dz * dz;
+    }
 
     @Nullable
     private Player getFollowTargetPlayer() {
@@ -242,6 +302,9 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
         private final AbstractTrailTraderEntity trader;
 
+        /** Game time this run of the goal started, i.e. when the player went out of range. */
+        private long farSince;
+
         FollowTradingPlayerGoal(AbstractTrailTraderEntity trader) {
             this.trader = trader;
             this.setFlags(EnumSet.of(Goal.Flag.MOVE));
@@ -261,7 +324,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
             return player != null
                     && bondedFollowAllowed(player)
-                    && this.trader.distanceToSqr(player)
+                    && this.trader.bondDistanceSqr(player)
                     > BOND_FOLLOW_DISTANCE_SQR;
         }
 
@@ -271,8 +334,13 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
             return player != null
                     && bondedFollowAllowed(player)
-                    && this.trader.distanceToSqr(player)
+                    && this.trader.bondDistanceSqr(player)
                     > BOND_FOLLOW_DISTANCE_SQR;
+        }
+
+        @Override
+        public void start() {
+            this.farSince = this.trader.level().getGameTime();
         }
 
         @Override
@@ -289,7 +357,12 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                 return;
             }
 
-            this.trader.teleportNearBondedPlayer(player);
+            // Short grace so a player who briefly leaves range doesn't trigger a teleport at once.
+            if (this.trader.level().getGameTime() - this.farSince
+                    >= BOND_TELEPORT_GRACE_TICKS) {
+
+                this.trader.teleportNearBondedPlayer(player, "follow");
+            }
         }
     }
 
@@ -357,14 +430,22 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         }
     }
 
-    /** Teleports this bonded guide to a safe spot 16-80 blocks from its player. */
-    private void teleportNearBondedPlayer(Player player) {
+    /**
+     * Teleports this bonded guide (with its cargo donkey) to safe ground near its player: first a
+     * random spot 16-80 blocks away, searched around the player's height (so guides follow
+     * underground) and, when the player is raised above the terrain there, on the ground surface;
+     * then the nearest ground within 8 blocks of the player, down to 16 below their feet. Never
+     * lands in midair: with no safe ground found it waits BOND_TELEPORT_RETRY_TICKS and tries again.
+     */
+    private void teleportNearBondedPlayer(Player player, String reason) {
         if (!(this.level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        if (this.tickCount < this.bondTeleportBlockedUntil) {
-            return;   // player is at a guide destination; wait outside
+        long now = serverLevel.getGameTime();
+
+        if (now < this.bondTeleportBlockedUntil) {
+            return;   // cooling down, or waiting to retry after a failed search
         }
 
         if (serverLevel.dimension() != Level.OVERWORLD
@@ -373,7 +454,9 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             return;
         }
 
+        List<Donkey> donkeys = loadedCargoDonkeys(serverLevel);
         RandomSource random = this.getRandom();
+        int baseY = player.blockPosition().getY();
 
         for (int attempt = 0; attempt < BOND_TELEPORT_ATTEMPTS; attempt++) {
             double angle = random.nextDouble() * Math.PI * 2.0D;
@@ -387,7 +470,12 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             double x = player.getX() + Math.cos(angle) * distance;
             double z = player.getZ() + Math.sin(angle) * distance;
 
-            int baseY = player.blockPosition().getY();
+            BlockPos column = BlockPos.containing(x, baseY, z);
+
+            // Never load or generate a chunk just to look for a landing spot.
+            if (!serverLevel.isLoaded(column)) {
+                continue;
+            }
 
             // Search around the player's own Y so guides can follow underground.
             for (int verticalOffset = 0;
@@ -398,7 +486,9 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                         serverLevel,
                         x,
                         baseY + verticalOffset,
-                        z)) {
+                        z,
+                        donkeys,
+                        reason)) {
 
                     return;
                 }
@@ -408,33 +498,80 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                         serverLevel,
                         x,
                         baseY - verticalOffset,
-                        z)) {
+                        z,
+                        donkeys,
+                        reason)) {
 
                     return;
                 }
             }
+
+            // Player raised more than 16 blocks above the terrain here (pillar, flying, mount,
+            // scaffolding): try the column's ground surface.
+            int surfaceY = serverLevel.getHeight(
+                    Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                    column.getX(),
+                    column.getZ());
+
+            if (surfaceY < baseY - 16
+                    && tryTeleportToBondPosition(
+                    serverLevel,
+                    x,
+                    surfaceY,
+                    z,
+                    donkeys,
+                    reason)) {
+
+                return;
+            }
         }
 
-        // Fallback: no safe spot found, so land on the player - unless the player is
-        // at a guide destination, in which case retry in 5 seconds.
-        if (GuideStructureAvoidance.isNearDestination(serverLevel, player.blockPosition())) {
-            this.bondTeleportBlockedUntil = this.tickCount + 100;
-            return;
-        }
-        this.teleportTo(
-                player.getX(),
-                player.getY(),
-                player.getZ()
-        );
+        // Fallback: the nearest ground beside or below the player.
+        BlockPos feet = player.blockPosition();
 
-        this.getNavigation().stop();
+        for (int[] offset : GROUND_NEAR_PLAYER_OFFSETS) {
+            if (tryTeleportToBondPosition(
+                    serverLevel,
+                    feet.getX() + offset[0] + 0.5D,
+                    feet.getY() + offset[1],
+                    feet.getZ() + offset[2] + 0.5D,
+                    donkeys,
+                    reason + "/near-player")) {
+
+                return;
+            }
+        }
+
+        // No safe ground anywhere near (player over the void or open water, at a guide
+        // destination, ...): stay put and try again later rather than land in midair.
+        this.bondTeleportBlockedUntil = now + BOND_TELEPORT_RETRY_TICKS;
+
+        if (DEBUG_LOGGING) {
+            com.terrainlab.TerrainLab.LOGGER.info(
+                    "[GuideTeleport] {} reason={} no safe ground near {} at ({}, {}, {})"
+                            + " - retrying in {} ticks",
+                    this.getType().toShortString(),
+                    reason,
+                    player.getScoreboardName(),
+                    feet.getX(),
+                    feet.getY(),
+                    feet.getZ(),
+                    BOND_TELEPORT_RETRY_TICKS);
+        }
     }
 
+    /**
+     * Teleports this guide (and its cargo donkeys) to (x, y, z) if that is safe ground: a sturdy
+     * floor, no fluid, room for the guide, not near a guide destination, and - when the guide has a
+     * loaded cargo donkey - room for the donkey beside it.
+     */
     private boolean tryTeleportToBondPosition(
             ServerLevel serverLevel,
             double x,
             int y,
-            double z) {
+            double z,
+            List<Donkey> donkeys,
+            String reason) {
 
         BlockPos feetPos = BlockPos.containing(x, y, z);
         BlockPos headPos = feetPos.above();
@@ -466,15 +603,294 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             return false;
         }
 
-        // Never land near a guide destination; checked last as it is the most expensive test.
+        // Never land near a guide destination; checked late as it is an expensive test.
         if (GuideStructureAvoidance.isNearDestination(serverLevel, feetPos)) {
             return false;
         }
 
-        this.teleportTo(x, y, z);
-        this.getNavigation().stop();
+        Map<Donkey, Vec3> donkeySpots =
+                planCargoDonkeySpots(serverLevel, new Vec3(x, y, z), destinationBox, donkeys);
+
+        if (donkeySpots == null) {
+            return false;   // no room for the donkey here
+        }
+
+        moveWithCargo(serverLevel, x, y, z, donkeys, donkeySpots, reason);
+        this.bondTeleportBlockedUntil =
+                serverLevel.getGameTime() + BOND_TELEPORT_COOLDOWN_TICKS;
 
         return true;
+    }
+
+    /** This guide's cargo donkeys that are loaded in the given level. */
+    private List<Donkey> loadedCargoDonkeys(ServerLevel level) {
+        List<Donkey> donkeys = new ArrayList<>();
+        UUID guideId = this.getUUID();
+
+        for (Entity entity : level.getAllEntities()) {
+            if (entity instanceof Donkey donkey
+                    && donkey.isAlive()
+                    && donkey.getData(ModAttachments.CARGO_DONKEY_OWNER_TRADER.get())
+                    .filter(guideId::equals).isPresent()) {
+
+                donkeys.add(donkey);
+            }
+        }
+
+        return donkeys;
+    }
+
+    /**
+     * A free spot beside the guide's destination for each donkey, or null if any donkey has none.
+     * Each spot keeps clear of the guide and of the spots already given to other donkeys.
+     */
+    @Nullable
+    private static Map<Donkey, Vec3> planCargoDonkeySpots(
+            ServerLevel level,
+            Vec3 guideDestination,
+            AABB guideBox,
+            List<Donkey> donkeys) {
+
+        Map<Donkey, Vec3> spots = new HashMap<>();
+        List<AABB> occupied = new ArrayList<>();
+        occupied.add(guideBox);
+
+        for (Donkey donkey : donkeys) {
+            Vec3 spot = findCargoDonkeySpot(level, guideDestination, donkey, occupied);
+
+            if (spot == null) {
+                return null;
+            }
+
+            spots.put(donkey, spot);
+            occupied.add(donkeyBoxAt(donkey, spot));
+        }
+
+        return spots;
+    }
+
+    private static AABB donkeyBoxAt(Donkey donkey, Vec3 pos) {
+        return donkey.getBoundingBox().move(
+                pos.x - donkey.getX(),
+                pos.y - donkey.getY(),
+                pos.z - donkey.getZ());
+    }
+
+    /**
+     * The nearest standable spot 2-4 blocks from {@code center} with room for the donkey's (larger)
+     * hitbox: a sturdy floor, no fluid, no block collision and no overlap with {@code occupied}.
+     * Close enough that the lead stays well inside its range.
+     */
+    @Nullable
+    private static Vec3 findCargoDonkeySpot(
+            ServerLevel level,
+            Vec3 center,
+            Donkey donkey,
+            List<AABB> occupied) {
+
+        BlockPos base = BlockPos.containing(center);
+        int[] dys = {0, 1, -1, 2, -2};
+
+        for (int r = 2; r <= 4; r++) {
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != r) {
+                        continue;
+                    }
+
+                    for (int dy : dys) {
+                        BlockPos feet = base.offset(dx, dy, dz);
+
+                        if (!level.isLoaded(feet)) {
+                            continue;
+                        }
+
+                        BlockPos below = feet.below();
+
+                        if (!level.getBlockState(below)
+                                .isFaceSturdy(level, below, Direction.UP)) {
+                            continue;
+                        }
+
+                        if (!level.getFluidState(feet).isEmpty()
+                                || !level.getFluidState(feet.above()).isEmpty()) {
+                            continue;
+                        }
+
+                        Vec3 pos = new Vec3(
+                                feet.getX() + 0.5D, feet.getY(), feet.getZ() + 0.5D);
+                        AABB box = donkeyBoxAt(donkey, pos);
+
+                        if (!level.noCollision(donkey, box)) {
+                            continue;
+                        }
+
+                        boolean overlaps = false;
+
+                        for (AABB other : occupied) {
+                            if (other.intersects(box)) {
+                                overlaps = true;
+                                break;
+                            }
+                        }
+
+                        if (!overlaps) {
+                            return pos;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Moves this guide to (x, y, z) in its own level together with its cargo donkeys: each lead is
+     * removed first (no lead item dropped), the guide is moved, each donkey is moved beside it
+     * ({@code plannedSpots}, or a fresh search for donkeys that would be left out of lead range)
+     * and leashed to the guide again with a fresh lead.
+     */
+    private void moveWithCargo(
+            ServerLevel level,
+            double x,
+            double y,
+            double z,
+            List<Donkey> donkeys,
+            @Nullable Map<Donkey, Vec3> plannedSpots,
+            String reason) {
+
+        Vec3 from = this.position();
+
+        for (Donkey donkey : donkeys) {
+            if (donkey.isLeashed()) {
+                donkey.removeLeash();
+            }
+        }
+
+        super.teleportTo(x, y, z);
+        this.getNavigation().stop();
+        this.setDeltaMovement(Vec3.ZERO);
+        this.resetFallDistance();
+
+        for (Donkey donkey : donkeys) {
+            placeAndReleash(
+                    donkey,
+                    this,
+                    plannedSpots != null ? plannedSpots.get(donkey) : null);
+        }
+
+        logTeleport(reason, from, level, donkeys.size());
+    }
+
+    /**
+     * Puts a cargo donkey whose lead has been removed back on a fresh lead to its guide. It is
+     * moved to {@code spot} if given; otherwise, if it is in another level or out of lead range,
+     * to a free spot beside the guide (or onto the guide's own spot when there is none, which has
+     * a floor and is better than leaving it out of range).
+     */
+    private static void placeAndReleash(
+            Donkey donkey,
+            AbstractTrailTraderEntity guide,
+            @Nullable Vec3 spot) {
+
+        if (!donkey.isAlive()
+                || !guide.isAlive()
+                || !(guide.level() instanceof ServerLevel guideLevel)) {
+            return;
+        }
+
+        boolean needsMove = donkey.level() != guideLevel
+                || donkey.distanceToSqr(guide) > CARGO_DONKEY_MAX_DISTANCE_SQR;
+
+        if (spot == null && needsMove) {
+            spot = findCargoDonkeySpot(
+                    guideLevel, guide.position(), donkey, List.of(guide.getBoundingBox()));
+
+            if (spot == null) {
+                spot = guide.position();
+            }
+        }
+
+        Donkey placed = donkey;
+
+        if (spot != null) {
+            if (donkey.level() != guideLevel) {
+                Entity moved = donkey.teleport(new TeleportTransition(
+                        guideLevel,
+                        spot,
+                        Vec3.ZERO,
+                        donkey.getYRot(),
+                        donkey.getXRot(),
+                        TeleportTransition.DO_NOTHING));
+
+                if (!(moved instanceof Donkey movedDonkey)) {
+                    return;
+                }
+
+                placed = movedDonkey;
+            } else {
+                donkey.teleportTo(spot.x, spot.y, spot.z);
+            }
+
+            placed.getNavigation().stop();
+            placed.setDeltaMovement(Vec3.ZERO);
+            placed.resetFallDistance();
+        }
+
+        if (placed.getLeashHolder() != guide) {
+            placed.setLeashedTo(guide, true);
+        }
+    }
+
+    /**
+     * Brings a cargo donkey back to its guide (watchdog, chunk rejoin): out of lead range, its lead
+     * is removed without a drop, it is moved beside the guide and leashed again with a fresh lead;
+     * in range it is only re-leashed if it lost its lead.
+     */
+    public static void reuniteCargoDonkey(
+            Donkey donkey,
+            AbstractTrailTraderEntity guide,
+            String reason) {
+
+        if (!donkey.isAlive() || !guide.isAlive()) {
+            return;
+        }
+
+        boolean far = donkey.level() != guide.level()
+                || donkey.distanceToSqr(guide) > CARGO_DONKEY_MAX_DISTANCE_SQR;
+
+        if (far && donkey.isLeashed()) {
+            donkey.removeLeash();
+        }
+
+        Vec3 from = donkey.position();
+        placeAndReleash(donkey, guide, null);
+
+        if (far && DEBUG_LOGGING) {
+            com.terrainlab.TerrainLab.LOGGER.info(
+                    "[GuideTeleport] cargo donkey of {} reason={} from ({}, {}, {}) to guide at"
+                            + " ({}, {}, {})",
+                    guide.getType().toShortString(),
+                    reason,
+                    Math.round(from.x), Math.round(from.y), Math.round(from.z),
+                    Math.round(guide.getX()), Math.round(guide.getY()), Math.round(guide.getZ()));
+        }
+    }
+
+    private void logTeleport(String reason, Vec3 from, ServerLevel fromLevel, int donkeys) {
+        if (DEBUG_LOGGING) {
+            com.terrainlab.TerrainLab.LOGGER.info(
+                    "[GuideTeleport] {} reason={} from {} ({}, {}, {}) to {} ({}, {}, {})"
+                            + " donkeys={}",
+                    this.getType().toShortString(),
+                    reason,
+                    fromLevel.dimension().identifier(),
+                    Math.round(from.x), Math.round(from.y), Math.round(from.z),
+                    this.level().dimension().identifier(),
+                    Math.round(this.getX()), Math.round(this.getY()), Math.round(this.getZ()),
+                    donkeys);
+        }
     }
 
     protected abstract ItemLike[] getRelicItems();
@@ -1434,8 +1850,8 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
                     releaseForcedChunk(level, entry);
 
-                    if (guide.distanceToSqr(player) > BOND_FOLLOW_DISTANCE_SQR) {
-                        guide.teleportNearBondedPlayer(player);
+                    if (guide.bondDistanceSqr(player) > BOND_FOLLOW_DISTANCE_SQR) {
+                        guide.teleportNearBondedPlayer(player, "recall");
                     }
 
                     entry.putLong(RECALL_POS, guide.blockPosition().asLong());
@@ -2534,6 +2950,10 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         double originZ = this.getZ();
 
         RandomSource random = this.getRandom();
+        List<Donkey> donkeys = loadedCargoDonkeys(serverLevel);
+
+        // The fall that killed it must not count on arrival.
+        this.resetFallDistance();
 
         // Search around the original position, aiming for roughly 100 blocks away.
         for (int attempt = 0; attempt < 64; attempt++) {
@@ -2547,7 +2967,8 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
             for (int verticalOffset = 0; verticalOffset <= 16; verticalOffset++) {
                 if (tryTeleportToBondPosition(
-                        serverLevel, targetX, baseY + verticalOffset, targetZ)) {
+                        serverLevel, targetX, baseY + verticalOffset, targetZ,
+                        donkeys, "escape")) {
                     this.setHealth(this.getMaxHealth());
                     this.setDeltaMovement(0.0D, 0.0D, 0.0D);
                     return;
@@ -2555,7 +2976,8 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
                 if (verticalOffset > 0
                         && tryTeleportToBondPosition(
-                        serverLevel, targetX, baseY - verticalOffset, targetZ)) {
+                        serverLevel, targetX, baseY - verticalOffset, targetZ,
+                        donkeys, "escape")) {
                     this.setHealth(this.getMaxHealth());
                     this.setDeltaMovement(0.0D, 0.0D, 0.0D);
                     return;
@@ -2564,15 +2986,16 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         }
 
         // No safe spot near where it fell (for example in the void, where there is no ground at
-        // all): go to the bonded player if they are in this dimension, else to the world spawn.
+        // all): go to safe ground beside the bonded player if they are in this dimension, else to
+        // the world spawn. Never onto the player's own position, which may be in midair.
         // Never call super.die(): that would remove the guide and lose its identity.
         this.setHealth(this.getMaxHealth());
         this.setDeltaMovement(0.0D, 0.0D, 0.0D);
         this.resetFallDistance();
 
         Player owner = serverLevel.getPlayerByUUID(this.firstTradingPlayerId);
-        if (owner != null && !owner.isSpectator()) {
-            this.teleportTo(owner.getX(), owner.getY(), owner.getZ());
+        if (owner != null && !owner.isSpectator() && teleportToGroundNearPlayer(serverLevel, owner, donkeys)) {
+            // landed beside the owner
         } else {
             ServerLevel overworld = serverLevel.getServer().overworld();
             BlockPos spawn = overworld.getHeightmapPos(
@@ -2588,19 +3011,100 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         this.getNavigation().stop();
     }
 
-    /** Cargo donkeys travel with the guide so the lead never snaps and drops a spare lead. */
+    /** Nearest safe ground within 8 blocks of the player (down to 16 below their feet), with room for the donkey. */
+    private boolean teleportToGroundNearPlayer(ServerLevel level, Player player, List<Donkey> donkeys) {
+        BlockPos feet = player.blockPosition();
+
+        for (int[] offset : GROUND_NEAR_PLAYER_OFFSETS) {
+            if (tryTeleportToBondPosition(
+                    level,
+                    feet.getX() + offset[0] + 0.5D,
+                    feet.getY() + offset[1],
+                    feet.getZ() + offset[2] + 0.5D,
+                    donkeys,
+                    "escape/near-owner")) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Cargo donkeys travel with the guide so the lead never snaps and drops a spare lead. A move
+     * that keeps every donkey within lead range (e.g. dismounting) is a plain teleport; otherwise
+     * the leads are removed, the donkeys moved beside the guide and re-leashed (moveWithCargo).
+     */
     @Override
     public void teleportTo(double x, double y, double z) {
-        super.teleportTo(x, y, z);
-        if (this.level() instanceof ServerLevel serverLevel) {
-            for (Entity entity : serverLevel.getAllEntities()) {
-                if (entity instanceof Donkey donkey
-                        && donkey.getData(ModAttachments.CARGO_DONKEY_OWNER_TRADER.get())
-                        .filter(this.getUUID()::equals).isPresent()) {
-                    donkey.teleportTo(x, y, z);
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            super.teleportTo(x, y, z);
+            return;
+        }
+
+        List<Donkey> donkeys = loadedCargoDonkeys(serverLevel);
+        boolean leavesDonkeyBehind = false;
+
+        for (Donkey donkey : donkeys) {
+            if (donkey.distanceToSqr(x, y, z) > CARGO_DONKEY_MAX_DISTANCE_SQR) {
+                leavesDonkeyBehind = true;
+                break;
+            }
+        }
+
+        if (!leavesDonkeyBehind) {
+            super.teleportTo(x, y, z);
+            return;
+        }
+
+        moveWithCargo(serverLevel, x, y, z, donkeys, null, "teleportTo");
+    }
+
+    /**
+     * Every other teleport (commands, portals, the cross-dimension escape to world spawn) also takes
+     * the cargo donkeys along: leads removed without a drop, guide moved, then each donkey moved
+     * beside the arrived guide - into its level if it changed - and re-leashed with a fresh lead.
+     */
+    @Override
+    @Nullable
+    public Entity teleport(TeleportTransition transition) {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return super.teleport(transition);
+        }
+
+        List<Donkey> donkeys = loadedCargoDonkeys(serverLevel);
+
+        if (donkeys.isEmpty()) {
+            return super.teleport(transition);
+        }
+
+        Vec3 from = this.position();
+
+        for (Donkey donkey : donkeys) {
+            if (donkey.isLeashed()) {
+                donkey.removeLeash();
+            }
+        }
+
+        Entity arrived = super.teleport(transition);
+
+        if (arrived instanceof AbstractTrailTraderEntity guide && guide.isAlive()) {
+            for (Donkey donkey : donkeys) {
+                placeAndReleash(donkey, guide, null);
+            }
+
+            guide.logTeleport("teleport", from, serverLevel, donkeys.size());
+        } else {
+            // Teleport refused: put the leads back.
+            for (Donkey donkey : donkeys) {
+                if (donkey.isAlive() && this.isAlive()) {
+                    donkey.setLeashedTo(this, true);
                 }
             }
         }
+
+        return arrived;
     }
 
     /** Beyond this a cargo donkey is moved back to its guide (vanilla leads snap at 12 blocks). */
@@ -2649,18 +3153,9 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
 
             // Out of lead range: bring the donkey over, even if it is still on the lead (a donkey
             // left behind in an unloaded chunk reattaches by ID from any distance, and a
-            // non-ticking one never snaps, so the lead is drawn across the whole gap).
-            if (donkey.distanceToSqr(trader) > CARGO_DONKEY_MAX_DISTANCE_SQR) {
-                donkey.teleportTo(trader.getX(), trader.getY(), trader.getZ());
-            }
-
-            if (donkey.getLeashHolder() != trader) {
-                donkey.setLeashedTo(
-                        trader,
-                        true
-                );
-
-            }
+            // non-ticking one never snaps, so the lead is drawn across the whole gap). The lead
+            // is removed without a drop and replaced with a fresh one once it has moved.
+            reuniteCargoDonkey(donkey, trader, "watchdog");
         }
     }
 }

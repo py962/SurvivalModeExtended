@@ -1,3 +1,4 @@
+
 package com.terrainlab.event;
 
 import com.terrainlab.block.FieldStoneBlock;
@@ -6,44 +7,69 @@ import com.terrainlab.portal.RedstonePortalShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
-/**
- * Drives Redstone Portal activation and deactivation from block-change notifications. The
- * event reports the changed position and its new state:
- * <ul>
- *   <li>If it is a Field Stone, its LIT state is synced to its power and the frame it
- *   borders is re-scanned.</li>
- *   <li>Otherwise (a lever, dust, or a broken frame block), adjacent Field Stones are
- *   re-checked and adjacent portal cells re-validated.</li>
- * </ul>
- */
-public class RedstonePortalHandler {
+public final class RedstonePortalHandler {
+
+    private RedstonePortalHandler() {
+    }
 
     @SubscribeEvent
     public static void onNeighborNotify(BlockEvent.NeighborNotifyEvent event) {
-        // This handler's own setBlock calls re-fire this event synchronously; the mutating flag
-        // covers the whole body to prevent unbounded recursion.
-        if (RedstonePortalShape.isMutating()) return;
-        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        if (RedstonePortalShape.isMutating()) {
+            return;
+        }
+
+        if (!(event.getLevel() instanceof ServerLevel level)) {
+            return;
+        }
+
+        BlockPos pos = event.getPos();
+        Block changedBlock = event.getState().getBlock();
+
+        // Handle a Field Stone at the changed position directly.
+        if (changedBlock instanceof FieldStoneBlock) {
+            RedstonePortalShape.setMutating(true);
+            try {
+                updateLit(level, pos);
+                RedstonePortalShape.recomputeFromFrame(level, pos);
+            } finally {
+                RedstonePortalShape.setMutating(false);
+            }
+            return;
+        }
+
+        // Ordinary block changes (including seasonal plant removal) should
+        // be ignored unless an already-loaded adjacent chunk contains a
+        // relevant portal block.
+        boolean relevant = false;
+
+        for (Direction dir : Direction.values()) {
+            BlockPos neighbor = pos.relative(dir);
+            Block neighborBlock = getLoadedBlock(level, neighbor);
+
+            if (neighborBlock instanceof FieldStoneBlock
+                    || neighborBlock instanceof RedstonePortalBlock) {
+                relevant = true;
+                break;
+            }
+        }
+
+        if (!relevant) {
+            return;
+        }
 
         RedstonePortalShape.setMutating(true);
         try {
-            BlockPos pos = event.getPos();
-            Block block = event.getState().getBlock();
-
-            if (block instanceof FieldStoneBlock) {
-                updateLit(level, pos);
-                RedstonePortalShape.recomputeFromFrame(level, pos);
-                return;
-            }
-
             for (Direction dir : Direction.values()) {
                 BlockPos neighbor = pos.relative(dir);
-                Block neighborBlock = level.getBlockState(neighbor).getBlock();
+                Block neighborBlock = getLoadedBlock(level, neighbor);
+
                 if (neighborBlock instanceof FieldStoneBlock) {
                     updateLit(level, neighbor);
                     RedstonePortalShape.recomputeFromFrame(level, neighbor);
@@ -56,10 +82,44 @@ public class RedstonePortalHandler {
         }
     }
 
-    /** Syncs a Field Stone's LIT state to whether it is powered. */
+    /**
+     * Returns the block at a position only when its chunk is already loaded.
+     * Never requests a chunk load.
+     */
+    private static Block getLoadedBlock(ServerLevel level, BlockPos pos) {
+        LevelChunk chunk = level.getChunkSource().getChunkNow(
+                pos.getX() >> 4,
+                pos.getZ() >> 4
+        );
+
+        if (chunk == null) {
+            return null;
+        }
+
+        return chunk.getBlockState(pos).getBlock();
+    }
+
+    /**
+     * Syncs a Field Stone's LIT state to whether it is powered.
+     */
     private static void updateLit(ServerLevel level, BlockPos pos) {
-        BlockState state = level.getBlockState(pos);
+        LevelChunk chunk = level.getChunkSource().getChunkNow(
+                pos.getX() >> 4,
+                pos.getZ() >> 4
+        );
+
+        if (chunk == null) {
+            return;
+        }
+
+        BlockState state = chunk.getBlockState(pos);
+
+        if (!(state.getBlock() instanceof FieldStoneBlock)) {
+            return;
+        }
+
         boolean powered = level.getBestNeighborSignal(pos) > 0;
+
         if (state.getValue(FieldStoneBlock.LIT) != powered) {
             level.setBlock(pos, state.setValue(FieldStoneBlock.LIT, powered), 3);
         }

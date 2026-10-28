@@ -28,7 +28,38 @@
         "probability": 0.118093334
       }
     ],
-    "minecraft:visual/fog_color": "#685f70"
+    "minecraft:visual/fog_color": "#685f70",
+    "minecraft:gameplay/natural_mob_spawns": {
+      "argument": {
+        "spawn_costs": {},
+        "spawns_by_category": {
+          "creature": [
+            {
+              "type": "minecraft:strider",
+              "count": {
+                "type": "minecraft:uniform",
+                "max_inclusive": 2,
+                "min_inclusive": 1
+              },
+              "weight": 60
+            }
+          ],
+          "monster": [
+            {
+              "type": "minecraft:ghast",
+              "count": 1,
+              "weight": 20
+            },
+            {
+              "type": "minecraft:magma_cube",
+              "count": 2,
+              "weight": 50
+            }
+          ]
+        }
+      },
+      "modifier": "overlay"
+    }
   },
   "carvers": "minecraft:nether_cave",
   "downfall": 0.0,
@@ -67,36 +98,5 @@
     ]
   ],
   "has_precipitation": false,
-  "spawn_costs": {},
-  "spawners": {
-    "ambient": [],
-    "axolotls": [],
-    "creature": [
-      {
-        "type": "minecraft:strider",
-        "maxCount": 2,
-        "minCount": 1,
-        "weight": 60
-      }
-    ],
-    "misc": [],
-    "monster": [
-      {
-        "type": "minecraft:ghast",
-        "maxCount": 1,
-        "minCount": 1,
-        "weight": 20
-      },
-      {
-        "type": "minecraft:magma_cube",
-        "maxCount": 2,
-        "minCount": 2,
-        "weight": 50
-      }
-    ],
-    "underground_water_creature": [],
-    "water_ambient": [],
-    "water_creature": []
-  },
   "temperature": 2.0
 }

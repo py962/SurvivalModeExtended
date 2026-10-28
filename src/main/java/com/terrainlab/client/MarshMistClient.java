@@ -31,8 +31,8 @@ public final class MarshMistClient {
     private static final float MIST_START = 40.0F;
     private static final float MIST_END = 50.0F;
 
-    // Gaze is strongest when looking horizontally.
-    // Mist fades to zero when looking 40 degrees up or down.
+    // Mist is full when looking horizontally or down, and fades to zero
+    // when looking 40 degrees up.
     private static final float FULL_MIST_PITCH = 40.0F;
 
     // Eye height above terrain over which the mist clears.
@@ -76,13 +76,13 @@ public final class MarshMistClient {
     }
 
     /**
-     * Mist is strongest when looking horizontally.
-     * Looking up or down reduces the mist symmetrically.
+     * Mist stays at full strength looking horizontally or down; looking
+     * up thins it (pitch is negative when looking up).
      * The transition is eased to avoid flickering.
      */
     private static float gaze(float pitchDegrees) {
         float target = 1.0F - smoothstep(
-                Math.abs(pitchDegrees) / FULL_MIST_PITCH
+                Math.max(0.0F, -pitchDegrees) / FULL_MIST_PITCH
         );
 
         long now = System.nanoTime();
@@ -195,7 +195,8 @@ public final class MarshMistClient {
                 var biome = level.getBiome(pos);
 
                 if (biome.is(ModBiomeSets.MARSH)
-                        || biome.is(ModBiomeSets.FROZEN_MARSH)) {
+                        || biome.is(ModBiomeSets.FROZEN_MARSH)
+                        || biome.is(net.minecraft.world.level.biome.Biomes.SWAMP)) {
                     marsh++;
                 }
             }

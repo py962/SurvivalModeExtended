@@ -33,9 +33,10 @@ import net.minecraft.tags.BlockTags;
 import java.util.EnumSet;
 
 /**
- * Owl: nocturnal Parrot-based bird. Tamed owls are bed-anchored pets (see {@link AnchoredPets}):
- * they only roost and perch inside their roaming zone, never circle, and none of these goals
- * move them while they sit or while they are outside the zone (FlyTowardsHomeGoal brings them back).
+ * Owl: nocturnal Parrot-based bird. Tamed owls are bed-anchored pets (see
+ * {@link AnchoredPets}): they only roost and perch inside their roaming zone,
+ * never circle, and none of these goals move them while they sit or while they
+ * are outside the zone.
  */
 public class OwlEntity extends Parrot {
 
@@ -49,6 +50,16 @@ public class OwlEntity extends Parrot {
                             "gameplay/owl_morning_gift"
                     )
             );
+
+    /**
+     * End game-time tick for the daytime circling fallback.
+     * The owl retries finding a roost when this time is reached.
+     */
+    private long daytimeCircleUntil;
+
+    private boolean isDaytimeCircleFallbackActive() {
+        return level().getGameTime() < daytimeCircleUntil;
+    }
 
     private static boolean isDayTime(Level level) {
         long dayTime = level.getOverworldClockTime() % 24000L;
@@ -65,9 +76,11 @@ public class OwlEntity extends Parrot {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        // Tamed birds never ride the owner's shoulder (the shoulder layer only draws parrots); they
-        // follow and perch nearby instead.
-        this.goalSelector.removeAllGoals(goal -> goal instanceof net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal);
+
+        // Tamed birds never ride the owner's shoulder.
+        this.goalSelector.removeAllGoals(
+                goal -> goal instanceof LandOnOwnersShoulderGoal
+        );
 
         this.goalSelector.getAvailableGoals()
                 .removeIf(wrapped ->
@@ -88,7 +101,6 @@ public class OwlEntity extends Parrot {
     @Override
     protected void onFlap() {
         // Silent: skips the parrot flap sound.
-        // TODO: add an owl wing-flap sound.
         this.owlNextFlap =
                 this.flyDist + this.flapSpeed / 2.0F * GLIDE_FACTOR;
     }
@@ -110,13 +122,13 @@ public class OwlEntity extends Parrot {
 
     /**
      * Daytime resting:
-     * finds an air block on top of the canopy (leaves below, open sky above), moves the owl
-     * there so it sits on the leaf surface, and holds it until night
-     * or until the resting position becomes invalid.
+     * finds an air block above leaves with open sky and moves the owl there.
+     * If no roost is found, the owl yields to the circling goal for 600 ticks
+     * before trying the search again.
      */
     private static class OwlNocturnalGoal extends Goal {
         private static final int SEARCH_RADIUS = 16;
-        private static final int SEARCH_VERTICAL = 8;
+        private static final int SEARCH_VERTICAL = 16;
         private static final double REST_SPEED = 1.0D;
         private static final double ARRIVAL_DISTANCE = 0.45D;
 
@@ -135,12 +147,20 @@ public class OwlEntity extends Parrot {
         public boolean canUse() {
             if (!isDayTime(this.owl.level())
                     || this.owl.isOrderedToSit()
-                    || AnchoredPets.isTameAndAwayFromHome(this.owl)) {
+                    || AnchoredPets.isTameAndAwayFromHome(this.owl)
+                    || this.owl.isDaytimeCircleFallbackActive()) {
                 return false;
             }
 
             this.restPos = findRestPosition();
-            return this.restPos != null;
+
+            if (this.restPos == null) {
+                this.owl.daytimeCircleUntil =
+                        this.owl.level().getGameTime() + 600L;
+                return false;
+            }
+
+            return true;
         }
 
         @Override
@@ -206,10 +226,8 @@ public class OwlEntity extends Parrot {
 
             Vec3 target = Vec3.atBottomCenterOf(this.restPos);
 
-            /*
-             * Use the movement controller directly. Ground-style navigation
-             * may fail to route to an air block above the canopy.
-             */
+            // Ground-style navigation may fail to route to an air block
+            // above the canopy, so use the movement controller directly.
             this.owl.moveControl.setWantedPosition(
                     target.x,
                     target.y,
@@ -228,8 +246,10 @@ public class OwlEntity extends Parrot {
             BlockState air = level.getBlockState(pos);
             BlockState leaves = level.getBlockState(pos.below());
 
-            // Open sky above keeps roosts on the top of the canopy, never in pockets inside a crown.
-            return air.isAir() && leaves.is(BlockTags.LEAVES) && level.canSeeSky(pos);
+            // Roost on top of the canopy, not inside the leaves.
+            return air.isAir()
+                    && leaves.is(BlockTags.LEAVES)
+                    && level.canSeeSky(pos);
         }
 
         private BlockPos findRestPosition() {
@@ -243,7 +263,8 @@ public class OwlEntity extends Parrot {
                         BlockPos candidate = origin.offset(dx, dy, dz);
 
                         if (!isValidRestPosition(candidate)
-                                || !AnchoredPets.isAllowedTarget(this.owl, candidate)) {
+                                || !AnchoredPets.isAllowedTarget(
+                                this.owl, candidate)) {
                             continue;
                         }
 
@@ -263,7 +284,8 @@ public class OwlEntity extends Parrot {
     }
 
     /**
-     * Night-time circling for wild owls.
+     * Circling for wild owls at night, or temporarily during the day when
+     * no suitable roost can be found.
      */
     private static class OwlCircleGoal extends Goal {
         private static final int CIRCLE_ALTITUDE = 24;
@@ -293,7 +315,8 @@ public class OwlEntity extends Parrot {
         }
 
         private boolean shouldCircle() {
-            return !isDayTime(this.owl.level())
+            return (!isDayTime(this.owl.level())
+                    || this.owl.isDaytimeCircleFallbackActive())
                     && !this.owl.isTame()
                     && !this.owl.isOrderedToSit();
         }
@@ -546,7 +569,8 @@ public class OwlEntity extends Parrot {
                         if (state.is(BlockTags.FENCES)
                                 && this.owl.level()
                                 .getBlockState(candidate.above()).isAir()
-                                && AnchoredPets.isAllowedTarget(this.owl, candidate)) {
+                                && AnchoredPets.isAllowedTarget(
+                                this.owl, candidate)) {
                             return candidate;
                         }
                     }
@@ -569,7 +593,8 @@ public class OwlEntity extends Parrot {
                         if (state.is(BlockTags.LEAVES)
                                 && this.owl.level()
                                 .getBlockState(candidate.above()).isAir()
-                                && AnchoredPets.isAllowedTarget(this.owl, candidate)) {
+                                && AnchoredPets.isAllowedTarget(
+                                this.owl, candidate)) {
                             return candidate;
                         }
                     }

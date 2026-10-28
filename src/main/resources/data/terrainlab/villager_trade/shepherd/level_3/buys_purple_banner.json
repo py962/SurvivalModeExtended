@@ -14,7 +14,7 @@
     "entity": "this",
     "predicate": {
       "minecraft:predicates": {
-        "minecraft:villager/variant": "minecraft:snow"
+        "minecraft:villager/variant": "minecraft:taiga"
       }
     }
   }

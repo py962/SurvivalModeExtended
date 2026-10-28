@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": "terrainlab:diamond_upgrade_smithing_template",
+  "base": "minecraft:iron_sword",
+  "addition": "#minecraft:diamond_tool_materials",
+  "result": {
+    "id": "minecraft:diamond_sword",
+    "components": {
+      "minecraft:damage": 0
+    }
+  }
+}

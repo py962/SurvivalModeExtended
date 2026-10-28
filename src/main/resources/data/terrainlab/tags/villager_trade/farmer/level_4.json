@@ -2,9 +2,11 @@
   "values": [
     "terrainlab:farmer/level_4/buys_red_mushroom",
     "terrainlab:farmer/level_4/sells_red_mushroom",
-    "terrainlab:farmer/level_4/buys_melon_slice",
     "terrainlab:farmer/level_4/buys_pumpkin",
+    "terrainlab:farmer/level_4/buys_melon_slice",
+    "terrainlab:farmer/level_4/buys_apple",
+    "terrainlab:farmer/level_4/sells_pumpkin",
     "terrainlab:farmer/level_4/sells_melon_slice",
-    "terrainlab:farmer/level_4/sells_pumpkin"
+    "terrainlab:farmer/level_4/sells_apple"
   ]
 }

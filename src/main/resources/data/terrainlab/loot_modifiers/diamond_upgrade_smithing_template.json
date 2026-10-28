@@ -1,0 +1,48 @@
+{
+  "type": "neoforge:add_table",
+  "condition": {
+    "type": "minecraft:any_of",
+    "terms": [
+      {
+        "type": "minecraft:all_of",
+        "terms": [
+          {
+            "type": "neoforge:loot_table_id",
+            "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+          },
+          {
+            "type": "minecraft:random_chance",
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "type": "minecraft:all_of",
+        "terms": [
+          {
+            "type": "neoforge:loot_table_id",
+            "loot_table_id": "terrainlab:chests/outlaws_hideout_chest"
+          },
+          {
+            "type": "minecraft:random_chance",
+            "chance": 0.5
+          }
+        ]
+      },
+      {
+        "type": "minecraft:all_of",
+        "terms": [
+          {
+            "type": "neoforge:loot_table_id",
+            "loot_table_id": "terrainlab:chests/hidden_monument_room"
+          },
+          {
+            "type": "minecraft:random_chance",
+            "chance": 0.5
+          }
+        ]
+      }
+    ]
+  },
+  "table": "terrainlab:chests/diamond_upgrade_smithing_template"
+}

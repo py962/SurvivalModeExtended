@@ -1,20 +1,20 @@
 {
   "values": [
-    "terrainlab:weaponsmith/level_4/buys_diamond_axe",
-    "terrainlab:weaponsmith/level_4/sells_diamond_axe_quickstrike",
-    "terrainlab:weaponsmith/level_4/sells_diamond_axe_sharpness_unbreaking",
-    "terrainlab:weaponsmith/level_4/sells_diamond_axe_unbreaking",
-    "terrainlab:weaponsmith/level_4/sells_diamond_axe_reach",
-    "terrainlab:weaponsmith/level_4/sells_diamond_axe_cleave",
-    "terrainlab:weaponsmith/level_4/sells_diamond_axe_sharpness",
-    "terrainlab:weaponsmith/level_4/sells_diamond_axe_knockback",
-    "terrainlab:weaponsmith/level_4/buys_diamond_spear",
-    "terrainlab:weaponsmith/level_4/sells_diamond_spear_quickstrike",
-    "terrainlab:weaponsmith/level_4/sells_diamond_spear_sharpness_unbreaking",
-    "terrainlab:weaponsmith/level_4/sells_diamond_spear_unbreaking",
-    "terrainlab:weaponsmith/level_4/sells_diamond_spear_reach",
-    "terrainlab:weaponsmith/level_4/sells_diamond_spear_lunge",
-    "terrainlab:weaponsmith/level_4/sells_diamond_spear_sharpness",
-    "terrainlab:weaponsmith/level_4/sells_diamond_spear_knockback"
+    "terrainlab:weaponsmith/level_4/buys_iron_axe",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_unbreaking",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_reach",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_knockback",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_quickstrike",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_sharpness",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_quickstrike_reach",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_sharpness_unbreaking",
+    "terrainlab:weaponsmith/level_4/buys_iron_spear",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_unbreaking",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_reach",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_knockback",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_quickstrike",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_sharpness",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_quickstrike_reach",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_sharpness_unbreaking"
   ]
 }

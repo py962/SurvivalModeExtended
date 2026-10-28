@@ -52,6 +52,14 @@ public class ModBlockEntities {
                             ModBlocks.CELESTIAL_FORGE.get()
                     ));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.terrainlab.blockentity.PotionCauldronBlockEntity>> POTION_CAULDRON_BE =
+            BLOCK_ENTITIES.register("potion_cauldron", () ->
+                    new BlockEntityType<>(
+                            com.terrainlab.blockentity.PotionCauldronBlockEntity::new,
+                            false,
+                            ModBlocks.POTION_CAULDRON.get()
+                    ));
+
     // One shared type for all custom conduit blocks (Breath uses vanilla's conduit);
     // the block entity derives its variant from the block.
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CelestialConduitBlockEntity>> CELESTIAL_CONDUIT_BE =

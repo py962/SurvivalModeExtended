@@ -13,7 +13,7 @@ public final class HeatSourceBlocks {
 
     // Applied undecayed up to 1 block away (see HeatSourceData#contributionAt).
     public static final double CAMPFIRE_STRENGTH = 40.0;
-    public static final double LAVA_STRENGTH = 15.0;
+    public static final double LAVA_STRENGTH = 40.0;
     public static final double MAGMA_STRENGTH = 10.0;
 
     // Fire is not indexed (it changes constantly); HeatContributionService samples it live. Soul fire gives no heat.

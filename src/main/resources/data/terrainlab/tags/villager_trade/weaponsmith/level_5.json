@@ -1,12 +1,12 @@
 {
   "values": [
-    "terrainlab:weaponsmith/level_5/buys_diamond_sword",
-    "terrainlab:weaponsmith/level_5/sells_diamond_sword_quickstrike",
-    "terrainlab:weaponsmith/level_5/sells_diamond_sword_sharpness_unbreaking",
-    "terrainlab:weaponsmith/level_5/sells_diamond_sword_unbreaking",
-    "terrainlab:weaponsmith/level_5/sells_diamond_sword_reach",
-    "terrainlab:weaponsmith/level_5/sells_diamond_sword_sweeping_edge",
-    "terrainlab:weaponsmith/level_5/sells_diamond_sword_sharpness",
-    "terrainlab:weaponsmith/level_5/sells_diamond_sword_knockback"
+    "terrainlab:weaponsmith/level_5/buys_iron_sword",
+    "terrainlab:weaponsmith/level_5/sells_iron_sword_unbreaking",
+    "terrainlab:weaponsmith/level_5/sells_iron_sword_reach",
+    "terrainlab:weaponsmith/level_5/sells_iron_sword_knockback",
+    "terrainlab:weaponsmith/level_5/sells_iron_sword_quickstrike",
+    "terrainlab:weaponsmith/level_5/sells_iron_sword_sharpness",
+    "terrainlab:weaponsmith/level_5/sells_iron_sword_quickstrike_reach",
+    "terrainlab:weaponsmith/level_5/sells_iron_sword_sharpness_unbreaking"
   ]
 }

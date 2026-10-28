@@ -1,12 +1,12 @@
 {
   "values": [
     "terrainlab:leatherworker/level_5/buys_saddle",
-    "terrainlab:leatherworker/level_5/sells_saddle_agility",
-    "terrainlab:leatherworker/level_5/sells_saddle_agility_feather_falling",
     "terrainlab:leatherworker/level_5/sells_saddle_unbreaking",
     "terrainlab:leatherworker/level_5/sells_saddle_depth_strider_unbreaking",
-    "terrainlab:leatherworker/level_5/sells_saddle_feather_falling",
+    "terrainlab:leatherworker/level_5/sells_saddle_feather_falling_agility",
+    "terrainlab:leatherworker/level_5/sells_saddle_agility",
+    "terrainlab:leatherworker/level_5/sells_saddle_frost_walker",
     "terrainlab:leatherworker/level_5/sells_saddle_depth_strider",
-    "terrainlab:leatherworker/level_5/sells_saddle_feather_falling_unbreaking"
+    "terrainlab:leatherworker/level_5/sells_saddle_feather_falling"
   ]
 }

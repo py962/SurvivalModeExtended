@@ -59,11 +59,7 @@ public final class CargoDonkeyRejoinHandler {
         if (!donkey.isAlive() || !guide.isAlive() || donkey.level() != guide.level()) {
             return;
         }
-        if (donkey.distanceToSqr(guide) > AbstractTrailTraderEntity.CARGO_DONKEY_MAX_DISTANCE_SQR) {
-            donkey.teleportTo(guide.getX(), guide.getY(), guide.getZ());
-        }
-        if (donkey.getLeashHolder() != guide) {
-            donkey.setLeashedTo(guide, true);
-        }
+        // Out of range: lead removed without a drop, moved beside the guide, fresh lead.
+        AbstractTrailTraderEntity.reuniteCargoDonkey(donkey, guide, "rejoin");
     }
 }

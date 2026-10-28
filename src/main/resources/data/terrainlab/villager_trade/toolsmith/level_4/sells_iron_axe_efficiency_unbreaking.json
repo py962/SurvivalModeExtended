@@ -1,0 +1,53 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 11
+  },
+  "gives": {
+    "id": "minecraft:iron_axe"
+  },
+  "max_uses": 4,
+  "xp": 10,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:any_of",
+    "terms": [
+      {
+        "type": "minecraft:entity_properties",
+        "entity": "this",
+        "predicate": {
+          "minecraft:predicates": {
+            "minecraft:villager/variant": "minecraft:plains"
+          }
+        }
+      },
+      {
+        "type": "minecraft:inverted",
+        "term": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:predicates": {
+              "minecraft:villager/variant": [
+                "minecraft:desert",
+                "minecraft:jungle",
+                "minecraft:plains",
+                "minecraft:savanna",
+                "minecraft:snow",
+                "minecraft:swamp",
+                "minecraft:taiga"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "given_item_modifier": {
+    "type": "minecraft:set_enchantments",
+    "enchantments": {
+      "minecraft:efficiency": 2,
+      "minecraft:unbreaking": 2
+    }
+  }
+}

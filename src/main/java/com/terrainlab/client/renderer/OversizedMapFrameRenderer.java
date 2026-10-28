@@ -223,13 +223,16 @@ public class OversizedMapFrameRenderer
                 poseStack.popPose();
             } else if (!state.item.isEmpty()) {
                 /*
-                 * Display items without map data (e.g. a terrainlab:atlas
-                 * with no map yet) are rendered through their item renderer
-                 * and enlarged to fit the oversized frame.
+                 * Any other item (2x2: anything; 3x3: banners, paintings,
+                 * a terrainlab:atlas with no map yet) is drawn like vanilla
+                 * frame contents, enlarged in-plane to the frame size (same
+                 * proportion of the frame as in a 1x1 frame). Depth stays
+                 * vanilla so block items do not sink into the wall.
+                 * Rotation: 45 degrees per step, like vanilla.
                  */
                 poseStack.pushPose();
 
-                poseStack.scale(size, size, size);
+                poseStack.scale(size, size, 1.0F);
 
                 poseStack.rotateDegrees(
                         Axis.ZP,

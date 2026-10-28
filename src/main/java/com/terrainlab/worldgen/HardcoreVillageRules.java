@@ -7,6 +7,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.StructureTags;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -25,12 +26,12 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Ultra-hardcore village rules: villages are rare (only {@link #VILLAGE_RARITY} of village start
+ * Isolation difficulty village rules: villages are rare (only {@link #VILLAGE_RARITY} of village start
  * positions generate) and always abandoned (the start piece is drawn only from the start pool's zombie
  * elements). Applied in JigsawStructure#findGenerationPoint (JigsawStructureHardcoreVillageMixin), which
  * both real generation and StructureCheck (/locate, explorer maps) go through, so they agree.
  * <p>
- * Worldgen threads cannot reach LevelData, so the world's hardcore flag is copied into a static here on
+ * Worldgen threads cannot reach LevelData, so whether the world's difficulty is Hard (Isolation) is copied into a static here on
  * {@link ServerAboutToStartEvent} (fired in initServer before loadLevel creates the levels and prepares
  * spawn chunks) and cleared on {@link ServerStoppedEvent}. Every server start reassigns it, so the
  * next world opened in the same session never inherits it.
@@ -38,12 +39,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class HardcoreVillageRules {
 
-    /** Fraction of village start positions that generate in an ultra-hardcore world. */
+    /** Fraction of village start positions that generate on Isolation difficulty. */
     public static final double VILLAGE_RARITY = 0.25;
 
     private static final long POSITION_SALT = 0x5A6F6D6269655649L;
 
-    private static volatile boolean hardcore;
+    private static volatile boolean isolation;
 
     /** Zombie-only copy of each start pool, or empty if the pool has no zombie elements. */
     private static final Map<StructureTemplatePool, Optional<StructureTemplatePool>> ZOMBIE_START_POOLS =
@@ -53,18 +54,18 @@ public final class HardcoreVillageRules {
     }
 
     public static boolean isActive() {
-        return hardcore;
+        return isolation;
     }
 
     @SubscribeEvent
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
         ZOMBIE_START_POOLS.clear();
-        hardcore = event.getServer().getWorldData().isHardcore();
+        isolation = event.getServer().getWorldData().getDifficulty() == Difficulty.HARD;
     }
 
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
-        hardcore = false;
+        isolation = false;
         ZOMBIE_START_POOLS.clear();
     }
 

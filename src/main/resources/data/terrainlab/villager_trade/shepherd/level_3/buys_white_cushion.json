@@ -1,0 +1,32 @@
+{
+  "wants": {
+    "id": "minecraft:white_cushion",
+    "count": 5
+  },
+  "gives": {
+    "id": "minecraft:emerald"
+  },
+  "max_uses": 8,
+  "xp": 5,
+  "reputation_discount": 0.05,
+  "merchant_predicate": {
+    "type": "minecraft:inverted",
+    "term": {
+      "type": "minecraft:entity_properties",
+      "entity": "this",
+      "predicate": {
+        "minecraft:predicates": {
+          "minecraft:villager/variant": [
+            "minecraft:desert",
+            "minecraft:jungle",
+            "minecraft:plains",
+            "minecraft:savanna",
+            "minecraft:snow",
+            "minecraft:swamp",
+            "minecraft:taiga"
+          ]
+        }
+      }
+    }
+  }
+}

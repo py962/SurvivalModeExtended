@@ -1,20 +1,20 @@
 {
   "values": [
-    "terrainlab:toolsmith/level_4/buys_diamond_shovel",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency_unbreaking",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_efficiency_reach",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_reach",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_silk_touch",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_unbreaking_reach",
-    "terrainlab:toolsmith/level_4/sells_diamond_shovel_unbreaking",
-    "terrainlab:toolsmith/level_4/buys_diamond_axe",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency_unbreaking",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_efficiency_reach",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_reach",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_silk_touch",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_unbreaking_reach",
-    "terrainlab:toolsmith/level_4/sells_diamond_axe_unbreaking"
+    "terrainlab:toolsmith/level_4/buys_iron_shovel",
+    "terrainlab:toolsmith/level_4/sells_iron_shovel_efficiency_unbreaking",
+    "terrainlab:toolsmith/level_4/sells_iron_shovel_reach",
+    "terrainlab:toolsmith/level_4/sells_iron_shovel_efficiency",
+    "terrainlab:toolsmith/level_4/sells_iron_shovel_silk_touch",
+    "terrainlab:toolsmith/level_4/sells_iron_shovel_unbreaking",
+    "terrainlab:toolsmith/level_4/sells_iron_shovel_aqua_affinity",
+    "terrainlab:toolsmith/level_4/sells_iron_shovel_efficiency_reach",
+    "terrainlab:toolsmith/level_4/buys_iron_axe",
+    "terrainlab:toolsmith/level_4/sells_iron_axe_efficiency_unbreaking",
+    "terrainlab:toolsmith/level_4/sells_iron_axe_reach",
+    "terrainlab:toolsmith/level_4/sells_iron_axe_efficiency",
+    "terrainlab:toolsmith/level_4/sells_iron_axe_silk_touch",
+    "terrainlab:toolsmith/level_4/sells_iron_axe_unbreaking",
+    "terrainlab:toolsmith/level_4/sells_iron_axe_aqua_affinity",
+    "terrainlab:toolsmith/level_4/sells_iron_axe_efficiency_reach"
   ]
 }

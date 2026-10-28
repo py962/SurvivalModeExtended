@@ -80,7 +80,6 @@
           "modifier": {
             "type": "minecraft:enchant_randomly",
             "options": [
-              "minecraft:breach",
               "minecraft:density"
             ]
           },

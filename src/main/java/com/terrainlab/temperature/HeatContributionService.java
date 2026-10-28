@@ -25,8 +25,8 @@ import java.util.Set;
  */
 public final class HeatContributionService {
 
-    private static final int NATURAL_LAVA_RADIUS = 4; // blocks
-    private static final double NATURAL_LAVA_DECAY_PER_BLOCK = 3.5;
+    private static final int NATURAL_LAVA_RADIUS = 6; // blocks
+    private static final double NATURAL_LAVA_DECAY_PER_BLOCK = 6.0; // fades out ~6.7 blocks away
 
     private static final int FIRE_RADIUS = 3; // blocks
     private static final double FIRE_DECAY_PER_BLOCK = 7.0;
@@ -40,7 +40,7 @@ public final class HeatContributionService {
                 ? serverLevel.getData(ModAttachments.HEAT_SOURCE_INDEX.get())
                 : com.terrainlab.client.ClientHeatSourceIndex.get();
 
-        // The radius also covers the natural-lava cube (corner ~6.9 blocks away), for de-duplication.
+        // The radius also covers natural lava's reach (~6.7 blocks), for de-duplication.
         List<HeatSourceData> nearby = index.near(pos, HeatFloodFill.RADIUS);
 
         double total = indexedContribution(level, index, nearby, pos);

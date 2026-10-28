@@ -44,7 +44,8 @@ public final class SeasonalWeatherCycleHandler {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (event.getServer().getTickCount() % WeatherConstants.CHECK_INTERVAL_TICKS != 0) {
+        if (event.getServer().getTickCount()
+                % WeatherConstants.CHECK_INTERVAL_TICKS != 0) {
             return;
         }
 
@@ -90,7 +91,10 @@ public final class SeasonalWeatherCycleHandler {
                 seasonData.getSeasonalOffset()
         );
 
-        boolean wetSeason = isWetSeason(season.visualSeason());
+        VisualSeason visualSeason = season.visualSeason();
+        boolean wetSeason = isWetSeason(visualSeason);
+        boolean autumn = visualSeason == VisualSeason.AUTUMN;
+
         ThreadLocalRandom random = ThreadLocalRandom.current();
         boolean raining = level.isRaining();
 
@@ -107,7 +111,8 @@ public final class SeasonalWeatherCycleHandler {
                         level,
                         random,
                         WeatherConstants.WET_SEASON_RAIN_DURATION_MIN_TICKS,
-                        WeatherConstants.WET_SEASON_RAIN_DURATION_MAX_TICKS
+                        WeatherConstants.WET_SEASON_RAIN_DURATION_MAX_TICKS,
+                        autumn
                 );
             } else {
                 forceClear(
@@ -145,7 +150,8 @@ public final class SeasonalWeatherCycleHandler {
                     level,
                     random,
                     WeatherConstants.DRY_SEASON_SHOWER_DURATION_MIN_TICKS,
-                    WeatherConstants.DRY_SEASON_SHOWER_DURATION_MAX_TICKS
+                    WeatherConstants.DRY_SEASON_SHOWER_DURATION_MAX_TICKS,
+                    false
             );
         } else {
             forceClear(
@@ -166,11 +172,13 @@ public final class SeasonalWeatherCycleHandler {
             ServerLevel level,
             ThreadLocalRandom random,
             int minTicks,
-            int maxTicks
+            int maxTicks,
+            boolean allowThunder
     ) {
         int duration = minTicks + random.nextInt(maxTicks - minTicks + 1);
 
-        boolean thunder = WeatherConstants.rollPercent(
+        boolean thunder = allowThunder
+                && WeatherConstants.rollPercent(
                 random,
                 WeatherConstants.THUNDERSTORM_PERCENT
         );

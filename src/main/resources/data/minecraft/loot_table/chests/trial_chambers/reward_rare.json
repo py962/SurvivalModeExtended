@@ -120,7 +120,6 @@
             "type": "minecraft:enchant_randomly",
             "options": [
               "minecraft:riptide",
-              "minecraft:loyalty",
               "minecraft:channeling",
               "minecraft:impaling",
               "minecraft:mending"

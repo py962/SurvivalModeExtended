@@ -1,20 +1,14 @@
 {
   "values": [
-    "terrainlab:armorer/level_3/buys_diamond_boots",
-    "terrainlab:armorer/level_3/sells_diamond_boots_unbreaking_thorns",
-    "terrainlab:armorer/level_3/sells_diamond_boots_thorns",
-    "terrainlab:armorer/level_3/sells_diamond_boots_protection_thorns",
-    "terrainlab:armorer/level_3/sells_diamond_boots_unbreaking",
-    "terrainlab:armorer/level_3/sells_diamond_boots_protection",
-    "terrainlab:armorer/level_3/sells_diamond_boots_projectile_protection",
-    "terrainlab:armorer/level_3/sells_diamond_boots_blast_protection",
-    "terrainlab:armorer/level_3/buys_diamond_helmet",
-    "terrainlab:armorer/level_3/sells_diamond_helmet_unbreaking_thorns",
-    "terrainlab:armorer/level_3/sells_diamond_helmet_thorns",
-    "terrainlab:armorer/level_3/sells_diamond_helmet_protection_thorns",
-    "terrainlab:armorer/level_3/sells_diamond_helmet_unbreaking",
-    "terrainlab:armorer/level_3/sells_diamond_helmet_protection",
-    "terrainlab:armorer/level_3/sells_diamond_helmet_projectile_protection",
-    "terrainlab:armorer/level_3/sells_diamond_helmet_blast_protection"
+    "terrainlab:armorer/level_3/buys_iron_horse_armor",
+    "terrainlab:armorer/level_3/sells_iron_horse_armor",
+    "terrainlab:armorer/level_3/buys_iron_boots",
+    "terrainlab:armorer/level_3/sells_iron_boots_protection_unbreaking",
+    "terrainlab:armorer/level_3/sells_iron_boots_unbreaking",
+    "terrainlab:armorer/level_3/sells_iron_boots_blast_protection",
+    "terrainlab:armorer/level_3/sells_iron_boots_fire_protection",
+    "terrainlab:armorer/level_3/sells_iron_boots_protection",
+    "terrainlab:armorer/level_3/sells_iron_boots_projectile_protection",
+    "terrainlab:armorer/level_3/sells_iron_boots_thorns"
   ]
 }

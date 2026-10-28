@@ -44,6 +44,12 @@ public class ModRecipeSerializers {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CelestialPairShapedRecipe>> CELESTIAL_PAIR_SHAPED =
             RECIPE_SERIALIZERS.register("celestial_pair_shaped", () -> CelestialPairShapedRecipe.SERIALIZER);
 
+    // Splash/lingering conversion of cauldron-mixed Custom Potions (no base potion for vanilla's recipes to match).
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<com.terrainlab.recipe.CustomPotionBrewingRecipe>> CUSTOM_POTION_BREWING =
+            RECIPE_SERIALIZERS.register("custom_potion_brewing",
+                    () -> new RecipeSerializer<>(com.terrainlab.recipe.CustomPotionBrewingRecipe.MAP_CODEC,
+                            com.terrainlab.recipe.CustomPotionBrewingRecipe.STREAM_CODEC));
+
     public static void register(IEventBus modEventBus) {
         RECIPE_SERIALIZERS.register(modEventBus);
     }

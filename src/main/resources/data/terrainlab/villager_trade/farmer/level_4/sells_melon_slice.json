@@ -15,9 +15,9 @@
     "predicate": {
       "minecraft:predicates": {
         "minecraft:villager/variant": [
+          "minecraft:savanna",
           "minecraft:desert",
-          "minecraft:jungle",
-          "minecraft:savanna"
+          "minecraft:jungle"
         ]
       }
     }

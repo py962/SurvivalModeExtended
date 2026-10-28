@@ -1,6 +1,12 @@
 {
   "values": [
-    "terrainlab:armorer/level_5/buys_golden_horse_armor",
-    "terrainlab:armorer/level_5/sells_golden_horse_armor"
+    "terrainlab:armorer/level_5/buys_iron_chestplate",
+    "terrainlab:armorer/level_5/sells_iron_chestplate_protection_unbreaking",
+    "terrainlab:armorer/level_5/sells_iron_chestplate_unbreaking",
+    "terrainlab:armorer/level_5/sells_iron_chestplate_blast_protection",
+    "terrainlab:armorer/level_5/sells_iron_chestplate_fire_protection",
+    "terrainlab:armorer/level_5/sells_iron_chestplate_protection",
+    "terrainlab:armorer/level_5/sells_iron_chestplate_projectile_protection",
+    "terrainlab:armorer/level_5/sells_iron_chestplate_thorns"
   ]
 }

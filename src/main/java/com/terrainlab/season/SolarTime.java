@@ -27,6 +27,13 @@ public final class SolarTime {
     public static final long VANILLA_SLEEP_START = 12542L;
     public static final long VANILLA_SLEEP_END = 23460L;
 
+    /**
+     * Bed window on the unwarped clock: 8pm to 4am, roughly midsummer sunset to sunrise. The rest of the
+     * year the sun sets before and rises after it, leaving dark time either side for mobs to spawn.
+     */
+    public static final long BED_START = 14000L;
+    public static final long BED_END = 22000L;
+
     // Debug trace state (server side only).
     private static long lastDebugDay = Long.MIN_VALUE;
     private static long lastDebugBucket = Long.MIN_VALUE;
@@ -277,14 +284,10 @@ public final class SolarTime {
     }
 
     /** Vanilla's unwarped sleep window. */
-    public static boolean isVanillaSleepTime(Level level) {
-        long t = Math.floorMod(
-                level.getOverworldClockTime(),
-                24000L
-        );
-
-        return t >= VANILLA_SLEEP_START
-                && t < VANILLA_SLEEP_END;
+    /** True during the 8pm-4am bed window (unwarped overworld clock). */
+    public static boolean isBedTime(Level level) {
+        long t = Math.floorMod(level.getOverworldClockTime(), 24000L);
+        return t >= BED_START && t < BED_END;
     }
 
     /**

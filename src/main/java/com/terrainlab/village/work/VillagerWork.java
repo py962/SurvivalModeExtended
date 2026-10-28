@@ -15,6 +15,8 @@ import net.minecraft.world.entity.ai.behavior.BehaviorControl;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.BarrelBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -158,12 +160,20 @@ public final class VillagerWork {
 
     // ---------------------------------------------------------------- chest lid
 
-    /** Opens (or closes) the chest lid for nearby players, with the vanilla sound. */
+    /** Opens (or closes) the chest lid, or a barrel, for nearby players, with the vanilla sound. */
     public static void setChestOpen(ServerLevel level, BlockPos chestPos, boolean open) {
         if (!level.isLoaded(chestPos)) {
             return;
         }
         BlockState state = level.getBlockState(chestPos);
+        if (state.getBlock() instanceof BarrelBlock) {
+            if (state.getValue(BarrelBlock.OPEN) != open) {
+                level.setBlock(chestPos, state.setValue(BarrelBlock.OPEN, open), Block.UPDATE_ALL);
+            }
+            level.playSound(null, chestPos, open ? SoundEvents.BARREL_OPEN : SoundEvents.BARREL_CLOSE,
+                    SoundSource.BLOCKS, 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
+            return;
+        }
         if (!(state.getBlock() instanceof ChestBlock)) {
             return;
         }

@@ -1,0 +1,33 @@
+﻿{
+  "parent": "terrainlab:survival/root",
+  "criteria": {
+    "hermit": {
+      "trigger": "terrainlab:event",
+      "conditions": {
+        "event": "hermit"
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:moss_block",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancements.terrainlab.hermit.title"
+    },
+    "description": {
+      "translate": "advancements.terrainlab.hermit.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "requirements": [
+    [
+      "hermit"
+    ]
+  ],
+  "sends_telemetry_event": false
+}
