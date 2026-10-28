@@ -16,7 +16,8 @@ import net.minecraft.world.entity.player.Player;
  * <p>Scale = 0.75 + time + kills + moon, multiplied by the world difficulty (Normal 2, Hard 3):
  * <ul>
  *   <li>time: up to +0.25, reached after 50 hours played (vanilla allows +1.25 from time);</li>
- *   <li>kills: +0.01 per kill (mobs of any kind, animals included, and players), up to +2.0 at 200 kills;</li>
+ *   <li>kills (mobs of any kind, animals included, and players): nothing until 100, rising evenly to +2.0
+ *       at 500, so only regular fighters and farmers get the extra difficulty;</li>
  *   <li>moon: vanilla's full-moon bonus (up to +0.25), never more than the time term.</li>
  * </ul>
  * The nearest player within {@link #PLAYER_RANGE} blocks decides; with nobody near, vanilla applies.
@@ -27,7 +28,8 @@ public final class PlayerDifficulty {
     private static final float BASE_SCALE = 0.75F;
     private static final float MAX_TIME_SCALE = 0.25F;
     private static final float FULL_TIME_TICKS = 50.0F * 60 * 60 * 20; // 50 hours played
-    private static final float SCALE_PER_KILL = 0.01F;
+    private static final int KILLS_START = 100;
+    private static final int KILLS_FULL = 500;
     private static final float MAX_KILL_SCALE = 2.0F;
     private static final float MAX_MOON_SCALE = 0.25F;
 
@@ -47,7 +49,7 @@ public final class PlayerDifficulty {
         // Same kill count as the Pacifist challenge: vanilla mob kills (animals included) plus player kills.
         int killCount = player.getStats().getValue(Stats.CUSTOM.get(Stats.MOB_KILLS))
                 + player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAYER_KILLS));
-        float kills = Math.min(MAX_KILL_SCALE, SCALE_PER_KILL * killCount);
+        float kills = MAX_KILL_SCALE * Mth.clamp((killCount - KILLS_START) / (float) (KILLS_FULL - KILLS_START), 0.0F, 1.0F);
         float moon = Mth.clamp(level.getMoonBrightness(pos) * MAX_MOON_SCALE, 0.0F, time);
         return base.getId() * (BASE_SCALE + time + kills + moon);
     }
