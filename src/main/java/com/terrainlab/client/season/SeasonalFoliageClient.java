@@ -51,10 +51,33 @@ public final class SeasonalFoliageClient {
      * {@link SeasonalLeaves#shadeAt}: russet brown (base), lighter tan/ochre, deep russet red-brown.
      */
     private static final int[] OAK_BROWN = {0xFFC07838, 0xFFD4A04E, 0xFF9C4426};
+
+    /** Oaks only turn in these biomes: data/terrainlab/tags/worldgen/biome/seasonal_oaks.json. */
+    private static final net.minecraft.tags.TagKey<net.minecraft.world.level.biome.Biome> SEASONAL_OAKS =
+            net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BIOME,
+                    Identifier.fromNamespaceAndPath(TerrainLab.MODID, "seasonal_oaks"));
+    private static final Map<net.minecraft.world.level.biome.Biome, Boolean> OAK_BIOMES =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** Green where oaks are seasonal, red elsewhere; blended and cached by vanilla like a biome tint. */
+    static final net.minecraft.world.level.ColorResolver OAK_MASK = (biome, x, z) ->
+            OAK_BIOMES.computeIfAbsent(biome, SeasonalFoliageClient::isOakBiome) ? 0xFF00FF00 : 0xFFFF0000;
+
+    private static boolean isOakBiome(net.minecraft.world.level.biome.Biome biome) {
+        var level = Minecraft.getInstance().level;
+        return level != null && level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME)
+                .wrapAsHolder(biome).is(SEASONAL_OAKS);
+    }
+
+    private static boolean isSeasonalOak(@Nullable BlockAndTintGetter level, @Nullable BlockPos pos) {
+        if (level == null || pos == null) return false;
+        int mask = level.getBlockTint(pos, OAK_MASK);
+        return ((mask >> 8) & 0xFF) > ((mask >> 16) & 0xFF);
+    }
     /** Birch particle tints for looks whose block texture is pre-coloured. */
     private static final int BIRCH_FROSTY = 0xFFE4ECF2;
     /** Per shade, matching the gold, lemon and amber textures. */
-    private static final int[] BIRCH_YELLOW = {0xFFF2CC3A, 0xFFF6E05A, 0xFFDC8C24};
+    private static final int[] BIRCH_YELLOW = {0xFFF2CC3A, 0xFFF6E05A, 0xFF8D6214};
 
     /** Vanilla's leaf tints (BlockColors.createDefault), used outside the seasonal looks. */
     private static final int VANILLA_BIRCH = -8345771;
@@ -78,6 +101,7 @@ public final class SeasonalFoliageClient {
     @SubscribeEvent
     static void onRegisterColorResolvers(RegisterColorHandlersEvent.ColorResolvers event) {
         event.register(SeasonalLeaves.BIOME_MASK);
+        event.register(OAK_MASK);
     }
 
     @SubscribeEvent
@@ -156,6 +180,7 @@ public final class SeasonalFoliageClient {
     @SubscribeEvent
     static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         SeasonalLeaves.resetSession();
+        OAK_BIOMES.clear();
         SeasonalLeafRerender.reset();
     }
 
@@ -167,6 +192,7 @@ public final class SeasonalFoliageClient {
             Look look = SeasonalLeaves.lookAt(level, pos, this.tree);
             switch (look) {
                 case BROWN:
+                    if (!isSeasonalOak(level, pos)) break;
                     return OAK_BROWN[pos != null ? SeasonalLeaves.shadeAt(pos) : 0];
                 case FROSTY:
                     if (this.tree == Tree.BIRCH) return BIRCH_FROSTY;

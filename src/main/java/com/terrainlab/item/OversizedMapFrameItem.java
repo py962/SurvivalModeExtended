@@ -91,8 +91,8 @@ public class OversizedMapFrameItem extends ItemFrameItem {
                 player
         ).accept(frame);
 
-        // Checks the complete footprint, support and overlap.
-        if (!frame.survives()) {
+        // The clicked block must support it; the footprint must be clear.
+        if (!frame.canPlace()) {
             return InteractionResult.FAIL;
         }
 
