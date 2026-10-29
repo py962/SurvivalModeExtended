@@ -122,6 +122,7 @@
     "LootTableLuckBonusMixin",
     "LootPoolLuckBonusMixin",
     "ShowTradesToPlayerFishingMixin",
+    "PlayerSpawnFinderSafeGroundMixin",
     "PlayerListCharacterDataMixin",
     "MinecraftServerCharacterOwnerMixin"
   ],
