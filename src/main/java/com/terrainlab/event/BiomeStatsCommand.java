@@ -40,7 +40,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * Runs on a background thread and reports progress every PROGRESS_INTERVAL_MS. Writes every biome
  * (samples and share) to a CSV under {@code terrainlab_biome_stats/} in the server directory and
- * prints the summary in chat. {@code /terrainlab biomestats stop} ends a survey early, keeping the
+ * prints the summary in chat. Also records the climate noise at every sample (temperature, humidity,
+ * continentalness, erosion, weirdness, depth): mean, variance, standard deviation, min and max go to
+ * a second CSV ({@code ..._climate.csv}) with the share of samples in each temperature band, and the
+ * biome CSV gains each biome's mean temperature, humidity and continentalness and how its samples
+ * split across the temperature bands. {@code /terrainlab biomestats stop} ends a survey early, keeping the
  * partial results.
  */
 public final class BiomeStatsCommand {
@@ -53,6 +57,10 @@ public final class BiomeStatsCommand {
     private static final long PROGRESS_INTERVAL_MS = 10_000L;
     /** Biomes under this share (in percent) are grouped into one "Other" line in chat. */
     private static final double OTHER_THRESHOLD = 0.1;
+    private static final String[] PARAMS = {"temperature", "humidity", "continentalness", "erosion", "weirdness", "depth"};
+    /** Land temperature band edges of the overworld biome list. */
+    private static final double[] TEMP_EDGES = {-0.45, -0.2, 0.0, 0.2, 0.45};
+    private static final String[] TEMP_BANDS = {"frozen", "cold", "cool", "mild", "warm", "hot"};
     private static final DateTimeFormatter FILE_TIME = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss", Locale.ROOT);
 
     private BiomeStatsCommand() {
@@ -70,6 +78,47 @@ public final class BiomeStatsCommand {
                                 .executes(ctx -> start(ctx, DEFAULT_RADIUS))
                                 .then(Commands.argument("radius", IntegerArgumentType.integer(64, 30_000))
                                         .executes(ctx -> start(ctx, IntegerArgumentType.getInteger(ctx, "radius")))))));
+    }
+
+    /** Running count, sum, sum of squares, min and max of one climate value. */
+    private static final class Stat {
+        long n;
+        double sum;
+        double sumSq;
+        double min = Double.MAX_VALUE;
+        double max = -Double.MAX_VALUE;
+
+        void add(double v) {
+            n++;
+            sum += v;
+            sumSq += v * v;
+            if (v < min) min = v;
+            if (v > max) max = v;
+        }
+
+        double mean() {
+            return n == 0 ? 0.0 : sum / n;
+        }
+
+        double variance() {
+            if (n == 0) return 0.0;
+            double m = mean();
+            return Math.max(0.0, sumSq / n - m * m);
+        }
+    }
+
+    /** One biome's climate: mean temperature, humidity and continentalness, and samples per temperature band. */
+    private static final class BiomeClimate {
+        final Stat temperature = new Stat();
+        final Stat humidity = new Stat();
+        final Stat continentalness = new Stat();
+        final long[] bands = new long[TEMP_BANDS.length];
+    }
+
+    private static int temperatureBand(double t) {
+        int band = 0;
+        while (band < TEMP_EDGES.length && t >= TEMP_EDGES[band]) band++;
+        return band;
     }
 
     /** One biome and how many samples landed in it. */
@@ -134,6 +183,12 @@ public final class BiomeStatsCommand {
         Climate.Sampler sampler = randomState.sampler();
         int quartY = QuartPos.fromBlock(y);
 
+        Climate.Sampler climateSampler = randomState.sampler();
+        Stat[] climate = new Stat[PARAMS.length];
+        for (int i = 0; i < climate.length; i++) climate[i] = new Stat();
+        Map<String, BiomeClimate> biomeClimate = new HashMap<>();
+        long[] bandTotals = new long[TEMP_BANDS.length];
+
         Map<String, Long> counts = new HashMap<>();
         long total = 0L;
         int rows = 0;
@@ -149,7 +204,26 @@ public final class BiomeStatsCommand {
             for (int iz = 0; iz < perAxis; iz++) {
                 Holder<Biome> biome = biomeSource.getNoiseBiome(quartX, quartY, QuartPos.fromBlock(-radius + iz * STEP),
                         sampler);
-                counts.merge(biome.getRegisteredName(), 1L, Long::sum);
+                String name = biome.getRegisteredName();
+                counts.merge(name, 1L, Long::sum);
+
+                Climate.TargetPoint point = climateSampler.sample(quartX, quartY, QuartPos.fromBlock(-radius + iz * STEP));
+                double t = Climate.unquantizeCoord(point.temperature());
+                double h = Climate.unquantizeCoord(point.humidity());
+                double c = Climate.unquantizeCoord(point.continentalness());
+                climate[0].add(t);
+                climate[1].add(h);
+                climate[2].add(c);
+                climate[3].add(Climate.unquantizeCoord(point.erosion()));
+                climate[4].add(Climate.unquantizeCoord(point.weirdness()));
+                climate[5].add(Climate.unquantizeCoord(point.depth()));
+                BiomeClimate bc = biomeClimate.computeIfAbsent(name, k -> new BiomeClimate());
+                bc.temperature.add(t);
+                bc.humidity.add(h);
+                bc.continentalness.add(c);
+                int band = temperatureBand(t);
+                bc.bands[band]++;
+                bandTotals[band]++;
             }
             total += perAxis;
             rows++;
@@ -182,10 +256,16 @@ public final class BiomeStatsCommand {
         int otherBiomes = 0;
         long otherSamples = 0L;
         try (BufferedWriter w = Files.newBufferedWriter(file)) {
-            w.write("biome,samples,percent\n");
+            w.write("biome,samples,percent,mean_temperature,mean_humidity,mean_continentalness");
+            for (String band : TEMP_BANDS) w.write(",pct_" + band);
+            w.write("\n");
             for (Count c : sorted) {
                 double percent = 100.0 * c.samples() / divisor;
-                w.write(String.format(Locale.ROOT, "%s,%d,%.3f%n", c.biome(), c.samples(), percent));
+                BiomeClimate bc = biomeClimate.get(c.biome());
+                StringBuilder row = new StringBuilder(String.format(Locale.ROOT, "%s,%d,%.3f,%.4f,%.4f,%.4f", c.biome(), c.samples(),
+                        percent, bc.temperature.mean(), bc.humidity.mean(), bc.continentalness.mean()));
+                for (long n : bc.bands) row.append(String.format(Locale.ROOT, ",%.2f", 100.0 * n / Math.max(1L, c.samples())));
+                w.write(row.append('\n').toString());
                 if (percent < OTHER_THRESHOLD) {
                     otherBiomes++;
                     otherSamples += c.samples();
@@ -194,6 +274,27 @@ public final class BiomeStatsCommand {
                 }
             }
         }
+        Path climateFile = dir.resolve(base + "_climate.csv");
+        try (BufferedWriter w = Files.newBufferedWriter(climateFile)) {
+            w.write("parameter,mean,variance,std_dev,min,max\n");
+            for (int i = 0; i < PARAMS.length; i++) {
+                Stat st = climate[i];
+                w.write(String.format(Locale.ROOT, "%s,%.5f,%.5f,%.5f,%.5f,%.5f%n", PARAMS[i], st.mean(), st.variance(),
+                        Math.sqrt(st.variance()), st.n == 0 ? 0.0 : st.min, st.n == 0 ? 0.0 : st.max));
+            }
+            w.write("\ntemperature_band,from,to,samples,percent\n");
+            for (int i = 0; i < TEMP_BANDS.length; i++) {
+                double from = i == 0 ? -1.0 : TEMP_EDGES[i - 1];
+                double to = i == TEMP_EDGES.length ? 1.0 : TEMP_EDGES[i];
+                w.write(String.format(Locale.ROOT, "%s,%.2f,%.2f,%d,%.3f%n", TEMP_BANDS[i], from, to, bandTotals[i],
+                        100.0 * bandTotals[i] / divisor));
+            }
+        }
+        for (int i = 0; i < 3; i++) {
+            lines.add(String.format(Locale.ROOT, "%s: mean %.3f, std dev %.3f", PARAMS[i], climate[i].mean(),
+                    Math.sqrt(climate[i].variance())));
+        }
+
         if (otherBiomes > 0) {
             lines.add(String.format(Locale.ROOT, "Other (%d biomes), %.1f%%",
                     otherBiomes, 100.0 * otherSamples / divisor));
@@ -212,6 +313,7 @@ public final class BiomeStatsCommand {
                 source.sendSuccess(() -> Component.literal(line), false);
             }
             source.sendSuccess(() -> Component.literal("Full list: " + file.toAbsolutePath()), false);
+            source.sendSuccess(() -> Component.literal("Climate: " + climateFile.toAbsolutePath()), false);
         });
         LOGGER.info("[TerrainLab/biomestats] Biome survey written to {}", file);
     }

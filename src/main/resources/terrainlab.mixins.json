@@ -124,6 +124,7 @@
     "LootTableLuckBonusMixin",
     "LootPoolLuckBonusMixin",
     "ShowTradesToPlayerFishingMixin",
+    "PlayerSpawnFinderSafeGroundMixin",
     "PlayerListCharacterDataMixin"
   ],
   "client": [
