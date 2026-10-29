@@ -1,7 +1,6 @@
 package com.terrainlab.client;
 
 import com.terrainlab.TerrainLab;
-import com.terrainlab.forestfloor.SeasonOffsetSync;
 import com.terrainlab.season.Season;
 import com.terrainlab.season.SeasonManager;
 import net.minecraft.client.Minecraft;
@@ -46,8 +45,8 @@ public final class CrimsonPetals {
 
     static boolean isCrimson() {
         ClientLevel level = Minecraft.getInstance().level;
-        long offset = SeasonOffsetSync.clientOffset;
-        if (level == null || offset == Long.MIN_VALUE) return false;
+        if (level == null) return false;
+        long offset = ClientSeasonState.getSeasonalOffset();
         Season season = Season.fromYearTick(SeasonManager.yearRelativeTick(level.getGameTime(), offset));
         return season == Season.EARLY_AUTUMN || season == Season.LATE_AUTUMN || season == Season.MIDWINTER;
     }
