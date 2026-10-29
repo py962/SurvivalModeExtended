@@ -149,6 +149,8 @@
     "CrossedArmsItemLayerFishingMixin",
     "WorldListEntryCharacterMixin",
     "IntegratedServerCharacterMixin",
+    "PlayerInfoCharacterSkinMixin",
+    "CreateWorldScreenCharacterMixin",
     "IntegratedPlayerListCharacterMixin"
   ],
   "injectors": {

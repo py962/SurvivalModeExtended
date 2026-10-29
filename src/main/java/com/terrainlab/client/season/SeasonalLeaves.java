@@ -61,9 +61,9 @@ public final class SeasonalLeaves {
     private static final Look[] OAK_LOOKS = {
             Look.BROWN, Look.VANILLA, Look.VANILLA, Look.VANILLA, Look.BROWN, Look.BROWN};
     private static final Look[] BIRCH_LOOKS = {
-            Look.FROSTY, Look.FLOWERING, Look.FLOWERING, Look.VANILLA, Look.YELLOW, Look.YELLOW};
+            Look.YELLOW, Look.FLOWERING, Look.FLOWERING, Look.VANILLA, Look.VANILLA, Look.YELLOW};
     private static final Look[] CHERRY_LOOKS = {
-            Look.CRIMSON, Look.VANILLA, Look.VANILLA, Look.CRIMSON, Look.CRIMSON, Look.CRIMSON};
+            Look.CRIMSON, Look.VANILLA, Look.VANILLA, Look.VANILLA, Look.CRIMSON, Look.CRIMSON};
 
     /** Autumn looks come in this many shades, picked per leaf block from its position. */
     public static final int SHADE_COUNT = 3;

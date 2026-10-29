@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
 import java.lang.ref.WeakReference;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +48,17 @@ public final class CharacterSession {
     private record Bound(WeakReference<MinecraftServer> server, Selection selection) {
     }
 
+    /**
+     * The first character of a world being created: chosen on the naming screen before the world
+     * exists, turned into the world's character list when its integrated server starts.
+     *
+     * @param profile the account's profile (character 1 always has the account's UUID)
+     */
+    public record NewWorldCharacter(String name, String skin, boolean slim, GameProfile profile) {
+    }
+
+    private static volatile NewWorldCharacter pendingNewWorld;
+
     private static volatile Selection pending;
     private static volatile Bound bound;
 
@@ -56,6 +68,11 @@ public final class CharacterSession {
     /** Client: remembers the character chosen for the world about to be opened. */
     public static void select(Selection selection) {
         pending = selection;
+    }
+
+    /** Client: remembers the first character for the world about to be created. */
+    public static void selectForNewWorld(NewWorldCharacter character) {
+        pendingNewWorld = character;
     }
 
     /** Client: forgets a selection that was not used (the character screen was reopened or left). */
@@ -71,6 +88,11 @@ public final class CharacterSession {
     public static Selection claim(MinecraftServer server) {
         Selection selection = pending;
         pending = null;
+        NewWorldCharacter fresh = pendingNewWorld;
+        pendingNewWorld = null;
+        if (selection == null && fresh != null) {
+            selection = createFirstCharacter(server, fresh);
+        }
         if (selection == null) {
             bound = null;
             return null;
@@ -82,6 +104,21 @@ public final class CharacterSession {
         }
         bound = new Bound(new WeakReference<>(server), selection);
         return selection;
+    }
+
+    /**
+     * Writes the character list of a newly created world with its first character, as chosen on the
+     * naming screen. Does nothing (null) for a world that already has a list, so a stale choice can
+     * never rename an existing world's character.
+     */
+    private static Selection createFirstCharacter(MinecraftServer server, NewWorldCharacter fresh) {
+        Path worldDir = server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize();
+        if (Files.exists(CharacterRegistry.file(worldDir))) return null;
+        CharacterRegistry registry = CharacterRegistry.loadOrCreate(worldDir, fresh.profile().id(), fresh.name(), 0L);
+        CharacterRegistry.Entry first = registry.primary().withSkin(fresh.skin(), fresh.slim());
+        registry.replace(first);
+        registry.save();
+        return new Selection(worldDir, first.uuid(), first.name(), first.uuid(), registry.knownUuids(), fresh.profile());
     }
 
     /** The character active on this server, or null (vanilla behaviour). */

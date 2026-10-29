@@ -38,10 +38,12 @@ import java.util.UUID;
  * <pre>
  * {
  *   "version": 1,
- *   "characters": [ {"uuid": "…", "name": "Steve", "created": 1761480000000, "lastPlayed": 1761480000000}, … ],
+ *   "characters": [ {"uuid": "…", "name": "Steve", "created": 1761480000000, "lastPlayed": 1761480000000, "skin": "alex", "arms": "slim"}, … ],
  *   "retired": [ "…" ]   // UUIDs of deleted characters, so their leftovers are never mistaken for legacy owner data
  * }
  * </pre>
+ * "skin" (one of vanilla's nine default skins) and "arms" ("wide" or "slim") are optional: a
+ * character without them wears the account's skin.
  * Timestamps are epoch milliseconds; {@code lastPlayed} 0 means "never played". The file is read
  * and written on the client (before the integrated server starts, and when a session ends), never
  * by the server, so there is no cross-thread access to it.
@@ -54,14 +56,25 @@ public final class CharacterRegistry {
     private static final int VERSION = 1;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    /** One character. {@code name} is display-only; the game identifies the character by {@code uuid}. */
-    public record Entry(UUID uuid, String name, long created, long lastPlayed) {
+    /**
+     * One character. {@code name} is display-only; the game identifies the character by {@code uuid}.
+     * {@code skin} is the name of a default skin ("steve", "alex", ...), or null for the account's skin.
+     */
+    public record Entry(UUID uuid, String name, long created, long lastPlayed, String skin, boolean slim) {
+        public Entry(UUID uuid, String name, long created, long lastPlayed) {
+            this(uuid, name, created, lastPlayed, null, false);
+        }
+
         public Entry withName(String newName) {
-            return new Entry(this.uuid, newName, this.created, this.lastPlayed);
+            return new Entry(this.uuid, newName, this.created, this.lastPlayed, this.skin, this.slim);
         }
 
         public Entry withLastPlayed(long time) {
-            return new Entry(this.uuid, this.name, this.created, time);
+            return new Entry(this.uuid, this.name, this.created, time, this.skin, this.slim);
+        }
+
+        public Entry withSkin(String newSkin, boolean newSlim) {
+            return new Entry(this.uuid, this.name, this.created, this.lastPlayed, newSkin, newSlim);
         }
     }
 
@@ -134,7 +147,9 @@ public final class CharacterRegistry {
                 String name = sanitizeName(o.has("name") ? o.get("name").getAsString() : "", "Character " + (this.characters.size() + 1));
                 long created = o.has("created") ? o.get("created").getAsLong() : 0L;
                 long lastPlayed = o.has("lastPlayed") ? o.get("lastPlayed").getAsLong() : 0L;
-                this.characters.add(new Entry(uuid, name, created, lastPlayed));
+                String skin = o.has("skin") ? o.get("skin").getAsString() : null;
+                boolean slim = o.has("arms") && "slim".equals(o.get("arms").getAsString());
+                this.characters.add(new Entry(uuid, name, created, lastPlayed, skin, slim));
             } catch (Exception e) {
                 TerrainLab.LOGGER.warn("Skipping malformed character entry {}", element);
             }
@@ -160,6 +175,10 @@ public final class CharacterRegistry {
             o.addProperty("name", entry.name());
             o.addProperty("created", entry.created());
             o.addProperty("lastPlayed", entry.lastPlayed());
+            if (entry.skin() != null) {
+                o.addProperty("skin", entry.skin());
+                o.addProperty("arms", entry.slim() ? "slim" : "wide");
+            }
             list.add(o);
         }
         root.add("characters", list);

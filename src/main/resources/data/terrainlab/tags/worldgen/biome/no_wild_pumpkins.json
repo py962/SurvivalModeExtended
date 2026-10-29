@@ -1,0 +1,65 @@
+{
+  "values": [
+    "minecraft:plains",
+    "minecraft:sunflower_plains",
+    "minecraft:desert",
+    "minecraft:swamp",
+    "minecraft:mangrove_swamp",
+    "minecraft:forest",
+    "minecraft:flower_forest",
+    "minecraft:birch_forest",
+    "minecraft:dark_forest",
+    "minecraft:pale_garden",
+    "minecraft:old_growth_birch_forest",
+    "minecraft:savanna",
+    "minecraft:savanna_plateau",
+    "minecraft:windswept_savanna",
+    "minecraft:jungle",
+    "minecraft:sparse_jungle",
+    "minecraft:bamboo_jungle",
+    "minecraft:badlands",
+    "minecraft:eroded_badlands",
+    "minecraft:wooded_badlands",
+    "minecraft:meadow",
+    "minecraft:cherry_grove",
+    "minecraft:stony_peaks",
+    "minecraft:river",
+    "minecraft:beach",
+    "minecraft:stony_shore",
+    "minecraft:warm_ocean",
+    "minecraft:lukewarm_ocean",
+    "minecraft:deep_lukewarm_ocean",
+    "minecraft:ocean",
+    "minecraft:deep_ocean",
+    "minecraft:cold_ocean",
+    "minecraft:deep_cold_ocean",
+    "minecraft:frozen_ocean",
+    "minecraft:deep_frozen_ocean",
+    "minecraft:mushroom_fields",
+    "minecraft:dripstone_caves",
+    "minecraft:lush_caves",
+    "minecraft:deep_dark",
+    {
+      "id": "terrainlab:marsh",
+      "required": false
+    },
+    {
+      "id": "terrainlab:inland_river",
+      "required": false
+    },
+    {
+      "id": "terrainlab:inland_lake",
+      "required": false
+    },
+    {
+      "id": "terrainlab:ice_caves",
+      "required": false
+    },
+    "minecraft:ice_spikes",
+    "minecraft:snowy_slopes",
+    "minecraft:snowy_beach",
+    "minecraft:frozen_river",
+    "minecraft:frozen_peaks",
+    "minecraft:jagged_peaks"
+  ]
+}
