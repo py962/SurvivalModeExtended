@@ -121,9 +121,11 @@ public class CharacterSelectScreen extends Screen {
     private void create() {
         if (!this.registry.canAdd()) return;
         String defaultName = this.defaultNewName();
-        this.minecraft.gui.setScreen(new CharacterNameScreen(this, Component.translatable("terrainlab.character.new.title"),
-                Component.translatable("terrainlab.character.new.confirm"), this.registry, defaultName, null, name -> {
-            CharacterRegistry.Entry created = this.registry.add(name);
+        this.minecraft.gui.setScreen(new CharacterNameScreen(Component.translatable("terrainlab.character.new.title"),
+                Component.translatable("terrainlab.character.new.confirm"), this.registry, defaultName, null, null, false,
+                () -> this.minecraft.gui.setScreen(this), result -> {
+            CharacterRegistry.Entry created = this.registry.add(result.name()).withSkin(result.skin(), result.slim());
+            this.registry.replace(created);
             this.play(created);
         }));
     }
@@ -135,9 +137,10 @@ public class CharacterSelectScreen extends Screen {
     }
 
     private void rename(CharacterRegistry.Entry character) {
-        this.minecraft.gui.setScreen(new CharacterNameScreen(this, Component.translatable("terrainlab.character.rename.title"),
-                CommonComponents.GUI_DONE, this.registry, character.name(), character.uuid(), name -> {
-            this.registry.replace(character.withName(name));
+        this.minecraft.gui.setScreen(new CharacterNameScreen(Component.translatable("terrainlab.character.rename.title"),
+                CommonComponents.GUI_DONE, this.registry, character.name(), character.uuid(), character.skin(), character.slim(),
+                () -> this.minecraft.gui.setScreen(this), result -> {
+            this.registry.replace(character.withName(result.name()).withSkin(result.skin(), result.slim()));
             this.registry.save();
             this.minecraft.gui.setScreen(this);
         }));

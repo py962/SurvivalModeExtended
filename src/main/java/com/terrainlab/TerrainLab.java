@@ -94,6 +94,7 @@ public class TerrainLab {
         com.terrainlab.registry.ModCreativeTabContents.register(modEventBus);
         ModFeatures.register(modEventBus);
         ModSounds.register(modEventBus);
+        com.terrainlab.forestfloor.ForestFloor.register(modEventBus);
         ModStructures.register(modEventBus);
         ModAttachments.register(modEventBus);
         com.terrainlab.registry.ModParticles.register(modEventBus);

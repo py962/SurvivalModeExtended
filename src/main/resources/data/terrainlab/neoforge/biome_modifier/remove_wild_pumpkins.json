@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:remove_features",
+  "biomes": "#terrainlab:no_wild_pumpkins",
+  "features": "minecraft:patch_pumpkin",
+  "steps": "vegetal_decoration"
+}

@@ -148,7 +148,9 @@
     "OffhandStrikeUseItemMixin",
     "CrossedArmsItemLayerFishingMixin",
     "WorldListEntryCharacterMixin",
-    "IntegratedServerCharacterMixin"
+    "IntegratedServerCharacterMixin",
+    "PlayerInfoCharacterSkinMixin",
+    "CreateWorldScreenCharacterMixin"
   ],
   "injectors": {
     "defaultRequire": 1
