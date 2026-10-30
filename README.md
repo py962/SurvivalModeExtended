@@ -17,6 +17,8 @@ A survival overhaul for **Minecraft 1.21.11** and  **26.3** on **NeoForge**. It 
 - **Items and effects:** new enchantments, potion effects and tipped arrows, wooden shields, feather-tiered arrows, the fur cloak, the leather flask, the houseboat, the Ancient Codex, the Replicator and more.
 - **Ambience:** layered biome soundscapes that blend between biomes and respond to altitude, weather and the ocean.
 
+- For further details see https://survivalmodeextended.substack.com/
+
 ## Requirements
 
 - Minecraft 1.21.11 or 26.3
