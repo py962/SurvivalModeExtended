@@ -1,6 +1,6 @@
 # Survival Mode Extended
 
-A survival overhaul for **Minecraft 1.21.11** on **NeoForge**. It makes the world something to prepare for and live in, while keeping the look and feel of vanilla.
+A survival overhaul for **Minecraft 1.21.11** and **26.3** on **NeoForge**. It makes the world something to prepare for and live in, while keeping the look and feel of vanilla.
 
 > **Beta.** Expect bugs and balance changes, and keep backups of any world you use it in. Please report problems on the [issue tracker](https://github.com/py962/SurvivalModeExtended/issues).
 
@@ -27,7 +27,7 @@ A survival overhaul for **Minecraft 1.21.11** on **NeoForge**. It makes the worl
 
 ## Building from source
 
-Requires Java 21.
+Requires Java 21 (25 for 26.3)
 
 ```
 ./gradlew build
