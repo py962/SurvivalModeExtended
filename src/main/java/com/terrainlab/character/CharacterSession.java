@@ -7,6 +7,7 @@ import net.minecraft.world.level.storage.LevelResource;
 import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public final class CharacterSession {
         }
     }
 
-    private record Bound(WeakReference<MinecraftServer> server, Selection selection) {
+    private record Bound(WeakReference<MinecraftServer> server, Selection selection, Set<UUID> retired) {
     }
 
     /**
@@ -102,7 +103,7 @@ public final class CharacterSession {
             bound = null;
             return null;
         }
-        bound = new Bound(new WeakReference<>(server), selection);
+        bound = new Bound(new WeakReference<>(server), selection, retiredOf(selection));
         return selection;
     }
 
@@ -119,6 +120,21 @@ public final class CharacterSession {
         registry.replace(first);
         registry.save();
         return new Selection(worldDir, first.uuid(), first.name(), first.uuid(), registry.knownUuids(), fresh.profile());
+    }
+
+    /** UUIDs of the world's deleted characters, read from its character list. */
+    private static Set<UUID> retiredOf(Selection selection) {
+        CharacterRegistry registry = CharacterRegistry.loadExisting(selection.worldDir());
+        if (registry == null) return Set.of();
+        Set<UUID> retired = new HashSet<>(registry.knownUuids());
+        for (CharacterRegistry.Entry entry : registry.characters()) retired.remove(entry.uuid());
+        return Set.copyOf(retired);
+    }
+
+    /** The deleted characters of the world this server runs (empty outside a character session). */
+    public static Set<UUID> retiredFor(MinecraftServer server) {
+        Bound b = bound;
+        return b != null && server != null && b.server().get() == server ? b.retired() : Set.of();
     }
 
     /** The character active on this server, or null (vanilla behaviour). */

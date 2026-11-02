@@ -3,6 +3,7 @@ package com.terrainlab.forestfloor;
 import com.mojang.serialization.Codec;
 import com.terrainlab.TerrainLab;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
@@ -46,6 +47,20 @@ public final class ForestFloor {
             "autumn_pumpkins",
             () -> AttachmentType.<java.util.List<Long>>builder(() -> java.util.List.of())
                     .serialize(Codec.LONG.listOf().fieldOf("positions")).build());
+
+    /** Spring carpet flowers this chunk placed, so only those are ever removed again. */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<java.util.List<Long>>> SPRING_CARPET = ATTACHMENTS.register(
+            "spring_carpet",
+            () -> AttachmentType.<java.util.List<Long>>builder(() -> java.util.List.of())
+                    .serialize(Codec.LONG.listOf().fieldOf("positions")).build());
+
+    /** Spring flower carpet: forests at 60% of open grass, plains/meadow/marsh at 40%. */
+    public static final TagKey<Biome> SPRING_CARPET_DENSE =
+            TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(TerrainLab.MODID, "spring_carpet_dense"));
+    public static final TagKey<Biome> SPRING_CARPET_BIOMES =
+            TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(TerrainLab.MODID, "spring_carpet"));
+    public static final ResourceKey<Biome> MARSH =
+            ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(TerrainLab.MODID, "marsh"));
 
     public static final TagKey<Biome> AUTUMN_PUMPKIN_BIOMES =
             TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(TerrainLab.MODID, "autumn_pumpkins"));

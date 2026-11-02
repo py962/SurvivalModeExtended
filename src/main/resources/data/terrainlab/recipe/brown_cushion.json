@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "cushion",
+  "pattern": [
+    "C",
+    "S"
+  ],
+  "key": {
+    "C": "minecraft:brown_carpet",
+    "S": "#minecraft:wooden_slabs"
+  },
+  "result": {
+    "id": "terrainlab:brown_cushion",
+    "count": 1
+  }
+}

@@ -2,6 +2,7 @@ package com.terrainlab.entity;
 
 import com.mojang.serialization.Codec;
 import com.terrainlab.debug.GuideSpawnTrace;
+import com.terrainlab.character.CharacterSession;
 import com.terrainlab.registry.ModAttachments;
 import com.terrainlab.item.OminousBannerItem;
 import com.terrainlab.item.StructureMapIcons;
@@ -73,6 +74,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -1650,6 +1652,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                         this.getType(),
                         this.getUUID()
                 );
+                recordBondedOwner(serverLevel);
             }
 
             if (DEBUG_LOGGING) {
@@ -1992,6 +1995,17 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
             // );
         }
 
+        // A guide bonded to a character that has since been deleted is free again; its trade
+        // progress is kept.
+        if (this.firstTradingPlayerId != null
+                && this.level() instanceof ServerLevel retiredLevel
+                && CharacterSession.retiredFor(retiredLevel.getServer()).contains(this.firstTradingPlayerId)) {
+
+            livingTraders(retiredLevel).remove(this.getType(), this.getUUID());
+            bondedGuideOwners(retiredLevel).remove(this.getType(), this.firstTradingPlayerId);
+            this.firstTradingPlayerId = null;
+        }
+
         // Runtime registries aren't saved, so a guide loaded from disk re-registers
         // itself and, if bonded, restores its persistent reservation.
         if (this.level() instanceof ServerLevel serverLevel) {
@@ -2003,6 +2017,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                         this.getType(),
                         this.getUUID()
                 );
+                recordBondedOwner(serverLevel);
             }
 
             // Spawn-egg / summoned guides never take the type's slot, so they can't get
@@ -2052,6 +2067,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                     this.getType(),
                     this.getUUID()
             );
+            recordBondedOwner(serverLevel);
         }
 
         // Never replace an active guide's UUID; a second one is handled by removeIfDuplicate() on its first tick.
@@ -2192,6 +2208,43 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         return serverLevel.getData(
                 ModAttachments.LIVING_TRAIL_TRADERS.get()
         );
+    }
+
+    /** Persistent per-level owner of each reserved guide type (see ModAttachments.BONDED_GUIDE_OWNERS). */
+    private static ConcurrentHashMap<EntityType<?>, UUID> bondedGuideOwners(
+            ServerLevel serverLevel) {
+
+        return serverLevel.getData(
+                ModAttachments.BONDED_GUIDE_OWNERS.get()
+        );
+    }
+
+    /** Records this guide's bonded owner if it holds its type's persistent reservation. */
+    private void recordBondedOwner(ServerLevel serverLevel) {
+        if (this.firstTradingPlayerId != null
+                && this.getUUID().equals(livingTraders(serverLevel).get(this.getType()))) {
+
+            bondedGuideOwners(serverLevel).put(this.getType(), this.firstTradingPlayerId);
+        }
+    }
+
+    /**
+     * Server start: frees the reservations of guides bonded to deleted characters, so a new
+     * guide of that type can spawn. The old guide itself unbonds when it next loads.
+     */
+    public static void releaseRetiredReservations(ServerLevel serverLevel, Set<UUID> retired) {
+        if (retired.isEmpty()) {
+            return;
+        }
+
+        ConcurrentHashMap<EntityType<?>, UUID> owners = bondedGuideOwners(serverLevel);
+
+        for (Map.Entry<EntityType<?>, UUID> entry : List.copyOf(owners.entrySet())) {
+            if (retired.contains(entry.getValue())) {
+                owners.remove(entry.getKey(), entry.getValue());
+                livingTraders(serverLevel).remove(entry.getKey());
+            }
+        }
     }
 
     /**
@@ -2350,6 +2403,9 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                     this.getType(),
                     this.getUUID()
             );
+            if (!livingTraders(serverLevel).containsKey(this.getType())) {
+                bondedGuideOwners(serverLevel).remove(this.getType());
+            }
         }
 
         idRegistry.put(
@@ -2398,6 +2454,9 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                     this.getType(),
                     this.getUUID()
             );
+            if (!livingTraders(serverLevel).containsKey(this.getType())) {
+                bondedGuideOwners(serverLevel).remove(this.getType());
+            }
         }
 
         super.remove(reason);
@@ -2724,6 +2783,7 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
                         this.getType(),
                         this.getUUID()
                 );
+                recordBondedOwner(serverLevel);
             }
 
             if (DEBUG_LOGGING) {

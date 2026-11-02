@@ -73,6 +73,7 @@ public class TerrainLab {
         NeoForge.EVENT_BUS.register(ModSpawnHandler.class);
         ModBlockEntities.register(modEventBus);
         ModEntities.register(modEventBus);
+        com.terrainlab.cushion.Cushions.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         NeoForge.EVENT_BUS.register(ModEndermanHandler.class);
         NeoForge.EVENT_BUS.register(ModLeashHandler.class);
@@ -410,6 +411,7 @@ public class TerrainLab {
                 if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                     com.terrainlab.temperature.PlayerInternalTemperature.tick(serverPlayer);
                     com.terrainlab.energy.PlayerEnergySystem.tick(serverPlayer);
+                    com.terrainlab.energy.PlayerCushionRestingSystem.tick(serverPlayer);
                     com.terrainlab.energy.PlayerEnergyEffects.tick(serverPlayer);
                     com.terrainlab.energy.PlayerHungerSystem.tick(serverPlayer);
                     com.terrainlab.food.PendingHealSystem.tick(serverPlayer);

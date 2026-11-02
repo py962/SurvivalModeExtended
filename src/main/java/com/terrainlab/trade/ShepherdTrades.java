@@ -1,5 +1,8 @@
 package com.terrainlab.trade;
 
+import com.terrainlab.cushion.Cushions;
+import net.minecraft.world.item.DyeColor;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
@@ -26,14 +29,15 @@ public final class ShepherdTrades {
     private static final List<Item> NON_WHITE_WOOL_CHOICES = List.of(Items.BROWN_WOOL, Items.BLACK_WOOL, Items.GRAY_WOOL);
 
     // Per-biome colour theme shared by beds, banners and carpets.
-    private static final Map<ResourceKey<VillagerType>, Item> BED_BY_TYPE = Map.of(
-            VillagerType.PLAINS, Items.LIGHT_GRAY_BED,
-            VillagerType.SAVANNA, Items.LIME_BED,
-            VillagerType.DESERT, Items.PINK_BED,
-            VillagerType.TAIGA, Items.PURPLE_BED,
-            VillagerType.SNOW, Items.MAGENTA_BED,
-            VillagerType.SWAMP, Items.BLUE_BED,
-            VillagerType.JUNGLE, Items.BROWN_BED
+    // Cushions replace beds at Journeyman, as in 26.3: a way for players to find out cushions exist.
+    private static final Map<ResourceKey<VillagerType>, Item> CUSHION_BY_TYPE = Map.of(
+            VillagerType.PLAINS, Cushions.item(DyeColor.LIGHT_GRAY),
+            VillagerType.SAVANNA, Cushions.item(DyeColor.LIME),
+            VillagerType.DESERT, Cushions.item(DyeColor.PINK),
+            VillagerType.TAIGA, Cushions.item(DyeColor.PURPLE),
+            VillagerType.SNOW, Cushions.item(DyeColor.MAGENTA),
+            VillagerType.SWAMP, Cushions.item(DyeColor.BLUE),
+            VillagerType.JUNGLE, Cushions.item(DyeColor.BROWN)
     );
 
     private static final Map<ResourceKey<VillagerType>, Item> BANNER_BY_TYPE = Map.of(
@@ -109,11 +113,11 @@ public final class ShepherdTrades {
         apprentice.add(TradeListings.VillagerTypeVariantTradeListing.buying(CARPET_BY_TYPE, Items.WHITE_CARPET, 13, 1, APPRENTICE_MAX_USES, 2));
         apprentice.add(TradeListings.VillagerTypeVariantTradeListing.selling(CARPET_BY_TYPE, Items.WHITE_CARPET, 9, 1, APPRENTICE_MAX_USES, 2));
 
-        // Journeyman (level 3): Bed (villager type), Banner (villager type) - 5 XP/trade
+        // Journeyman (level 3): Cushion (villager type), Banner (villager type) - 5 XP/trade
         List<VillagerTrades.ItemListing> journeyman = trades.get(3);
         journeyman.clear();
-        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.buying(BED_BY_TYPE, Items.WHITE_BED, 5, 1, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.selling(BED_BY_TYPE, Items.WHITE_BED, 3, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.buying(CUSHION_BY_TYPE, Cushions.item(DyeColor.WHITE), 5, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.VillagerTypeVariantTradeListing.selling(CUSHION_BY_TYPE, Cushions.item(DyeColor.WHITE), 3, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.VillagerTypeVariantTradeListing.buying(BANNER_BY_TYPE, Items.WHITE_BANNER, 5, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.VillagerTypeVariantTradeListing.selling(BANNER_BY_TYPE, Items.WHITE_BANNER, 3, 1, JOURNEYMAN_MAX_USES, 5));
 

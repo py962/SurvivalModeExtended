@@ -53,7 +53,7 @@ import java.util.Map;
  * the spot is free and it can survive there, otherwise the record is dropped. Plants placed by an entity
  * or grown by bonemeal are recorded as player-placed and never touched.
  * <p>
- * Each position flips {@link #delayTicks} (a hash in [0, STAGGER_TICKS)) after the calendar boundary,
+ * Each position flips {@link #delayTicks} (a hash in [0, the group's stagger)) after the calendar boundary,
  * so a position's effective season is the season at {@code yearTick - delay}. That makes every scan
  * stateless: it just compares each plant (or dormant record) with its own effective season.
  * <p>
@@ -101,13 +101,13 @@ public final class SeasonalPlantService {
     private static final int BONEMEAL_UP = 3;
 
     /** Boost extras put into the world per tick, across all chunks of a level. */
-    private static final int EXTRA_PLACEMENTS_PER_TICK = 24;
+    private static final int EXTRA_PLACEMENTS_PER_TICK = 48;
     /** Upper bound on the extras of one category in one chunk. */
-    private static final int MAX_EXTRAS_PER_CATEGORY = 48;
+    private static final int MAX_EXTRAS_PER_CATEGORY = 96;
     /** Distinct sample states kept per category while scanning a chunk. */
     private static final int MAX_SAMPLES = 32;
     /** Minimum sky light on the spot for flowers and pumpkins. */
-    private static final int MIN_OPEN_SKY_LIGHT = 13;
+    private static final int MIN_OPEN_SKY_LIGHT = 10;
 
     private static final class LevelState {
         final LongOpenHashSet loaded = new LongOpenHashSet();
@@ -191,7 +191,7 @@ public final class SeasonalPlantService {
 
         if (jumped) {
             refill(st, gameTime);
-        } else if (boundaryMatters && intoState < STAGGER_TICKS) {
+        } else if (boundaryMatters && intoState < SeasonalPlantCategory.changeWindow(previous, current)) {
             // Stagger window open: keep sweeping loaded chunks so positions flip close to their delay.
             if (st.sweepQueue.isEmpty() && gameTime - st.lastSweepAt >= MIN_SWEEP_INTERVAL) {
                 refill(st, gameTime);
@@ -232,16 +232,16 @@ public final class SeasonalPlantService {
     }
 
     /** Per-position flip delay after a season boundary, in [0, STAGGER_TICKS). */
-    static long delayTicks(long packedPos) {
+    static long delayTicks(long packedPos, long stagger) {
         long h = packedPos * 0x9E3779B97F4A7C15L;
         h ^= h >>> 31;
         h *= 0xBF58476D1CE4E5B9L;
         h ^= h >>> 29;
-        return Math.floorMod(h, STAGGER_TICKS);
+        return Math.floorMod(h, stagger);
     }
 
-    static Season effectiveSeason(long packedPos, long yearTick) {
-        return Season.fromYearTick(Math.floorMod(yearTick - delayTicks(packedPos), Season.YEAR_LENGTH_TICKS));
+    static Season effectiveSeason(long packedPos, long yearTick, SeasonalPlantCategory category) {
+        return Season.fromYearTick(Math.floorMod(yearTick - delayTicks(packedPos, category.stagger()), Season.YEAR_LENGTH_TICKS));
     }
 
     private static Season seasonOfState(long absState) {
@@ -254,7 +254,7 @@ public final class SeasonalPlantService {
      * {@code Long.MIN_VALUE} when the category is out of season there.
      */
     static long inSeasonRun(SeasonalPlantCategory category, long packedPos, long total) {
-        long abs = Math.floorDiv(total - delayTicks(packedPos), Season.STATE_LENGTH_TICKS);
+        long abs = Math.floorDiv(total - delayTicks(packedPos, category.stagger()), Season.STATE_LENGTH_TICKS);
         if (!category.isInSeason(seasonOfState(abs))) {
             return Long.MIN_VALUE;
         }
@@ -512,7 +512,7 @@ public final class SeasonalPlantService {
             }
         }
         long packed = lower.asLong();
-        if (category.isInSeason(effectiveSeason(packed, yearTick)) || data.isPlayerPlaced(packed)) {
+        if (category.isInSeason(effectiveSeason(packed, yearTick, category)) || data.isPlayerPlaced(packed)) {
             return false;
         }
         if (!lowerState.getFluidState().isEmpty()) {
@@ -569,7 +569,7 @@ public final class SeasonalPlantService {
             BlockState state = entry.getValue();
             SeasonalPlantCategory category = SeasonalPlantCategory.of(state);
             // A null category means the tags changed since it was stored: give it back rather than lose it.
-            if (category != null && !category.isInSeason(effectiveSeason(packed, yearTick))) {
+            if (category != null && !category.isInSeason(effectiveSeason(packed, yearTick, category))) {
                 continue;
             }
             boolean extra = data.extras.contains(packed);

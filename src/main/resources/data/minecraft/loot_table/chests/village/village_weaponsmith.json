@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:apple",
+          "name": "minecraft:iron_nugget",
           "weight": 15
         },
         {
@@ -49,8 +49,8 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:oak_sapling",
-          "weight": 5
+          "name": "minecraft:coal",
+          "weight": 15
         }
       ],
       "rolls": {

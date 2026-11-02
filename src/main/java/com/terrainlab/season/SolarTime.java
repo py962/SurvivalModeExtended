@@ -24,11 +24,11 @@ public final class SolarTime {
     public static final long VANILLA_SLEEP_END = 23460L;
 
     /**
-     * Bed window on the unwarped clock: 8pm to 4am, roughly midsummer sunset to sunrise. The rest of the
+     * Bed window on the unwarped clock: 730pm to 430am, roughly midsummer sunset to sunrise. The rest of the
      * year the sun sets before and rises after it, leaving dark time either side for mobs to spawn.
      */
-    public static final long BED_START = 14000L;
-    public static final long BED_END = 22000L;
+    public static final long BED_START = 13500L;
+    public static final long BED_END = 22500L;
 
     // Debug trace state (server side only).
     private static long lastDebugDay = Long.MIN_VALUE;

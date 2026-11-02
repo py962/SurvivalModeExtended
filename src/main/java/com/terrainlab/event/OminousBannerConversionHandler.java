@@ -55,6 +55,18 @@ public final class OminousBannerConversionHandler {
 
     /** The mod banner replacing a vanilla ominous banner, or null if the stack is something else. */
     private static ItemStack convert(Level level, ItemStack stack) {
+        // A pattern-less Ominous Banner is a white banner that an older version mislabelled.
+        if (stack.is(com.terrainlab.registry.ModItems.OMINOUS_BANNER.get())) {
+            BannerPatternLayers own = stack.get(DataComponents.BANNER_PATTERNS);
+            if (own != null && !own.layers().isEmpty()) {
+                return null;
+            }
+            ItemStack white = new ItemStack(Items.WHITE_BANNER, stack.getCount());
+            if (stack.has(DataComponents.CUSTOM_NAME)) {
+                white.set(DataComponents.CUSTOM_NAME, stack.get(DataComponents.CUSTOM_NAME));
+            }
+            return white;
+        }
         if (!stack.is(Items.WHITE_BANNER)) {
             return null;
         }

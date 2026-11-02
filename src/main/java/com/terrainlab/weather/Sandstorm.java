@@ -127,6 +127,7 @@ public final class Sandstorm {
     public static boolean isActiveAt(Level level, BlockPos pos) {
         return level.dimension() == Level.OVERWORLD
                 && level.isRaining()
+                && dustFactor(level.getGameTime()) > 0.0F
                 && isSandstormBiome(level, pos);
     }
 
@@ -134,7 +135,21 @@ public final class Sandstorm {
     public static float strength(Level level, float partialTick) {
         float rain = level.getRainLevel(partialTick);
         float thunder = level.getThunderLevel(partialTick);
-        return rain * Mth.lerp(thunder, WeatherConstants.SANDSTORM_NORMAL_STRENGTH, 1.0F);
+        return rain * dustFactor(level.getGameTime())
+                * Mth.lerp(thunder, WeatherConstants.SANDSTORM_NORMAL_STRENGTH, 1.0F);
+    }
+
+    /**
+     * How dusty the wind is, 0..1: a slow wave of game time (so server and client agree without
+     * syncing) that is above zero about a quarter of the time. A global storm only raises a
+     * sandstorm while it is, so sandstorms come with roughly a quarter of rain spells and fade in
+     * and out over a minute or two instead of switching.
+     */
+    public static float dustFactor(long gameTime) {
+        double t = gameTime;
+        double wave = Math.sin(t / 7000.0) + 0.6 * Math.sin(t / 2300.0 + 1.1);
+        return (float) Mth.clamp((wave - WeatherConstants.SANDSTORM_DUST_THRESHOLD)
+                / WeatherConstants.SANDSTORM_DUST_FADE, 0.0, 1.0);
     }
 
     /**

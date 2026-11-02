@@ -1,3 +1,4 @@
+
 package com.terrainlab.event;
 
 import net.minecraft.core.BlockPos;
@@ -40,6 +41,10 @@ public class ModEndermanHandler {
     private static final int SEARCH_RADIUS = 48;
     private static final int MAX_PATTERN_DIST = 3;
 
+    // Player pattern requirements.
+    private static final int PLAYER_PATTERN_BLOCKS = 3;
+    private static final long PATTERN_TIMEOUT_TICKS = 60L;
+
     private static final double ENDERMAN_WALK_SPEED = 1.0D;
     private static final double PLACEMENT_DISTANCE_SQ = 3.0D;
 
@@ -54,6 +59,14 @@ public class ModEndermanHandler {
             new HashMap<>();
 
     private static final Map<UUID, List<BlockPos>> endermanBlockHistory =
+            new HashMap<>();
+
+    // Independent history for the three-block player pattern.
+    private static final Map<UUID, List<BlockPos>> playerPatternHistory =
+            new HashMap<>();
+
+    // Game time when the first block of the current pattern was placed.
+    private static final Map<UUID, Long> playerFirstBlockTime =
             new HashMap<>();
 
     public static final Map<UUID, BlockPos> chorusAnchors =
@@ -203,6 +216,7 @@ public class ModEndermanHandler {
 
         UUID uuid = player.getUUID();
 
+        // Preserve the original five-position player history.
         List<BlockPos> history =
                 playerBlockHistory.computeIfAbsent(
                         uuid,
@@ -215,37 +229,130 @@ public class ModEndermanHandler {
             history.remove(0);
         }
 
-        if (history.size() < 2) {
+        // Check the separate three-block mimicry pattern.
+        processPlayerPattern(level, uuid, pos);
+    }
+
+    /**
+     * Processes the player's three-block pattern.
+     *
+     * All three blocks must:
+     * - Be placed within PATTERN_TIMEOUT_TICKS of the first block.
+     * - Form a straight line.
+     * - Have exactly equal spacing.
+     * - Have a non-zero displacement of at most MAX_PATTERN_DIST
+     *   using Manhattan distance.
+     *
+     * Horizontal, vertical and diagonal lines are supported.
+     */
+    private static void processPlayerPattern(
+            ServerLevel level,
+            UUID uuid,
+            BlockPos pos) {
+
+        List<BlockPos> pattern =
+                playerPatternHistory.computeIfAbsent(
+                        uuid,
+                        k -> new ArrayList<>()
+                );
+
+        long currentTime = level.getGameTime();
+
+        // First block, or restart after a timeout.
+        if (pattern.isEmpty()) {
+
+            pattern.add(pos.immutable());
+            playerFirstBlockTime.put(uuid, currentTime);
+
             return;
         }
 
-        BlockPos prev =
-                history.get(history.size() - 2);
+        long firstBlockTime =
+                playerFirstBlockTime.getOrDefault(
+                        uuid,
+                        currentTime
+                );
 
-        BlockPos curr =
-                history.get(history.size() - 1);
+        // The three-block pattern must be completed within three seconds.
+        if (currentTime - firstBlockTime > PATTERN_TIMEOUT_TICKS) {
 
-        int dx =
-                curr.getX() - prev.getX();
+            pattern.clear();
+            pattern.add(pos.immutable());
 
-        int dy =
-                curr.getY() - prev.getY();
+            playerFirstBlockTime.put(uuid, currentTime);
 
-        int dz =
-                curr.getZ() - prev.getZ();
+            return;
+        }
 
-        if (Math.abs(dx)
-                + Math.abs(dy)
-                + Math.abs(dz)
-                <= MAX_PATTERN_DIST) {
+        // Second block: establish direction and spacing.
+        if (pattern.size() == 1) {
 
-            startMimicrySequence(
-                    level,
-                    pos,
-                    dx,
-                    dy,
-                    dz
-            );
+            BlockPos first = pattern.get(0);
+
+            int dx = pos.getX() - first.getX();
+            int dy = pos.getY() - first.getY();
+            int dz = pos.getZ() - first.getZ();
+
+            int distance =
+                    Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
+
+            // Reject the same position or spacing greater than three.
+            if (distance == 0 || distance > MAX_PATTERN_DIST) {
+
+                pattern.clear();
+                pattern.add(pos.immutable());
+
+                playerFirstBlockTime.put(uuid, currentTime);
+
+                return;
+            }
+
+            pattern.add(pos.immutable());
+
+            return;
+        }
+
+        // Third block: require exactly the same displacement vector.
+        if (pattern.size() == 2) {
+
+            BlockPos first = pattern.get(0);
+            BlockPos second = pattern.get(1);
+
+            int dx1 = second.getX() - first.getX();
+            int dy1 = second.getY() - first.getY();
+            int dz1 = second.getZ() - first.getZ();
+
+            int dx2 = pos.getX() - second.getX();
+            int dy2 = pos.getY() - second.getY();
+            int dz2 = pos.getZ() - second.getZ();
+
+            boolean validPattern =
+                    dx1 == dx2
+                            && dy1 == dy2
+                            && dz1 == dz2;
+
+            if (validPattern) {
+
+                // The three blocks form a valid equally spaced straight line.
+                startMimicrySequence(
+                        level,
+                        pos,
+                        dx1,
+                        dy1,
+                        dz1
+                );
+
+                pattern.clear();
+                playerFirstBlockTime.remove(uuid);
+
+            } else {
+
+                // Invalid continuation: restart using the latest block.
+                pattern.clear();
+                pattern.add(pos.immutable());
+
+                playerFirstBlockTime.put(uuid, currentTime);
+            }
         }
     }
 
@@ -819,7 +926,12 @@ public class ModEndermanHandler {
 
                 enderman.setCarriedBlock(null);
 
-                com.terrainlab.advancement.ModAdvancements.awardNearby(level, target.getCenter(), 32.0, "enderman_sequence");
+                com.terrainlab.advancement.ModAdvancements.awardNearby(
+                        level,
+                        target.getCenter(),
+                        32.0,
+                        "enderman_sequence"
+                );
 
                 iterator.remove();
 

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "cushion",
+  "pattern": [
+    "C",
+    "S"
+  ],
+  "key": {
+    "C": "minecraft:cyan_carpet",
+    "S": "#minecraft:wooden_slabs"
+  },
+  "result": {
+    "id": "terrainlab:cyan_cushion",
+    "count": 1
+  }
+}

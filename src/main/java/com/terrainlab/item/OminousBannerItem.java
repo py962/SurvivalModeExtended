@@ -28,6 +28,15 @@ public class OminousBannerItem extends BannerItem {
         super(Blocks.WHITE_BANNER, Blocks.WHITE_WALL_BANNER, properties);
     }
 
+    /**
+     * Does not register itself as the item of the white banner blocks. Every BlockItem does by
+     * default, and the last one registered wins, which made placed white banners give (and
+     * pick-block and break into) plain, pattern-less Ominous Banners.
+     */
+    @Override
+    public void registerBlocks(java.util.Map<net.minecraft.world.level.block.Block, Item> map, Item item) {
+    }
+
     /** Builds the decorated stack with vanilla's Ominous Banner pattern layers, hidden from the tooltip. */
     public static ItemStack createStack(HolderGetter<BannerPattern> patternGetter) {
         ItemStack stack = new ItemStack(ModItems.OMINOUS_BANNER.get());

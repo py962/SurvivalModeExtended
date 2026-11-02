@@ -143,6 +143,37 @@ public class HouseboatEntity extends Boat {
         super.closeRangeLeashBehaviour(entity);
     }
 
+    /**
+     * Returns true if a solid collision shape is beneath or touching the boat.
+     * Water, air, lily pads and non-solid blocks do not count.
+     */
+    private boolean hasSolidSupportOrContact() {
+        AABB box = this.getBoundingBox();
+
+        double epsilon = 0.001;
+
+        int minX = BlockPos.containing(box.minX + epsilon, box.minY - epsilon, box.minZ + epsilon).getX();
+        int maxX = BlockPos.containing(box.maxX - epsilon, box.minY - epsilon, box.maxZ - epsilon).getX();
+        int minY = BlockPos.containing(box.minX, box.minY - epsilon, box.minZ).getY();
+        int maxY = BlockPos.containing(box.minX, box.maxY, box.minZ).getY();
+        int minZ = BlockPos.containing(box.minX + epsilon, box.minY - epsilon, box.minZ + epsilon).getZ();
+        int maxZ = BlockPos.containing(box.maxX - epsilon, box.minY - epsilon, box.maxZ - epsilon).getZ();
+
+        for (BlockPos pos : BlockPos.betweenClosed(minX, minY, minZ, maxX, maxY, maxZ)) {
+            BlockState state = level().getBlockState(pos);
+
+            if (state.is(Blocks.LILY_PAD)) {
+                continue;
+            }
+
+            if (!state.getCollisionShape(level(), pos).isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public boolean checkElasticInteractions(Entity entity,
                                             Leashable.LeashData leashData) {
@@ -337,6 +368,12 @@ public class HouseboatEntity extends Boat {
                 level.dimension().equals(Level.END)) {
             player.displayClientMessage(
                     Component.literal("You cannot sleep in this dimension."), true);
+            return;
+        }
+
+        if (hasSolidSupportOrContact()) {
+            player.displayClientMessage(
+                    Component.literal("You can only sleep while floating or suspended."), true);
             return;
         }
 

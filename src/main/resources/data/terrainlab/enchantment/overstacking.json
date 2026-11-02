@@ -2,6 +2,7 @@
   "description": { "translate": "enchantment.terrainlab.overstacking" },
   "supported_items": "#terrainlab:enchantable/bundle_group",
   "primary_items": "#terrainlab:enchantable/bundle_group",
+  "exclusive_set": "terrainlab:recall",
   "weight": 2,
   "max_level": 1,
   "min_cost": { "base": 15, "per_level_above_first": 9 },

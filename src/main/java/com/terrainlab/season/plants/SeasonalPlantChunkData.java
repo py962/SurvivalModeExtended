@@ -99,6 +99,11 @@ public final class SeasonalPlantChunkData {
         return playerPlaced.isEmpty() && dormant.isEmpty() && extras.isEmpty() && boosted.isEmpty();
     }
 
+    /** Marks a plant placed by a mod system that manages it itself, so the seasonal service leaves it alone. */
+    public void markPlayerPlaced(long pos) {
+        playerPlaced.add(pos);
+    }
+
     public boolean isPlayerPlaced(long pos) {
         return playerPlaced.contains(pos);
     }

@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "terrainlab:oak_shield",
+    "minecraft:shield",
     "terrainlab:bamboo_shield",
     "terrainlab:birch_shield",
     "terrainlab:cherry_shield",

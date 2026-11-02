@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "cushion_dye",
+  "ingredients": [
+    "minecraft:orange_dye",
+    [
+      "terrainlab:white_cushion",
+      "terrainlab:magenta_cushion",
+      "terrainlab:light_blue_cushion",
+      "terrainlab:yellow_cushion",
+      "terrainlab:lime_cushion",
+      "terrainlab:pink_cushion",
+      "terrainlab:gray_cushion",
+      "terrainlab:light_gray_cushion",
+      "terrainlab:cyan_cushion",
+      "terrainlab:purple_cushion",
+      "terrainlab:blue_cushion",
+      "terrainlab:brown_cushion",
+      "terrainlab:green_cushion",
+      "terrainlab:red_cushion",
+      "terrainlab:black_cushion"
+    ]
+  ],
+  "result": {
+    "id": "terrainlab:orange_cushion",
+    "count": 1
+  }
+}

@@ -1,3 +1,4 @@
+
 package com.terrainlab.event;
 
 import com.terrainlab.TerrainLab;
@@ -28,7 +29,9 @@ public final class SeasonalWeatherCycleHandler {
     private SeasonalWeatherCycleHandler() {
     }
 
-    /** A /weather command takes over for the duration it set. */
+    /**
+     * A /weather command takes over for the duration it set.
+     */
     @SubscribeEvent
     public static void onCommand(CommandEvent event) {
         String input = event.getParseResults().getReader().getString().trim();
@@ -98,14 +101,14 @@ public final class SeasonalWeatherCycleHandler {
         boolean wetSeason = isWetSeason(visualSeason);
         boolean autumn = visualSeason == VisualSeason.AUTUMN;
 
+        // Existing rain is always allowed to finish naturally.
+        if (level.isRaining()) {
+            return;
+        }
+
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        boolean raining = level.isRaining();
 
         if (wetSeason) {
-            if (raining) {
-                return; // Wet-season rain is allowed to finish naturally.
-            }
-
             if (WeatherConstants.rollPercent(
                     random,
                     WeatherConstants.GLOBAL_WET_SEASON_RAIN_START_PERCENT
@@ -118,33 +121,13 @@ public final class SeasonalWeatherCycleHandler {
                         autumn
                 );
             } else {
-                forceClear(
-                        level,
-                        random,
-                        WeatherConstants.WET_SEASON_CLEAR_DURATION_MIN_TICKS,
-                        WeatherConstants.WET_SEASON_CLEAR_DURATION_MAX_TICKS
-                );
+                holdClear(level);
             }
 
             return;
         }
 
-        if (raining) {
-            if (WeatherConstants.rollPercent(
-                    random,
-                    WeatherConstants.GLOBAL_DRY_SEASON_RAIN_END_PERCENT
-            )) {
-                forceClear(
-                        level,
-                        random,
-                        WeatherConstants.DRY_SEASON_CLEAR_DURATION_MIN_TICKS,
-                        WeatherConstants.DRY_SEASON_CLEAR_DURATION_MAX_TICKS
-                );
-            }
-
-            return;
-        }
-
+        // Dry-season shower attempt.
         if (WeatherConstants.rollPercent(
                 random,
                 WeatherConstants.GLOBAL_DRY_SEASON_SHOWER_START_PERCENT
@@ -157,13 +140,16 @@ public final class SeasonalWeatherCycleHandler {
                     false
             );
         } else {
-            forceClear(
-                    level,
-                    random,
-                    WeatherConstants.DRY_SEASON_CLEAR_DURATION_MIN_TICKS,
-                    WeatherConstants.DRY_SEASON_CLEAR_DURATION_MAX_TICKS
-            );
+            holdClear(level);
         }
+    }
+
+    /**
+     * Keeps the weather clear until the next check. Without this, vanilla's own weather timer would
+     * start rain (and thunder, in any season) between this handler's rolls.
+     */
+    private static void holdClear(ServerLevel level) {
+        level.setWeatherParameters((int) (WeatherConstants.CHECK_INTERVAL_TICKS * 2), 0, false, false);
     }
 
     private static boolean isWetSeason(VisualSeason visualSeason) {
@@ -187,15 +173,5 @@ public final class SeasonalWeatherCycleHandler {
         );
 
         level.setWeatherParameters(0, duration, true, thunder);
-    }
-
-    private static void forceClear(
-            ServerLevel level,
-            ThreadLocalRandom random,
-            int minTicks,
-            int maxTicks
-    ) {
-        int duration = minTicks + random.nextInt(maxTicks - minTicks + 1);
-        level.setWeatherParameters(duration, 0, false, false);
     }
 }

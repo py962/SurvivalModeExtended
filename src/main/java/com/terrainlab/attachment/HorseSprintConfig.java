@@ -13,8 +13,8 @@ public class HorseSprintConfig {
     public static final double SPRINT_MULTIPLIER = 1.3D;
 
     public static final float MAX_STAMINA = 100.0f;
-    public static final float DRAIN_PER_TICK = 100.0f / (30 * 20);   // 30s of sprint
-    public static final float REGEN_PER_TICK = 100.0f / (25 * 20);   // 25s to fully recover
+    public static final float DRAIN_PER_TICK = 100.0f / (180 * 20);   // 180s of sprint
+    public static final float REGEN_PER_TICK = 100.0f / (30 * 20);   // 30s to fully recover
     public static final float RESUME_THRESHOLD = MAX_STAMINA * 0.2f; // must regen to 20% before sprinting again
 
     public static final Identifier SPRINT_MODIFIER_ID =

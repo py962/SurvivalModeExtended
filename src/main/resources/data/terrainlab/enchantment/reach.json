@@ -5,6 +5,7 @@
 },
 "supported_items": "#terrainlab:enchantable/reach_group",
 "primary_items": "#terrainlab:enchantable/reach_group",
+"exclusive_set": "terrainlab:quickstrike",
 "weight": 5,
 "max_level": 3,
 "min_cost": {

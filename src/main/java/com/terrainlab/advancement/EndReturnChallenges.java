@@ -18,6 +18,8 @@ import java.util.Set;
  *   or an easier game rule (any difficulty).</li>
  *   <li><b>Ultimate Survivor</b> - the same in a hardcore ("Ultra-Hardcore") world, replacing
  *   Survivor there.</li>
+ *   <li><b>Hermit</b> - as Survivor, but the world was on Isolation the whole time (hardcore or
+ *   not), so it can be earned together with Survivor or Ultimate Survivor.</li>
  *   <li><b>Pacifist</b> - vanilla mob_kills and player_kills both zero; never cheats, Creative,
  *   an easier game rule or Easy (Peaceful allowed).</li>
  *   <li><b>Nomad</b> - never completed a sleep twice in the same chunk (NomadSleepTracker); never
@@ -41,6 +43,7 @@ public final class EndReturnChallenges {
             ChallengeEligibility.CHEATS | ChallengeEligibility.CREATIVE | ChallengeEligibility.GAME_RULES;
     static final int PACIFIST_FORBIDDEN = SURVIVOR_FORBIDDEN | ChallengeEligibility.EASY;
     static final int NOMAD_FORBIDDEN = PACIFIST_FORBIDDEN | ChallengeEligibility.PEACEFUL;
+    static final int HERMIT_FORBIDDEN = SURVIVOR_FORBIDDEN | ChallengeEligibility.NOT_ISOLATION;
 
     private EndReturnChallenges() {
     }
@@ -73,6 +76,11 @@ public final class EndReturnChallenges {
         if ((disqualified & SURVIVOR_FORBIDDEN) == 0 && player.gameMode().isSurvival()) {
             award(player, player.level().getServer().isHardcore()
                     ? Accomplishment.ULTIMATE_SURVIVOR : Accomplishment.SURVIVOR, fresh);
+        }
+
+        // Hermit: the whole game on Isolation, hardcore or not, alongside Survivor or Ultimate Survivor.
+        if ((disqualified & HERMIT_FORBIDDEN) == 0 && player.gameMode().isSurvival()) {
+            award(player, Accomplishment.HERMIT, fresh);
         }
 
         int mobKills = player.getStats().getValue(Stats.CUSTOM.get(Stats.MOB_KILLS));

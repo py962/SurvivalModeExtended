@@ -31,25 +31,27 @@ public final class FoodCategoryTable {
         // COOL / WARMTH: temperature effects live in FoodTemperatureEffects; zero hunger here.
         put(Items.MELON_SLICE, FoodCategory.COOL);
         put(Items.MUSHROOM_STEW, FoodCategory.WARMTH);
+        put(Items.PUMPKIN_PIE, FoodCategory.WARMTH);
         put(Items.RABBIT_STEW, FoodCategory.WARMTH);
         put(Items.BEETROOT_SOUP, FoodCategory.WARMTH);
 
         // ENERGY
         put(Items.COCOA_BEANS, FoodCategory.ENERGY);
-        // Blue Orchid Suspicious Stew is component-based and handled outside this table.
+        put(Items.SWEET_BERRIES, FoodCategory.ENERGY);
+               // Blue Orchid Suspicious Stew is component-based and handled outside this table.
 
         // HUNGER_1: snack, 2 points
-        for (Item i : new Item[]{Items.COOKIE, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.CAKE}) {
+        for (Item i : new Item[]{Items.COOKIE, Items.CAKE, Items.GLOW_BERRIES}) {
             put(i, FoodCategory.HUNGER_1);
             HUNGER_POINTS.put(i, 2);
         }
         // HUNGER_2: light meal, 6 points
-        for (Item i : new Item[]{Items.BREAD, Items.BAKED_POTATO, Items.PUMPKIN_PIE, Items.COOKED_COD, Items.COOKED_SALMON, Items.COOKED_CHICKEN, Items.COOKED_RABBIT}) {
+        for (Item i : new Item[]{Items.BREAD, Items.POTATO, Items.COOKED_COD, Items.COOKED_SALMON, Items.COOKED_CHICKEN, Items.COOKED_RABBIT}) {
             put(i, FoodCategory.HUNGER_2);
             HUNGER_POINTS.put(i, 6);
         }
         // HUNGER_3: standard meal, 10 points
-        for (Item i : new Item[]{Items.COOKED_MUTTON, Items.COOKED_PORKCHOP, Items.COOKED_BEEF}) {
+        for (Item i : new Item[]{Items.BAKED_POTATO, Items.COOKED_MUTTON, Items.COOKED_PORKCHOP, Items.COOKED_BEEF}) {
             put(i, FoodCategory.HUNGER_3);
             HUNGER_POINTS.put(i, 10);
         }

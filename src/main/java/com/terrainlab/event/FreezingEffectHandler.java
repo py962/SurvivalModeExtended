@@ -1,5 +1,9 @@
 package com.terrainlab.event;
 
+import com.terrainlab.mixin.EntityStuckSpeedAccessor;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+
 import com.terrainlab.TerrainLab;
 import com.terrainlab.registry.ModMobEffects;
 import com.terrainlab.temperature.PlayerTemperatureConstants;
@@ -37,12 +41,33 @@ public class FreezingEffectHandler {
                 && instance.getDuration() <= PlayerTemperatureConstants.EFFECT_REFRESH_TICKS;
     }
 
+    /** Sideways speed kept per tick while a freezing player rises from a jump. */
+    private static final double AIRBORNE_DRAG = 0.6;
+
+    /**
+     * A freezing player can still jump a full block: the drag set at the start of the tick would otherwise
+     * scale the jump down and stop it after one tick, as in powder snow.
+     */
+    @SubscribeEvent
+    public static void onJump(LivingEvent.LivingJumpEvent event) {
+        if (event.getEntity() instanceof Player player && isFreezing(player)) {
+            ((EntityStuckSpeedAccessor) player).terrainlab$setStuckSpeedMultiplier(Vec3.ZERO);
+        }
+    }
+
     @SubscribeEvent
     public static void onLivingTick(EntityTickEvent.Pre event) {
         if (!(event.getEntity() instanceof LivingEntity living)) return;
         if (!isFreezing(living)) return;
 
-        living.makeStuckInBlock(Blocks.POWDER_SNOW.defaultBlockState(), new Vec3(0.9F, 1.5, 0.9F));
+        if (living instanceof Player && !living.onGround() && living.getDeltaMovement().y > 0.0) {
+            // Rising from a jump: no powder-snow drag (it would cut the jump short), just slow sideways
+            // movement so jumping isn't a faster way to get about while freezing.
+            Vec3 motion = living.getDeltaMovement();
+            living.setDeltaMovement(motion.x * AIRBORNE_DRAG, motion.y, motion.z * AIRBORNE_DRAG);
+        } else {
+            living.makeStuckInBlock(Blocks.POWDER_SNOW.defaultBlockState(), new Vec3(0.9F, 1.5, 0.9F));
+        }
 
         if (living.level().isClientSide()) return; // ticksFrozen is synced from the server
 

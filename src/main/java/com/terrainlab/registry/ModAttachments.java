@@ -348,6 +348,20 @@ public class ModAttachments {
                                     .fieldOf("traders"))
                             .build());
 
+    // Trader type -> UUID of the player (character) a reserved guide is bonded to, alongside
+    // LIVING_TRAIL_TRADERS, so a deleted character's reservations can be freed at server start
+    // without loading the guide. Serialized.
+    public static final Supplier<AttachmentType<ConcurrentHashMap<EntityType<?>, UUID>>> BONDED_GUIDE_OWNERS =
+            ATTACHMENT_TYPES.register("bonded_guide_owners", () ->
+                    AttachmentType.<ConcurrentHashMap<EntityType<?>, UUID>>builder(
+                                    (Supplier<ConcurrentHashMap<EntityType<?>, UUID>>) ConcurrentHashMap::new)
+                            .serialize(Codec.unboundedMap(BuiltInRegistries.ENTITY_TYPE.byNameCodec(), UUIDUtil.CODEC)
+                                    .xmap(
+                                            (Map<EntityType<?>, UUID> map) -> new ConcurrentHashMap<EntityType<?>, UUID>(map),
+                                            (ConcurrentHashMap<EntityType<?>, UUID> map) -> (Map<EntityType<?>, UUID>) map)
+                                    .fieldOf("owners"))
+                            .build());
+
     // On a cargo donkey: UUID of the trader it belongs to, used by the leash watchdog. Serialized.
     public static final Supplier<AttachmentType<Optional<UUID>>> CARGO_DONKEY_OWNER_TRADER =
             ATTACHMENT_TYPES.register("cargo_donkey_owner_trader", () ->

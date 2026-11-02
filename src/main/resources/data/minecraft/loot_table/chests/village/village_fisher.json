@@ -48,14 +48,30 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:wheat_seeds",
-          "weight": 3
+          "name": "minecraft:string",
+          "weight": 10
+        },
+      {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 1.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:bucket",
+          "weight": 5
         }
       ],
       "rolls": {
         "type": "minecraft:uniform",
         "max": 5.0,
-        "min": 1.0
+        "min": 3.0
       }
     }
   ],

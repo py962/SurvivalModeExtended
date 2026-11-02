@@ -1,11 +1,17 @@
 package com.terrainlab.character;
 
 import com.terrainlab.TerrainLab;
+import com.terrainlab.entity.AbstractTrailTraderEntity;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Game-bus hooks for singleplayer characters.
@@ -37,6 +43,16 @@ public final class CharacterServerEvents {
         CharacterSession.Selection active = CharacterSession.active();
         if (active != null && event.getEntity().getUUID().equals(active.uuid())) {
             event.setDisplayName(Component.literal(active.name()));
+        }
+    }
+
+    /** Frees the guide reservations of characters deleted since the world was last played. */
+    @SubscribeEvent
+    public static void onServerStarted(ServerStartedEvent event) {
+        Set<UUID> retired = CharacterSession.retiredFor(event.getServer());
+        if (retired.isEmpty()) return;
+        for (ServerLevel level : event.getServer().getAllLevels()) {
+            AbstractTrailTraderEntity.releaseRetiredReservations(level, retired);
         }
     }
 

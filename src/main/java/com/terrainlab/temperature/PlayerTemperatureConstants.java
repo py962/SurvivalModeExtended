@@ -28,8 +28,8 @@ public final class PlayerTemperatureConstants {
     // Added to the local temperature target every tick the player is on fire, degrees C.
     public static final double ON_FIRE_HEAT_CONTRIBUTION = 20.0;
 
-    // Heatstroke drains energy: HEATSTROKE_ENERGY_DRAIN (1% of the 100% scale) every interval.
-    public static final float HEATSTROKE_ENERGY_DRAIN = 0.01F;
+    // Heatstroke drains energy at twice the sprinting rate: 5% of the 100% scale every 5 s (full to empty in ~1 min 40 s).
+    public static final float HEATSTROKE_ENERGY_DRAIN = 0.05F;
     public static final int HEATSTROKE_ENERGY_DRAIN_INTERVAL_TICKS = 100; // 5 s
 
     // Per-tick restore rate of effect duration toward 20.

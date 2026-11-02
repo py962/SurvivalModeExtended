@@ -66,6 +66,7 @@ import com.terrainlab.client.renderer.OutlawRaiderRenderer;
 import com.terrainlab.client.renderer.TrapperRaiderRenderer;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 import net.neoforged.neoforge.client.event.RegisterDebugEntriesEvent;
+import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenProfile;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
 import com.terrainlab.client.hud.TerrainLabDebugEntry;
@@ -87,7 +88,8 @@ public class TerrainLabClient {
     static void onRegisterDebugEntries(RegisterDebugEntriesEvent event) {
         Identifier id = Identifier.fromNamespaceAndPath(TerrainLab.MODID, "debug_info");
         event.register(id, new TerrainLabDebugEntry());
-        event.includeInProfile(id, DebugScreenProfile.DEFAULT, DebugScreenEntryStatus.ALWAYS_ON);
+        event.includeInProfile(id, DebugScreenProfile.DEFAULT, DebugScreenEntryStatus.IN_OVERLAY);
+        event.includeInProfile(DebugScreenEntries.BIOME, DebugScreenProfile.DEFAULT, DebugScreenEntryStatus.IN_OVERLAY);
     }
 
     // Wood shields: "terrainlab:tinted_shield" special model renderer, vanilla's shield mesh tinted

@@ -444,13 +444,10 @@ public class ModItems {
     // ShieldFactory from ShieldDefinitions; ShieldCombatEvents handles the stats the component
     // cannot express and resolves stats via SHIELD_ITEMS.
 
+    // The oak shield is vanilla's shield, renamed in en_us and given the oak stats by
+    // VanillaShieldComponentsHandler; old terrainlab:oak_shield items load as it (alias in register()).
     public static final DeferredItem<Item> OAK_SHIELD =
-            ITEMS.register("oak_shield", id ->
-                    new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
-                            new Item.Properties().setId(
-                                    net.minecraft.resources.ResourceKey.create(
-                                            net.minecraft.core.registries.Registries.ITEM, id)),
-                            com.terrainlab.item.ShieldDefinitions.byId("oak_shield"))));
+            DeferredItem.createItem(net.minecraft.resources.Identifier.withDefaultNamespace("shield"));
     public static final DeferredItem<Item> BAMBOO_SHIELD =
             ITEMS.register("bamboo_shield", id ->
                     new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
@@ -720,5 +717,8 @@ public class ModItems {
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
+        ITEMS.addAlias(
+                net.minecraft.resources.Identifier.fromNamespaceAndPath(TerrainLab.MODID, "oak_shield"),
+                net.minecraft.resources.Identifier.withDefaultNamespace("shield"));
     }
 }

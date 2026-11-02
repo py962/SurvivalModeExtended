@@ -1,0 +1,52 @@
+{
+  "values": {
+    "terrainlab:white_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:orange_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:magenta_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:light_blue_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:yellow_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:lime_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:pink_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:gray_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:light_gray_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:cyan_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:purple_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:blue_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:brown_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:green_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:red_cushion": {
+      "burn_time": 50
+    },
+    "terrainlab:black_cushion": {
+      "burn_time": 50
+    }
+  }
+}

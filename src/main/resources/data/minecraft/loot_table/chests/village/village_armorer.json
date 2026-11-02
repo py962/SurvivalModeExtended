@@ -19,12 +19,45 @@
           ],
           "name": "minecraft:bread",
           "weight": 4
+        },
+ {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:copper_ingot",
+          "weight": 4
+        },
+ {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:coal",
+          "weight": 4
         }
+
       ],
       "rolls": {
         "type": "minecraft:uniform",
         "max": 5.0,
-        "min": 1.0
+        "min": 3.0
       }
     }
   ],
