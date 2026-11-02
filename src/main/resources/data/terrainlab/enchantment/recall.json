@@ -2,6 +2,7 @@
   "description": { "translate": "enchantment.terrainlab.recall" },
   "supported_items": "#terrainlab:enchantable/recall_group",
   "primary_items": "#terrainlab:enchantable/recall_group",
+  "exclusive_set": "terrainlab:overstacking",
   "weight": 1,
   "max_level": 1,
   "min_cost": { "base": 25, "per_level_above_first": 0 },

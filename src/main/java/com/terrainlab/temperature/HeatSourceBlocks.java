@@ -14,10 +14,10 @@ public final class HeatSourceBlocks {
     // Applied undecayed up to 1 block away (see HeatSourceData#contributionAt).
     public static final double CAMPFIRE_STRENGTH = 40.0;
     public static final double LAVA_STRENGTH = 40.0;
-    public static final double MAGMA_STRENGTH = 10.0;
+    public static final double MAGMA_STRENGTH = 30.0;
 
     // Fire is not indexed (it changes constantly); HeatContributionService samples it live. Soul fire gives no heat.
-    public static final double FIRE_STRENGTH = 20.0;
+    public static final double FIRE_STRENGTH = 40.0;
 
     private HeatSourceBlocks() {
     }
@@ -28,6 +28,9 @@ public final class HeatSourceBlocks {
         }
         if (state.is(Blocks.MAGMA_BLOCK)) {
             return MAGMA_STRENGTH;
+        }
+        if (state.is(Blocks.LAVA_CAULDRON)) {
+            return LAVA_STRENGTH;
         }
         var fluidType = state.getFluidState().getType();
         if (fluidType == Fluids.LAVA || fluidType == Fluids.FLOWING_LAVA) {

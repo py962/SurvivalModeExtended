@@ -11,6 +11,7 @@ public final class PlayerEnergyConstants {
     // Time for each activity to fully deplete energy from 100%: sprinting ~3 min 20 s,
     // jumping (~1 per 0.6s) ~8 min, held mining ~10 min, fighting (~1.6 clicks/s) ~10 min.
     public static final float SPRINT_DRAIN_PER_TICK = 0.00025F;
+    public static final float SWIMMING_DRAIN_PER_TICK = 0.00015F;
     public static final float JUMP_DRAIN = 0.0012F;
     public static final float MINING_SWING_DRAIN = 0.0011F;
     public static final float ATTACK_SWING_DRAIN = 0.0011F;
@@ -40,7 +41,7 @@ public final class PlayerEnergyConstants {
     public static final int MAX_HUNGER_CONVERSIONS_PER_NIGHT = 4;
 
     // Hunger drains on a flat timer, independent of saturation/exhaustion.
-    public static final int TICKS_PER_HUNGER_DRAIN = 18000; // 15 minutes
+    public static final int TICKS_PER_HUNGER_DRAIN = 12000; // 10 minutes
     public static final float SATURATION_BUFFER_LEVEL = 20.0F; // pinned so vanilla exhaustion never reaches hunger
     // Instant energy granted by Energy-tier food (Cocoa Beans).
     public static final float ENERGY_FOOD_PUSH = 0.10F;

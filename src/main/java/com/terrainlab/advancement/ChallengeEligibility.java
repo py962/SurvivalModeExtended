@@ -52,6 +52,8 @@ public final class ChallengeEligibility {
     public static final int PEACEFUL = 1 << 3;
     /** A world game rule was at an easier value (see {@link #EASIER_RULES}). */
     public static final int GAME_RULES = 1 << 4;
+    /** The world was not on Isolation (its stored difficulty, Hard) at some point. */
+    public static final int NOT_ISOLATION = 1 << 5;
 
     /** Vanilla default random tick speed; anything faster makes farming easier. */
     private static final int DEFAULT_RANDOM_TICK_SPEED = 3;
@@ -124,6 +126,10 @@ public final class ChallengeEligibility {
             flags |= EASY;
         } else if (difficulty == Difficulty.PEACEFUL) {
             flags |= PEACEFUL;
+        }
+        // The stored difficulty: gameplay reads Isolation as Normal (ServerLevelIsolationDifficultyMixin).
+        if (player.level().getServer().getWorldData().getDifficulty() != Difficulty.HARD) {
+            flags |= NOT_ISOLATION;
         }
         if (recordGameRules(player)) {
             flags |= GAME_RULES;

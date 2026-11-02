@@ -77,7 +77,8 @@ public final class SandstormSpawner {
         }
 
         StormState state = STATES.computeIfAbsent(level.dimension(), key -> new StormState());
-        boolean raining = level.isRaining();
+        // A sandstorm, not just rain: rain without dust (see Sandstorm#dustFactor) leaves no lapis.
+        boolean raining = level.isRaining() && Sandstorm.dustFactor(level.getGameTime()) > 0.0F;
 
         if (raining) {
             if (!state.raining) {

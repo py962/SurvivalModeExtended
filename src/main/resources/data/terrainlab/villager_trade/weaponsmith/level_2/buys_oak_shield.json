@@ -1,6 +1,6 @@
 {
   "wants": {
-    "id": "terrainlab:oak_shield"
+    "id": "minecraft:shield"
   },
   "gives": {
     "id": "minecraft:emerald"

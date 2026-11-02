@@ -48,6 +48,10 @@
     "AbstractBoatFlowingWaterSinkMixin",
     "AbstractBoatStepUpMixin",
     "PeacefulMatchesNormalMixin",
+    "ServerLevelIsolationDifficultyMixin",
+    "ZombieVillagerConversionMixin",
+    "EntityStuckSpeedAccessor",
+    "ProjectileFenceClipMixin",
     "PeacefulNoInstantRegenMixin",
     "SeaLevelBarrierSuppressionMixin",
     "PiglinSeekPortalMixin",
@@ -127,6 +131,8 @@
     "MinecraftServerCharacterOwnerMixin"
   ],
   "client": [
+    "WorldCreationUiStateHardcoreMixin",
+    "CreateWorldGameTabHardcoreMixin",
     "DebugScreenEntryListGateMixin",
     "DebugProfileCoordinatesMixin",
     "WolfModelCarpetSleepMixin",

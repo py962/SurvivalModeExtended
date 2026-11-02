@@ -18,9 +18,10 @@ import java.util.EnumSet;
  */
 public enum SeasonalPlantCategory {
     LEAF_LITTER("seasonal/leaf_litter", EnumSet.of(Season.MIDWINTER, Season.EARLY_AUTUMN, Season.LATE_AUTUMN)),
-    FLOWERS("seasonal/flowers", EnumSet.of(Season.EARLY_SPRING, Season.LATE_SPRING, Season.MIDSUMMER)),
+    // Flowers come and go gradually across a whole season (early spring in, early autumn out).
+    FLOWERS("seasonal/flowers", EnumSet.of(Season.EARLY_SPRING, Season.LATE_SPRING, Season.MIDSUMMER), Season.STATE_LENGTH_TICKS),
     PUMPKINS("seasonal/pumpkins", EnumSet.of(Season.MIDSUMMER, Season.EARLY_AUTUMN, Season.LATE_AUTUMN)),
-    MUSHROOMS("seasonal/mushrooms", EnumSet.of(Season.EARLY_AUTUMN, Season.LATE_AUTUMN, Season.MIDWINTER, Season.EARLY_SPRING));
+    MUSHROOMS("seasonal/mushrooms", EnumSet.of(Season.LATE_AUTUMN, Season.MIDWINTER, Season.EARLY_SPRING));
 
     /** Biomes whose naturally generated ground plants follow the seasons. */
     public static final TagKey<Biome> AFFECTED_BIOMES =
@@ -30,10 +31,32 @@ public enum SeasonalPlantCategory {
 
     private final TagKey<Block> tag;
     private final EnumSet<Season> inSeason;
+    private final long stagger;
 
     SeasonalPlantCategory(String tagPath, EnumSet<Season> inSeason) {
+        this(tagPath, inSeason, SeasonalPlantService.STAGGER_TICKS);
+    }
+
+    SeasonalPlantCategory(String tagPath, EnumSet<Season> inSeason, long stagger) {
         this.tag = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(TerrainLab.MODID, tagPath));
         this.inSeason = inSeason;
+        this.stagger = stagger;
+    }
+
+    /** Spread of the per-position flip delay after a boundary for this group. */
+    public long stagger() {
+        return stagger;
+    }
+
+    /** Longest flip spread among the groups that change between {@code from} and {@code to}; 0 if none change. */
+    public static long changeWindow(Season from, Season to) {
+        long window = 0L;
+        for (SeasonalPlantCategory category : VALUES) {
+            if (category.isInSeason(from) != category.isInSeason(to)) {
+                window = Math.max(window, category.stagger);
+            }
+        }
+        return window;
     }
 
     public boolean isInSeason(Season season) {

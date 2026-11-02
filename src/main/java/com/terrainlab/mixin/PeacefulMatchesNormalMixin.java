@@ -11,8 +11,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 /**
  * Hunger rules in {@code FoodData#tick}:
  * <ul>
- *   <li>Peaceful reports as Normal, so hunger depletes and starvation behaves as on Normal (mob spawning,
- *       which reads difficulty elsewhere, is unaffected).</li>
+ *   <li>Peaceful and Normal (and so Isolation) report as Hard here, so hunger depletes and starvation
+ *       can kill, as on vanilla Hard (mob spawning, which reads difficulty elsewhere, is unaffected).
+ *       Easy keeps vanilla's rule (starvation stops at 5 hearts).</li>
  *   <li>Natural regeneration from food is limited to Easy; the game rule still applies there.</li>
  * </ul>
  */
@@ -29,7 +30,7 @@ public abstract class PeacefulMatchesNormalMixin {
     )
     private Difficulty terrainlab$treatPeacefulAsNormal(ServerLevel level) {
         Difficulty real = level.getDifficulty();
-        return real == Difficulty.PEACEFUL ? Difficulty.NORMAL : real;
+        return real == Difficulty.PEACEFUL || real == Difficulty.NORMAL ? Difficulty.HARD : real;
     }
 
     // The only unboxing in tick() is the NATURAL_HEALTH_REGENERATION game-rule read.

@@ -11,7 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 /**
  * Heatstroke: drains player energy by HEATSTROKE_ENERGY_DRAIN every HEATSTROKE_ENERGY_DRAIN_INTERVAL_TICKS
- * (1% per 5 s). The cadence follows game time, because the effect is reapplied with a short duration
+ * (5% per 5 s, twice the sprinting rate). The cadence follows game time, because the effect is reapplied with a short duration
  * every few ticks while body temperature stays at or above the threshold.
  */
 public class HeatstrokeMobEffect extends MobEffect {

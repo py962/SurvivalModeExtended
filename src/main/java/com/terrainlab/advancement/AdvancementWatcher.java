@@ -171,10 +171,15 @@ public final class AdvancementWatcher {
         }
         ItemStack crafted = event.getCrafting();
         Identifier id = BuiltInRegistries.ITEM.getKey(crafted.getItem());
-        if (TerrainLab.MODID.equals(id.getNamespace()) && id.getPath().endsWith("_shield")) {
+        if (TerrainLab.MODID.equals(id.getNamespace()) && NAMED_SHIELDS.contains(id.getPath())) {
             ModAdvancements.award(player, "specialist_shield");
         }
     }
+
+    /** The named ("Shield of ...") wood shields; the plain ones (Oak, Birch, Spruce...) don't count. */
+    private static final java.util.Set<String> NAMED_SHIELDS = java.util.Set.of(
+            "azalea_shield", "pale_oak_shield", "dark_oak_shield", "jungle_shield",
+            "mangrove_shield", "warped_shield", "crimson_shield", "enderwood_shield");
 
     @SubscribeEvent
     public static void onVillageTier(VillageTierTransitionEvent event) {

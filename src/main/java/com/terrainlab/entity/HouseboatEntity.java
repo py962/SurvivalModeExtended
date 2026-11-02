@@ -52,6 +52,38 @@ public class HouseboatEntity extends Boat {
         super(type, level, dropItem);
     }
 
+    /**
+     * Returns true if a solid collision shape is beneath or touching the boat.
+     * Water, air, lily pads and non-solid blocks do not count.
+     */
+    private boolean hasSolidSupportOrContact() {
+        AABB box = this.getBoundingBox();
+
+        double epsilon = 0.001;
+
+        int minX = BlockPos.containing(box.minX + epsilon, box.minY - epsilon, box.minZ + epsilon).getX();
+        int maxX = BlockPos.containing(box.maxX - epsilon, box.minY - epsilon, box.maxZ - epsilon).getX();
+        int minY = BlockPos.containing(box.minX, box.minY - epsilon, box.minZ).getY();
+        int maxY = BlockPos.containing(box.minX, box.maxY, box.minZ).getY();
+        int minZ = BlockPos.containing(box.minX + epsilon, box.minY - epsilon, box.minZ + epsilon).getZ();
+        int maxZ = BlockPos.containing(box.maxX - epsilon, box.minY - epsilon, box.maxZ - epsilon).getZ();
+
+        for (BlockPos pos : BlockPos.betweenClosed(minX, minY, minZ, maxX, maxY, maxZ)) {
+            BlockState state = level().getBlockState(pos);
+
+            if (state.is(Blocks.LILY_PAD)) {
+                continue;
+            }
+
+            if (!state.getCollisionShape(level(), pos).isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     @Override
     protected double rideHeight(EntityDimensions dimensions) {
         return 0.2;
@@ -334,6 +366,12 @@ public class HouseboatEntity extends Boat {
         if (level.dimension().equals(Level.NETHER) ||
                 level.dimension().equals(Level.END)) {
             player.sendOverlayMessage(Component.literal("You cannot sleep in this dimension."));
+            return;
+        }
+
+        if (hasSolidSupportOrContact()) {
+            player.sendOverlayMessage(
+                    Component.literal("You can only sleep while floating or suspended."));
             return;
         }
 

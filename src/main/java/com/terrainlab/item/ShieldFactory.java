@@ -40,6 +40,15 @@ public final class ShieldFactory {
                 .component(DataComponents.BREAK_SOUND, SoundEvents.SHIELD_BREAK);
     }
 
+    /** Gives the vanilla shield (the Oak Shield) the same components a wood shield gets from its stats. */
+    public static void applyToVanillaShield(net.minecraft.core.component.DataComponentMap.Builder components,
+                                            net.minecraft.core.HolderLookup.Provider context, ShieldStats stats) {
+        components.set(DataComponents.MAX_DAMAGE, stats.maxDamage());
+        components.set(DataComponents.ENCHANTABLE, new net.minecraft.world.item.enchantment.Enchantable(ShieldStats.ENCHANTMENT_VALUE));
+        components.set(DataComponents.BLOCKS_ATTACKS, buildBlocksAttacks(stats, context.lookupOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE).getOrThrow(DamageTypeTags.BYPASSES_SHIELD)));
+        components.set(DataComponents.BREAK_SOUND, SoundEvents.SHIELD_BREAK);
+    }
+
     /**
      * Full negation within the stat-driven blocking angle, flat durability loss per block, and
      * vanilla shield sounds and bypass tag.

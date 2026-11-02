@@ -329,5 +329,10 @@ public class ModEntities {
 
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
+        // The 1.21.11 version's backported cushion entity becomes the vanilla cushion on upgrade
+        // (same saved data: "block_pos" and "color").
+        ENTITY_TYPES.addAlias(
+                net.minecraft.resources.Identifier.fromNamespaceAndPath(MODID, "cushion"),
+                net.minecraft.resources.Identifier.withDefaultNamespace("cushion"));
     }
 }

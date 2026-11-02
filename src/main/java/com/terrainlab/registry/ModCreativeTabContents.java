@@ -125,10 +125,9 @@ public class ModCreativeTabContents {
             after(event, Items.HOPPER_MINECART, ModItems.DISPENSER_MINECART, ModItems.DROPPER_MINECART);
 
         } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-            // Vanilla's Shield is replaced by the mod's Oak Shield (its recipe is disabled): the wood
-            // shields take its slot and vanilla's is removed.
-            after(event, Items.SHIELD, ModItems.SHIELD_ITEMS.values().toArray(new DeferredItem<?>[0]));
-            event.remove(new ItemStack(Items.SHIELD), VISIBILITY);
+            // The vanilla shield is the Oak Shield; the other wood shields follow it.
+            after(event, Items.SHIELD, ModItems.SHIELD_ITEMS.values().stream()
+                    .filter(item -> item != ModItems.OAK_SHIELD).toArray(DeferredItem<?>[]::new));
             after(event, Items.LEATHER_BOOTS, ModItems.FUR_CLOAK);
             ItemLike[] amulets = new ItemLike[CelestialVariant.values().length];
             for (CelestialVariant variant : CelestialVariant.values()) {

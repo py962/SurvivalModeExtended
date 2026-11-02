@@ -10,7 +10,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.RandomSource;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,8 +18,8 @@ import java.util.function.Consumer;
 /**
  * Names a character and picks its skin (new character, editing one, or the first character of a
  * world): a text box capped at {@link CharacterRegistry#MAX_NAME_LENGTH} characters that must not
- * be blank or match another character of the same world, one of vanilla's nine default skins with
- * wide or slim arms, and a rotating preview (drag to turn it).
+ * be blank or match another character of the same world, the account's own skin (custom or not) or
+ * one of vanilla's nine default skins with wide or slim arms, and a rotating preview (drag to turn it).
  */
 public class CharacterNameScreen extends Screen {
 
@@ -40,6 +39,8 @@ public class CharacterNameScreen extends Screen {
 
     private String skin;
     private boolean slim;
+    private final java.util.function.Supplier<net.minecraft.world.entity.player.PlayerSkin> accountSkin;
+    private CycleButton<Boolean> armsButton;
     private EditBox nameBox;
     private Button confirmButton;
     private Component error = null;
@@ -58,14 +59,10 @@ public class CharacterNameScreen extends Screen {
         this.confirmLabel = confirmLabel;
         this.onCancel = onCancel;
         this.onConfirm = onConfirm;
-        if (CharacterSkins.isValid(initialSkin)) {
-            this.skin = initialSkin;
-            this.slim = initialSlim;
-        } else {
-            RandomSource random = RandomSource.create();
-            this.skin = CharacterSkins.randomName(random);
-            this.slim = random.nextBoolean();
-        }
+        // A character without a chosen default skin wears the account's own skin (custom or not).
+        this.skin = CharacterSkins.isValid(initialSkin) ? initialSkin : CharacterSkins.ACCOUNT;
+        this.slim = initialSlim;
+        this.accountSkin = CharacterSkins.accountSkin();
     }
 
     @Override
@@ -74,7 +71,8 @@ public class CharacterNameScreen extends Screen {
         int cy = this.height / 2;
         int left = cx - 50;
 
-        PlayerSkinWidget preview = new PlayerSkinWidget(80, 120, this.minecraft.getEntityModels(), () -> CharacterSkins.skin(this.skin, this.slim));
+        PlayerSkinWidget preview = new PlayerSkinWidget(80, 120, this.minecraft.getEntityModels(), () -> CharacterSkins.ACCOUNT.equals(this.skin)
+                ? this.accountSkin.get() : CharacterSkins.skin(this.skin, this.slim));
         preview.setPosition(cx - 150, cy - 64);
         this.addRenderableWidget(preview);
 
@@ -86,11 +84,16 @@ public class CharacterNameScreen extends Screen {
         this.addRenderableWidget(this.nameBox);
 
         this.addRenderableWidget(CycleButton.builder((String name) -> Component.translatable("terrainlab.character.skin." + name), this.skin)
-                .withValues(CharacterSkins.NAMES)
-                .create(left, cy - 24, 200, 20, Component.translatable("terrainlab.character.skin"), (button, name) -> this.skin = name));
-        this.addRenderableWidget(CycleButton.builder((Boolean isSlim) -> Component.translatable(isSlim ? "terrainlab.character.arms.slim" : "terrainlab.character.arms.wide"), this.slim)
+                .withValues(CharacterSkins.CHOICES)
+                .create(left, cy - 24, 200, 20, Component.translatable("terrainlab.character.skin"), (button, name) -> {
+                    this.skin = name;
+                    this.armsButton.active = !CharacterSkins.ACCOUNT.equals(name);
+                }));
+        // The account's own skin already has its arm style.
+        this.armsButton = this.addRenderableWidget(CycleButton.builder((Boolean isSlim) -> Component.translatable(isSlim ? "terrainlab.character.arms.slim" : "terrainlab.character.arms.wide"), this.slim)
                 .withValues(List.of(false, true))
                 .create(left, cy, 200, 20, Component.translatable("terrainlab.character.arms"), (button, isSlim) -> this.slim = isSlim));
+        this.armsButton.active = !CharacterSkins.ACCOUNT.equals(this.skin);
 
         this.confirmButton = this.addRenderableWidget(Button.builder(this.confirmLabel, b -> this.confirm())
                 .bounds(left, cy + 40, 98, 20).build());
@@ -120,7 +123,8 @@ public class CharacterNameScreen extends Screen {
 
     private void confirm() {
         if (!this.confirmButton.active) return;
-        this.onConfirm.accept(new Result(CharacterRegistry.sanitizeName(this.nameBox.getValue(), this.initialName), this.skin, this.slim));
+        String chosen = CharacterSkins.ACCOUNT.equals(this.skin) ? null : this.skin;
+        this.onConfirm.accept(new Result(CharacterRegistry.sanitizeName(this.nameBox.getValue(), this.initialName), chosen, this.slim));
     }
 
     @Override

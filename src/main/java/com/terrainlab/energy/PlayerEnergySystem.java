@@ -37,6 +37,9 @@ public final class PlayerEnergySystem {
             energy -= SPRINT_DRAIN_PER_TICK;
         }
 
+        if (player.isSwimming()) {
+            energy -= SWIMMING_DRAIN_PER_TICK;
+        }
         energy -= com.terrainlab.event.ShieldCombatEvents.raisedShieldEnergyDrain(player);
 
         energy -= attackHoldDrain(player);

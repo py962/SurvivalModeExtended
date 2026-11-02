@@ -1,3 +1,4 @@
+
 package com.terrainlab.event;
 
 import net.minecraft.core.BlockPos;
@@ -7,7 +8,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -26,69 +26,84 @@ import java.util.*;
 import net.minecraft.world.entity.EntityTypes;
 
 /**
- * Enderman behaviours: placing chorus summons Endermen anchored to that spot, and short
- * player build patterns start a "mimicry" sequence in which nearby Endermen each place
- * one block continuing the pattern.
+ * Enderman behaviours:
+ *
+ * 1. Placing chorus summons Endermen anchored to that spot.
+ * 2. Three player-placed blocks forming a straight line with equal
+ *    spacing, placed within three seconds, start a mimicry sequence.
+ * 3. Nearby Endermen each place one block, continuing the pattern.
  */
 public class ModEndermanHandler {
 
+    // Original history and sequence limits: unchanged.
     private static final int HISTORY_LENGTH = 5;
-
-    // Maximum Endermen per player-started sequence; each places exactly one block.
     private static final int TASK_STEPS = 16;
 
-    private static final int WAIT_TIMEOUT = 3; // handler passes (one per second)
+    // Player pattern requirements.
+    private static final int PLAYER_PATTERN_BLOCKS = 3;
+    private static final long PATTERN_TIMEOUT_TICKS = 60L;
+
+    private static final int WAIT_TIMEOUT = 3;
     private static final int SEARCH_RADIUS = 48;
     private static final int MAX_PATTERN_DIST = 3;
 
     private static final double ENDERMAN_WALK_SPEED = 1.0D;
     private static final double PLACEMENT_DISTANCE_SQ = 3.0D;
 
-    // An Enderman further than this from its target teleports straight away instead of walking.
     private static final double TELEPORT_IMMEDIATELY_DIST_SQ = 8.0D * 8.0D;
-    // Handler passes (one per second) an Enderman may walk before it teleports instead.
     private static final int WALK_TIMEOUT = 3;
-    // After teleporting, it may place from slightly further away (it lands on the ground beside the target).
     private static final double TELEPORT_REACH_SQ = 9.0D;
 
+    // Original player and Enderman histories.
     private static final Map<UUID, List<BlockPos>> playerBlockHistory =
             new HashMap<>();
 
     private static final Map<UUID, List<BlockPos>> endermanBlockHistory =
             new HashMap<>();
 
+    // Separate three-block pattern history.
+    private static final Map<UUID, List<BlockPos>> playerPatternHistory =
+            new HashMap<>();
+
+    // Time at which each player's current pattern started.
+    private static final Map<UUID, Long> playerFirstBlockTime =
+            new HashMap<>();
+
     public static final Map<UUID, BlockPos> chorusAnchors =
             new HashMap<>();
 
-    // One active single-block placement task per Enderman.
     private static final Map<UUID, MimicryTask> mimicryTasks =
             new HashMap<>();
 
-    // Per-sequence state; an Enderman participates at most once per sequence.
     private static final Map<Long, MimicrySequence> mimicrySequences =
             new HashMap<>();
 
     private static long nextSequenceId = 1L;
 
-    // Blocks placed by a player, or by an Enderman continuing a player's pattern, mapped to
-    // the game time they were placed, per dimension. Endermen won't pick these up for a day.
-    // Held in memory only, so the protection resets when the server restarts.
-    private static final Map<ResourceKey<Level>, Map<BlockPos, Long>> protectedPlacements =
-            new HashMap<>();
+    // Protected placements, mapped to their placement time per dimension.
+    private static final Map<ResourceKey<Level>, Map<BlockPos, Long>>
+            protectedPlacements = new HashMap<>();
 
-    private static final long PLACEMENT_PROTECTION_TICKS = 24000L; // one full Minecraft day
+    private static final long PLACEMENT_PROTECTION_TICKS = 24000L;
 
     /** True if Endermen must not pick up the block at this position. */
     public static boolean isProtected(Level level, BlockPos pos) {
-        Map<BlockPos, Long> placements = protectedPlacements.get(level.dimension());
+
+        Map<BlockPos, Long> placements =
+                protectedPlacements.get(level.dimension());
+
         if (placements == null) {
             return false;
         }
+
         Long placedAt = placements.get(pos);
-        return placedAt != null && level.getGameTime() - placedAt <= PLACEMENT_PROTECTION_TICKS;
+
+        return placedAt != null
+                && level.getGameTime() - placedAt <= PLACEMENT_PROTECTION_TICKS;
     }
 
     private static void protect(Level level, BlockPos pos) {
+
         protectedPlacements
                 .computeIfAbsent(level.dimension(), k -> new HashMap<>())
                 .put(pos.immutable(), level.getGameTime());
@@ -108,12 +123,14 @@ public class ModEndermanHandler {
 
         private final long id;
         private final ServerLevel level;
+
         private final Set<UUID> participatingEndermen =
                 new HashSet<>();
 
         private int remainingSteps;
 
         private MimicrySequence(long id, ServerLevel level) {
+
             this.id = id;
             this.level = level;
             this.remainingSteps = TASK_STEPS;
@@ -131,7 +148,6 @@ public class ModEndermanHandler {
         private BlockPos target;
 
         private int waitTicks;
-
         private int travelPasses;
 
         private MimicryTask(
@@ -151,12 +167,12 @@ public class ModEndermanHandler {
         }
     }
 
-    // Assignment deferred until mimicryTasks iteration finishes, to avoid concurrent modification.
     private static class PendingAssignment {
 
         private final ServerLevel level;
         private final MimicrySequence sequence;
         private final BlockPos lastPos;
+
         private final int dx;
         private final int dy;
         private final int dz;
@@ -179,8 +195,7 @@ public class ModEndermanHandler {
     }
 
     @SubscribeEvent
-    public static void onBlockPlace(
-            BlockEvent.EntityPlaceEvent event) {
+    public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
 
         if (!(event.getLevel() instanceof ServerLevel level)) {
             return;
@@ -204,6 +219,7 @@ public class ModEndermanHandler {
 
         UUID uuid = player.getUUID();
 
+        // Preserve the original five-position player history.
         List<BlockPos> history =
                 playerBlockHistory.computeIfAbsent(
                         uuid,
@@ -216,37 +232,131 @@ public class ModEndermanHandler {
             history.remove(0);
         }
 
-        if (history.size() < 2) {
+        // Process the separate three-block mimicry pattern.
+        processPlayerPattern(level, player, pos);
+    }
+
+    /**
+     * Processes the player's three-block pattern.
+     *
+     * The three blocks must:
+     * - Be placed within PATTERN_TIMEOUT_TICKS.
+     * - Have identical displacement vectors.
+     * - Have a non-zero spacing of at most MAX_PATTERN_DIST.
+     *
+     * This supports horizontal, vertical and diagonal lines.
+     */
+    private static void processPlayerPattern(
+            ServerLevel level,
+            Player player,
+            BlockPos pos) {
+
+        UUID uuid = player.getUUID();
+
+        List<BlockPos> pattern =
+                playerPatternHistory.computeIfAbsent(
+                        uuid,
+                        k -> new ArrayList<>()
+                );
+
+        long currentTime = level.getGameTime();
+
+        // Start a new pattern if necessary.
+        if (pattern.isEmpty()) {
+
+            pattern.add(pos.immutable());
+
+            playerFirstBlockTime.put(uuid, currentTime);
+
             return;
         }
 
-        BlockPos prev =
-                history.get(history.size() - 2);
+        long firstBlockTime =
+                playerFirstBlockTime.getOrDefault(
+                        uuid,
+                        currentTime
+                );
 
-        BlockPos curr =
-                history.get(history.size() - 1);
+        // Timeout: the latest placement becomes the new first block.
+        if (currentTime - firstBlockTime > PATTERN_TIMEOUT_TICKS) {
 
-        int dx =
-                curr.getX() - prev.getX();
+            pattern.clear();
+            pattern.add(pos.immutable());
 
-        int dy =
-                curr.getY() - prev.getY();
+            playerFirstBlockTime.put(uuid, currentTime);
 
-        int dz =
-                curr.getZ() - prev.getZ();
+            return;
+        }
 
-        if (Math.abs(dx)
-                + Math.abs(dy)
-                + Math.abs(dz)
-                <= MAX_PATTERN_DIST) {
+        // Second block: establish the direction and spacing.
+        if (pattern.size() == 1) {
 
-            startMimicrySequence(
-                    level,
-                    pos,
-                    dx,
-                    dy,
-                    dz
-            );
+            BlockPos first = pattern.get(0);
+
+            int dx = pos.getX() - first.getX();
+            int dy = pos.getY() - first.getY();
+            int dz = pos.getZ() - first.getZ();
+
+            int distance =
+                    Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
+
+            // Reject identical positions or excessive spacing.
+            if (distance == 0 || distance > MAX_PATTERN_DIST) {
+
+                pattern.clear();
+                pattern.add(pos.immutable());
+
+                playerFirstBlockTime.put(uuid, currentTime);
+
+                return;
+            }
+
+            pattern.add(pos.immutable());
+
+            return;
+        }
+
+        // Third block: it must continue in exactly the same direction.
+        if (pattern.size() == 2) {
+
+            BlockPos first = pattern.get(0);
+            BlockPos second = pattern.get(1);
+
+            int dx1 = second.getX() - first.getX();
+            int dy1 = second.getY() - first.getY();
+            int dz1 = second.getZ() - first.getZ();
+
+            int dx2 = pos.getX() - second.getX();
+            int dy2 = pos.getY() - second.getY();
+            int dz2 = pos.getZ() - second.getZ();
+
+            boolean validPattern =
+                    dx1 == dx2
+                            && dy1 == dy2
+                            && dz1 == dz2;
+
+            if (validPattern) {
+
+                // All three blocks form an equally spaced straight line.
+                startMimicrySequence(
+                        level,
+                        pos,
+                        dx1,
+                        dy1,
+                        dz1
+                );
+
+                pattern.clear();
+                playerFirstBlockTime.remove(uuid);
+
+            } else {
+
+                // Invalid continuation: restart using the latest block.
+                pattern.clear();
+                pattern.add(pos.immutable());
+
+                playerFirstBlockTime.put(uuid, currentTime);
+            }
         }
     }
 
@@ -254,8 +364,7 @@ public class ModEndermanHandler {
             ServerLevel level,
             BlockPos pos) {
 
-        int count =
-                1 + level.getRandom().nextInt(3);
+        int count = 1 + level.getRandom().nextInt(3);
 
         for (int i = 0; i < count; i++) {
 
@@ -314,10 +423,7 @@ public class ModEndermanHandler {
         MimicrySequence sequence =
                 new MimicrySequence(sequenceId, level);
 
-        mimicrySequences.put(
-                sequenceId,
-                sequence
-        );
+        mimicrySequences.put(sequenceId, sequence);
 
         assignNextEnderman(
                 level,
@@ -342,14 +448,12 @@ public class ModEndermanHandler {
             return;
         }
 
-        BlockPos target =
-                lastPos.offset(dx, dy, dz);
+        BlockPos target = lastPos.offset(dx, dy, dz);
 
-        // If the target is occupied, try one further step in the same direction.
+        // If the target is occupied, try one further step.
         if (!level.getBlockState(target).canBeReplaced()) {
 
-            BlockPos alternate =
-                    target.offset(dx, dy, dz);
+            BlockPos alternate = target.offset(dx, dy, dz);
 
             if (level.getBlockState(alternate).canBeReplaced()) {
                 target = alternate;
@@ -377,20 +481,16 @@ public class ModEndermanHandler {
 
         for (Enderman enderman : nearby) {
 
-            UUID uuid =
-                    enderman.getUUID();
+            UUID uuid = enderman.getUUID();
 
-            // Already placed its block in this sequence.
             if (sequence.participatingEndermen.contains(uuid)) {
                 continue;
             }
 
-            // Busy with another sequence.
             if (mimicryTasks.containsKey(uuid)) {
                 continue;
             }
 
-            // Endermen already carrying a block take part too; they place what they hold.
             double distance =
                     enderman.distanceToSqr(
                             target.getX() + 0.5D,
@@ -409,12 +509,9 @@ public class ModEndermanHandler {
             return;
         }
 
-        UUID endermanUUID =
-                chosen.getUUID();
+        UUID endermanUUID = chosen.getUUID();
 
-        sequence.participatingEndermen.add(
-                endermanUUID
-        );
+        sequence.participatingEndermen.add(endermanUUID);
 
         BlockState carried =
                 pickBlockForEnderman(
@@ -425,11 +522,10 @@ public class ModEndermanHandler {
 
         if (carried == null || carried.isAir()) {
 
-            sequence.participatingEndermen.remove(
-                    endermanUUID
-            );
+            sequence.participatingEndermen.remove(endermanUUID);
 
             finishSequence(sequence.id);
+
             return;
         }
 
@@ -457,22 +553,24 @@ public class ModEndermanHandler {
             BlockPos near,
             Enderman enderman) {
 
-        BlockState carried =
-                enderman.getCarriedBlock();
+        BlockState carried = enderman.getCarriedBlock();
 
         if (carried != null && !carried.isAir()) {
             return carried;
         }
 
         // Only take blocks from the world when mob griefing is allowed.
-        Iterable<BlockPos> candidates = level.getGameRules().get(GameRules.MOB_GRIEFING)
-                ? BlockPos.betweenClosed(near.offset(-4, -2, -4), near.offset(4, 2, 4))
-                : List.of();
+        Iterable<BlockPos> candidates =
+                level.getGameRules().get(GameRules.MOB_GRIEFING)
+                        ? BlockPos.betweenClosed(
+                        near.offset(-4, -2, -4),
+                        near.offset(4, 2, 4)
+                )
+                        : List.of();
 
         for (BlockPos candidate : candidates) {
 
-            BlockState state =
-                    level.getBlockState(candidate);
+            BlockState state = level.getBlockState(candidate);
 
             if (state.isAir()) {
                 continue;
@@ -487,14 +585,9 @@ public class ModEndermanHandler {
                 continue;
             }
 
-            level.removeBlock(
-                    candidate,
-                    false
-            );
+            level.removeBlock(candidate, false);
 
-            enderman.setCarriedBlock(
-                    state
-            );
+            enderman.setCarriedBlock(state);
 
             enderman.swing(
                     InteractionHand.MAIN_HAND,
@@ -513,9 +606,7 @@ public class ModEndermanHandler {
                         )
                 );
 
-        enderman.setCarriedBlock(
-                fallback
-        );
+        enderman.setCarriedBlock(fallback);
 
         enderman.swing(
                 InteractionHand.MAIN_HAND,
@@ -527,8 +618,7 @@ public class ModEndermanHandler {
     }
 
     @SubscribeEvent
-    public static void onServerTick(
-            ServerTickEvent.Post event) {
+    public static void onServerTick(ServerTickEvent.Post event) {
 
         if (event.getServer().getTickCount() % 20 != 0) {
             return;
@@ -559,14 +649,11 @@ public class ModEndermanHandler {
 
         while (iterator.hasNext()) {
 
-            Map.Entry<UUID, MimicryTask> entry =
-                    iterator.next();
+            Map.Entry<UUID, MimicryTask> entry = iterator.next();
 
-            UUID endermanUUID =
-                    entry.getKey();
+            UUID endermanUUID = entry.getKey();
 
-            MimicryTask task =
-                    entry.getValue();
+            MimicryTask task = entry.getValue();
 
             Entity entity =
                     findEntityInServer(
@@ -574,15 +661,13 @@ public class ModEndermanHandler {
                             endermanUUID
                     );
 
-            // Enderman unloaded or dead: count the step and hand off to the next one.
+            // Enderman unloaded or dead: count the step and hand off.
             if (!(entity instanceof Enderman enderman)) {
 
                 iterator.remove();
 
                 MimicrySequence sequence =
-                        mimicrySequences.get(
-                                task.sequenceId
-                        );
+                        mimicrySequences.get(task.sequenceId);
 
                 if (sequence != null) {
 
@@ -603,15 +688,12 @@ public class ModEndermanHandler {
                 continue;
             }
 
-            ServerLevel level =
-                    (ServerLevel) enderman.level();
+            ServerLevel level = (ServerLevel) enderman.level();
 
-            BlockPos target =
-                    task.target;
+            BlockPos target = task.target;
 
-            // If the target became occupied, try one further step in the same direction.
-            if (!level.getBlockState(target)
-                    .canBeReplaced()) {
+            // If the target became occupied, try one further step.
+            if (!level.getBlockState(target).canBeReplaced()) {
 
                 BlockPos alternate =
                         target.offset(
@@ -620,14 +702,10 @@ public class ModEndermanHandler {
                                 task.dz
                         );
 
-                if (level.getBlockState(alternate)
-                        .canBeReplaced()) {
+                if (level.getBlockState(alternate).canBeReplaced()) {
 
-                    task.target =
-                            alternate.immutable();
-
-                    target =
-                            task.target;
+                    task.target = alternate.immutable();
+                    target = task.target;
 
                 } else {
 
@@ -637,9 +715,7 @@ public class ModEndermanHandler {
                     iterator.remove();
 
                     MimicrySequence sequence =
-                            mimicrySequences.get(
-                                    task.sequenceId
-                            );
+                            mimicrySequences.get(task.sequenceId);
 
                     if (sequence != null) {
 
@@ -661,8 +737,7 @@ public class ModEndermanHandler {
                 }
             }
 
-            BlockState carried =
-                    enderman.getCarriedBlock();
+            BlockState carried = enderman.getCarriedBlock();
 
             if (carried == null || carried.isAir()) {
 
@@ -684,9 +759,7 @@ public class ModEndermanHandler {
                         iterator.remove();
 
                         MimicrySequence sequence =
-                                mimicrySequences.get(
-                                        task.sequenceId
-                                );
+                                mimicrySequences.get(task.sequenceId);
 
                         if (sequence != null) {
 
@@ -725,7 +798,6 @@ public class ModEndermanHandler {
                 boolean farAway =
                         distanceSq > TELEPORT_IMMEDIATELY_DIST_SQ;
 
-                // Walking has failed: timed out, or its path ended or could not be made.
                 boolean stuck =
                         task.travelPasses > WALK_TIMEOUT
                                 || (task.travelPasses > 1
@@ -746,15 +818,12 @@ public class ModEndermanHandler {
 
                     } else {
 
-                        // No spot beside the target to land on: hand the step to another Enderman.
                         enderman.getNavigation().stop();
 
                         iterator.remove();
 
                         MimicrySequence sequence =
-                                mimicrySequences.get(
-                                        task.sequenceId
-                                );
+                                mimicrySequences.get(task.sequenceId);
 
                         if (sequence != null) {
 
@@ -788,15 +857,13 @@ public class ModEndermanHandler {
 
             if (distanceSq <= reachSq) {
 
-                carried =
-                        enderman.getCarriedBlock();
+                carried = enderman.getCarriedBlock();
 
                 if (carried == null || carried.isAir()) {
                     continue;
                 }
 
-                if (!level.getBlockState(target)
-                        .canBeReplaced()) {
+                if (!level.getBlockState(target).canBeReplaced()) {
                     continue;
                 }
 
@@ -812,25 +879,24 @@ public class ModEndermanHandler {
                         true
                 );
 
-                level.setBlock(
-                        target,
-                        carried,
-                        3
-                );
+                level.setBlock(target, carried, 3);
 
-                // Part of the player's pattern: protect it like a player-placed block.
+                // Protect the Enderman's placement like a player placement.
                 protect(level, target);
 
                 enderman.setCarriedBlock(null);
 
-                com.terrainlab.advancement.ModAdvancements.awardNearby(level, net.minecraft.world.phys.Vec3.atCenterOf(target), 32.0, "enderman_sequence");
+                com.terrainlab.advancement.ModAdvancements.awardNearby(
+                        level,
+                        Vec3.atCenterOf(target),
+                        32.0,
+                        "enderman_sequence"
+                );
 
                 iterator.remove();
 
                 MimicrySequence sequence =
-                        mimicrySequences.get(
-                                task.sequenceId
-                        );
+                        mimicrySequences.get(task.sequenceId);
 
                 if (sequence == null) {
                     continue;
@@ -844,9 +910,7 @@ public class ModEndermanHandler {
                                 k -> new ArrayList<>()
                         );
 
-                history.add(
-                        target.immutable()
-                );
+                history.add(target.immutable());
 
                 if (history.size() > HISTORY_LENGTH) {
                     history.remove(0);
@@ -868,16 +932,13 @@ public class ModEndermanHandler {
 
                 } else {
 
-                    finishSequence(
-                            sequence.id
-                    );
+                    finishSequence(sequence.id);
                 }
             }
         }
 
-        // Iteration is finished, so new tasks can be created safely.
-        for (PendingAssignment assignment :
-                pendingAssignments) {
+        // Assign new tasks after finishing iteration.
+        for (PendingAssignment assignment : pendingAssignments) {
 
             if (!mimicrySequences.containsKey(
                     assignment.sequence.id)) {
@@ -898,28 +959,23 @@ public class ModEndermanHandler {
         chorusAnchors.entrySet().removeIf(entry ->
                 !(findEntityInServer(event, entry.getKey()) instanceof Enderman));
 
-        for (ServerLevel level :
-                event.getServer().getAllLevels()) {
+        for (ServerLevel level : event.getServer().getAllLevels()) {
 
-            // Pull chorus-summoned Endermen back toward their anchor unless busy with a task.
-            for (Map.Entry<UUID, BlockPos> entry :
-                    chorusAnchors.entrySet()) {
+            // Pull chorus-summoned Endermen toward their anchor unless busy.
+            for (Map.Entry<UUID, BlockPos> entry : chorusAnchors.entrySet()) {
 
                 Entity entity =
-                        level.getEntities()
-                                .get(entry.getKey());
+                        level.getEntities().get(entry.getKey());
 
                 if (!(entity instanceof Enderman enderman)) {
                     continue;
                 }
 
-                if (mimicryTasks.containsKey(
-                        enderman.getUUID())) {
+                if (mimicryTasks.containsKey(enderman.getUUID())) {
                     continue;
                 }
 
-                BlockPos anchor =
-                        entry.getValue();
+                BlockPos anchor = entry.getValue();
 
                 double distSq =
                         enderman.distanceToSqr(
@@ -931,23 +987,16 @@ public class ModEndermanHandler {
                 if (distSq > 32 * 32) {
 
                     double angle =
-                            level.getRandom().nextDouble()
-                                    * Math.PI * 2;
+                            level.getRandom().nextDouble() * Math.PI * 2;
 
                     double radius =
-                            8
-                                    + level.getRandom().nextDouble()
-                                    * 8;
+                            8 + level.getRandom().nextDouble() * 8;
 
                     double tx =
-                            anchor.getX()
-                                    + Math.cos(angle)
-                                    * radius;
+                            anchor.getX() + Math.cos(angle) * radius;
 
                     double tz =
-                            anchor.getZ()
-                                    + Math.sin(angle)
-                                    * radius;
+                            anchor.getZ() + Math.sin(angle) * radius;
 
                     int ty =
                             level.getHeight(
@@ -969,26 +1018,28 @@ public class ModEndermanHandler {
     }
 
     /**
-     * Teleports the Enderman onto the ground beside the target, trying the four sides in turn.
-     * Returns true once it has landed within placing reach.
+     * Teleports the Enderman onto the ground beside the target.
+     * Tries the four sides in turn.
      */
     private static boolean teleportNextTo(
             ServerLevel level,
             Enderman enderman,
             BlockPos target) {
 
-        int[][] sides = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        int[][] sides = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1}
+        };
 
         for (int[] side : sides) {
 
-            Vec3 from =
-                    enderman.position();
+            Vec3 from = enderman.position();
 
             double x = target.getX() + side[0] + 0.5D;
             double z = target.getZ() + side[1] + 0.5D;
 
-            // randomTeleport drops onto the first solid block below this height,
-            // and refuses spots inside blocks or liquid.
             if (!enderman.randomTeleport(
                     x,
                     target.getY() + 1.0D,
@@ -1043,11 +1094,9 @@ public class ModEndermanHandler {
             ServerTickEvent.Post event,
             UUID uuid) {
 
-        for (ServerLevel level :
-                event.getServer().getAllLevels()) {
+        for (ServerLevel level : event.getServer().getAllLevels()) {
 
-            Entity entity =
-                    level.getEntities().get(uuid);
+            Entity entity = level.getEntities().get(uuid);
 
             if (entity != null) {
                 return entity;
@@ -1057,12 +1106,8 @@ public class ModEndermanHandler {
         return null;
     }
 
-    private static void finishSequence(
-            long sequenceId) {
+    private static void finishSequence(long sequenceId) {
 
-        mimicrySequences.remove(
-                sequenceId
-        );
+        mimicrySequences.remove(sequenceId);
     }
-
 }

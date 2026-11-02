@@ -83,7 +83,7 @@ public final class AccomplishmentCards {
                 server.getWorldData().getLevelName(),
                 server.overworld().getSeed(),
                 server.isHardcore(),
-                server.overworld().getDifficulty().getId(),
+                server.getWorldData().getDifficulty().getId(),
                 (disqualified & ChallengeEligibility.CHEATS) != 0,
                 server.overworld().getOverworldClockTime() / 24000L + 1L,
                 stats.getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)),
