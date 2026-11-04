@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "terrainlab:pine_leaves"
+    "terrainlab:pine_leaves",
+    "terrainlab:red_poplar_leaves",
+    "terrainlab:orange_poplar_leaves",
+    "terrainlab:yellow_poplar_leaves"
   ]
 }

@@ -2028,6 +2028,12 @@ public abstract class AbstractTrailTraderEntity extends WanderingTrader {
         }
     }
 
+    /** Forgets a level's runtime guide registries; called when the level unloads (TrailTraderLevelCleanup). */
+    public static void forgetLevel(ServerLevel serverLevel) {
+        ACTIVE_TRAIL_TRADERS.remove(serverLevel);
+        ACTIVE_TRAIL_TRADER_IDS.remove(serverLevel);
+    }
+
     private static ConcurrentHashMap<EntityType<?>, Long> getTraderRegistry(
             ServerLevel serverLevel) {
 

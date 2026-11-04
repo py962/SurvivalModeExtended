@@ -483,6 +483,13 @@ public class ModItems {
                                     net.minecraft.resources.ResourceKey.create(
                                             net.minecraft.core.registries.Registries.ITEM, id)),
                             com.terrainlab.item.ShieldDefinitions.byId("azalea_shield"))));
+    public static final DeferredItem<Item> POPLAR_SHIELD =
+            ITEMS.register("poplar_shield", id ->
+                    new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
+                            new Item.Properties().setId(
+                                    net.minecraft.resources.ResourceKey.create(
+                                            net.minecraft.core.registries.Registries.ITEM, id)),
+                            com.terrainlab.item.ShieldDefinitions.byId("poplar_shield"))));
     public static final DeferredItem<Item> SPRUCE_SHIELD =
             ITEMS.register("spruce_shield", id ->
                     new net.minecraft.world.item.ShieldItem(com.terrainlab.item.ShieldFactory.buildProperties(
@@ -558,6 +565,7 @@ public class ModItems {
         SHIELD_ITEMS.put("azalea_shield", AZALEA_SHIELD);
         SHIELD_ITEMS.put("spruce_shield", SPRUCE_SHIELD);
         SHIELD_ITEMS.put("pine_shield", PINE_SHIELD);
+        SHIELD_ITEMS.put("poplar_shield", POPLAR_SHIELD);
         SHIELD_ITEMS.put("dark_oak_shield", DARK_OAK_SHIELD);
         SHIELD_ITEMS.put("pale_oak_shield", PALE_OAK_SHIELD);
         SHIELD_ITEMS.put("jungle_shield", JUNGLE_SHIELD);
@@ -669,6 +677,30 @@ public class ModItems {
     public static final DeferredItem<net.minecraft.world.item.HangingSignItem> AZALEA_HANGING_SIGN = hangingSignItem("azalea_hanging_sign", ModBlocks.AZALEA_HANGING_SIGN, ModBlocks.AZALEA_WALL_HANGING_SIGN);
     public static final DeferredItem<net.minecraft.world.item.BoatItem> AZALEA_BOAT = boatItem("azalea_boat", ModEntities.AZALEA_BOAT);
     public static final DeferredItem<net.minecraft.world.item.BoatItem> AZALEA_CHEST_BOAT = boatItem("azalea_chest_boat", ModEntities.AZALEA_CHEST_BOAT);
+
+    // Poplar (backported from 26.3; these ids become minecraft:poplar_* on upgrade).
+    public static final DeferredItem<BlockItem> POPLAR_LOG = ITEMS.registerSimpleBlockItem("poplar_log", ModBlocks.POPLAR_LOG);
+    public static final DeferredItem<BlockItem> POPLAR_WOOD = ITEMS.registerSimpleBlockItem("poplar_wood", ModBlocks.POPLAR_WOOD);
+    public static final DeferredItem<BlockItem> STRIPPED_POPLAR_LOG = ITEMS.registerSimpleBlockItem("stripped_poplar_log", ModBlocks.STRIPPED_POPLAR_LOG);
+    public static final DeferredItem<BlockItem> STRIPPED_POPLAR_WOOD = ITEMS.registerSimpleBlockItem("stripped_poplar_wood", ModBlocks.STRIPPED_POPLAR_WOOD);
+    public static final DeferredItem<BlockItem> POPLAR_PLANKS = ITEMS.registerSimpleBlockItem("poplar_planks", ModBlocks.POPLAR_PLANKS);
+    public static final DeferredItem<BlockItem> POPLAR_STAIRS = ITEMS.registerSimpleBlockItem("poplar_stairs", ModBlocks.POPLAR_STAIRS);
+    public static final DeferredItem<BlockItem> POPLAR_SLAB = ITEMS.registerSimpleBlockItem("poplar_slab", ModBlocks.POPLAR_SLAB);
+    public static final DeferredItem<BlockItem> POPLAR_FENCE = ITEMS.registerSimpleBlockItem("poplar_fence", ModBlocks.POPLAR_FENCE);
+    public static final DeferredItem<BlockItem> POPLAR_FENCE_GATE = ITEMS.registerSimpleBlockItem("poplar_fence_gate", ModBlocks.POPLAR_FENCE_GATE);
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> POPLAR_DOOR = doorItem("poplar_door", ModBlocks.POPLAR_DOOR);
+    public static final DeferredItem<BlockItem> POPLAR_TRAPDOOR = ITEMS.registerSimpleBlockItem("poplar_trapdoor", ModBlocks.POPLAR_TRAPDOOR);
+    public static final DeferredItem<BlockItem> POPLAR_BUTTON = ITEMS.registerSimpleBlockItem("poplar_button", ModBlocks.POPLAR_BUTTON);
+    public static final DeferredItem<BlockItem> POPLAR_PRESSURE_PLATE = ITEMS.registerSimpleBlockItem("poplar_pressure_plate", ModBlocks.POPLAR_PRESSURE_PLATE);
+    public static final DeferredItem<net.minecraft.world.item.SignItem> POPLAR_SIGN = signItem("poplar_sign", ModBlocks.POPLAR_SIGN, ModBlocks.POPLAR_WALL_SIGN);
+    public static final DeferredItem<net.minecraft.world.item.HangingSignItem> POPLAR_HANGING_SIGN = hangingSignItem("poplar_hanging_sign", ModBlocks.POPLAR_HANGING_SIGN, ModBlocks.POPLAR_WALL_HANGING_SIGN);
+    public static final DeferredItem<BlockItem> POPLAR_SHELF = ITEMS.registerSimpleBlockItem("poplar_shelf", ModBlocks.POPLAR_SHELF);
+    public static final DeferredItem<BlockItem> RED_POPLAR_LEAVES = ITEMS.registerSimpleBlockItem("red_poplar_leaves", ModBlocks.RED_POPLAR_LEAVES);
+    public static final DeferredItem<BlockItem> ORANGE_POPLAR_LEAVES = ITEMS.registerSimpleBlockItem("orange_poplar_leaves", ModBlocks.ORANGE_POPLAR_LEAVES);
+    public static final DeferredItem<BlockItem> YELLOW_POPLAR_LEAVES = ITEMS.registerSimpleBlockItem("yellow_poplar_leaves", ModBlocks.YELLOW_POPLAR_LEAVES);
+    public static final DeferredItem<BlockItem> POPLAR_SAPLING = ITEMS.registerSimpleBlockItem("poplar_sapling", ModBlocks.POPLAR_SAPLING);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> POPLAR_BOAT = boatItem("poplar_boat", ModEntities.POPLAR_BOAT);
+    public static final DeferredItem<net.minecraft.world.item.BoatItem> POPLAR_CHEST_BOAT = boatItem("poplar_chest_boat", ModEntities.POPLAR_CHEST_BOAT);
 
     // Enderwood
     public static final DeferredItem<BlockItem> ENDERWOOD_STAIRS = ITEMS.registerSimpleBlockItem("enderwood_stairs", ModBlocks.ENDERWOOD_STAIRS);

@@ -5,6 +5,18 @@
     },
     "terrainlab:pine_sapling": {
       "chance": 0.3
+    },
+    "terrainlab:red_poplar_leaves": {
+      "chance": 0.3
+    },
+    "terrainlab:orange_poplar_leaves": {
+      "chance": 0.3
+    },
+    "terrainlab:yellow_poplar_leaves": {
+      "chance": 0.3
+    },
+    "terrainlab:poplar_sapling": {
+      "chance": 0.3
     }
   }
 }

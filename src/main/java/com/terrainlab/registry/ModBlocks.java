@@ -355,6 +355,77 @@ public class ModBlocks {
     public static final DeferredBlock<CeilingHangingSignBlock> AZALEA_HANGING_SIGN = hangingSign("azalea_hanging_sign", ModWoodTypes.AZALEA, MapColor.TERRACOTTA_LIGHT_BLUE, true);
     public static final DeferredBlock<WallHangingSignBlock> AZALEA_WALL_HANGING_SIGN = wallHangingSign("azalea_wall_hanging_sign", ModWoodTypes.AZALEA, AZALEA_HANGING_SIGN, MapColor.TERRACOTTA_LIGHT_BLUE, true);
 
+    // Poplar, backported from 26.3 (vanilla there; these ids become minecraft:poplar_* on upgrade).
+    // Map colours and sounds as vanilla 26.3's poplar set; 26.3's poplar leaf sound and ambience don't
+    // exist in 1.21.11, so the leaves use the standard leaves sound.
+    public static final DeferredBlock<RotatedPillarBlock> POPLAR_LOG = log("poplar_log", MapColor.COLOR_LIGHT_GRAY, MapColor.PODZOL);
+    public static final DeferredBlock<RotatedPillarBlock> POPLAR_WOOD = wood("poplar_wood", MapColor.PODZOL);
+    public static final DeferredBlock<RotatedPillarBlock> STRIPPED_POPLAR_LOG = log("stripped_poplar_log", MapColor.COLOR_LIGHT_GRAY, MapColor.COLOR_LIGHT_GRAY);
+    public static final DeferredBlock<RotatedPillarBlock> STRIPPED_POPLAR_WOOD = wood("stripped_poplar_wood", MapColor.COLOR_LIGHT_GRAY);
+    public static final DeferredBlock<Block> POPLAR_PLANKS = planks("poplar_planks", MapColor.COLOR_LIGHT_GRAY);
+    public static final DeferredBlock<StairBlock> POPLAR_STAIRS = stairs("poplar_stairs", POPLAR_PLANKS);
+    public static final DeferredBlock<SlabBlock> POPLAR_SLAB = slab("poplar_slab", MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<FenceBlock> POPLAR_FENCE = fence("poplar_fence", MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<FenceGateBlock> POPLAR_FENCE_GATE = fenceGate("poplar_fence_gate", ModWoodTypes.POPLAR, MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<DoorBlock> POPLAR_DOOR = door("poplar_door", ModWoodTypes.POPLAR_SET, MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<TrapDoorBlock> POPLAR_TRAPDOOR = trapdoor("poplar_trapdoor", ModWoodTypes.POPLAR_SET, MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<ButtonBlock> POPLAR_BUTTON = button("poplar_button", ModWoodTypes.POPLAR_SET);
+    public static final DeferredBlock<PressurePlateBlock> POPLAR_PRESSURE_PLATE = pressurePlate("poplar_pressure_plate", ModWoodTypes.POPLAR_SET, MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<StandingSignBlock> POPLAR_SIGN = sign("poplar_sign", ModWoodTypes.POPLAR, MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<WallSignBlock> POPLAR_WALL_SIGN = wallSign("poplar_wall_sign", ModWoodTypes.POPLAR, POPLAR_SIGN, MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<CeilingHangingSignBlock> POPLAR_HANGING_SIGN = hangingSign("poplar_hanging_sign", ModWoodTypes.POPLAR, MapColor.COLOR_LIGHT_GRAY, true);
+    public static final DeferredBlock<WallHangingSignBlock> POPLAR_WALL_HANGING_SIGN = wallHangingSign("poplar_wall_hanging_sign", ModWoodTypes.POPLAR, POPLAR_HANGING_SIGN, MapColor.COLOR_LIGHT_GRAY, true);
+    // Joins vanilla's shelf block entity type in WoodSetEvents.
+    public static final DeferredBlock<net.minecraft.world.level.block.ShelfBlock> POPLAR_SHELF =
+            BLOCKS.registerBlock("poplar_shelf", net.minecraft.world.level.block.ShelfBlock::new,
+                    () -> BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_LIGHT_GRAY)
+                            .instrument(NoteBlockInstrument.BASS)
+                            .sound(SoundType.SHELF)
+                            .ignitedByLava()
+                            .strength(2.0F, 3.0F));
+    public static final DeferredBlock<com.terrainlab.block.PoplarLeavesBlock> RED_POPLAR_LEAVES =
+            poplarLeaves("red_poplar_leaves", MapColor.COLOR_RED, ModParticles.RED_POPLAR_LEAVES);
+    public static final DeferredBlock<com.terrainlab.block.PoplarLeavesBlock> ORANGE_POPLAR_LEAVES =
+            poplarLeaves("orange_poplar_leaves", MapColor.COLOR_ORANGE, ModParticles.ORANGE_POPLAR_LEAVES);
+    public static final DeferredBlock<com.terrainlab.block.PoplarLeavesBlock> YELLOW_POPLAR_LEAVES =
+            poplarLeaves("yellow_poplar_leaves", MapColor.COLOR_YELLOW, ModParticles.YELLOW_POPLAR_LEAVES);
+    public static final DeferredBlock<SaplingBlock> POPLAR_SAPLING =
+            BLOCKS.registerBlock("poplar_sapling",
+                    p -> new SaplingBlock(ModWoodTypes.POPLAR_GROWER, p),
+                    () -> BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.METAL)
+                            .noCollision()
+                            .randomTicks()
+                            .instabreak()
+                            .sound(SoundType.GRASS)
+                            .pushReaction(PushReaction.DESTROY));
+    public static final DeferredBlock<FlowerPotBlock> POTTED_POPLAR_SAPLING =
+            BLOCKS.registerBlock("potted_poplar_sapling",
+                    p -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, POPLAR_SAPLING, p),
+                    () -> BlockBehaviour.Properties.of()
+                            .instabreak()
+                            .noOcclusion()
+                            .pushReaction(PushReaction.DESTROY));
+
+    private static DeferredBlock<com.terrainlab.block.PoplarLeavesBlock> poplarLeaves(
+            String name, MapColor color, Supplier<? extends net.minecraft.core.particles.ParticleOptions> particle) {
+        return BLOCKS.registerBlock(name,
+                p -> new com.terrainlab.block.PoplarLeavesBlock(0.01F, particle, p),
+                () -> BlockBehaviour.Properties.of()
+                        .mapColor(color)
+                        .strength(0.2F)
+                        .randomTicks()
+                        .sound(SoundType.GRASS)
+                        .noOcclusion()
+                        .isValidSpawn(Blocks::ocelotOrParrot)
+                        .isSuffocating((state, level, pos) -> false)
+                        .isViewBlocking((state, level, pos) -> false)
+                        .ignitedByLava()
+                        .pushReaction(PushReaction.DESTROY)
+                        .isRedstoneConductor((state, level, pos) -> false));
+    }
+
     // Enderwood (near-black); ENDERWOOD above is the planks.
     public static final DeferredBlock<StairBlock> ENDERWOOD_STAIRS = stairs("enderwood_stairs", ENDERWOOD);
     public static final DeferredBlock<SlabBlock> ENDERWOOD_SLAB = slab("enderwood_slab", MapColor.COLOR_BLACK, false);

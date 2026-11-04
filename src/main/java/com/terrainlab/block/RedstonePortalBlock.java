@@ -2,6 +2,7 @@ package com.terrainlab.block;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.portal.PortalNetworkSavedData;
+import com.terrainlab.portal.RedstonePortalEffects;
 import com.terrainlab.portal.RedstonePortalShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -130,6 +131,7 @@ public class RedstonePortalBlock extends Block implements Portal {
         }
 
         BlockPos targetPos = destination.pos();
+        Vec3 departure = entity.position(); // captured before the move, for the departure burst
         // TerrainLab.LOGGER.info(
                 // "[REDSTONE-PORTAL] {}: teleporting to dimension={} pos={}",
                 // who, destination.dimension(), targetPos);
@@ -140,6 +142,7 @@ public class RedstonePortalBlock extends Block implements Portal {
                 entity.getYRot(),
                 entity.getXRot(),
                 TeleportTransition.PLACE_PORTAL_TICKET.then(travelled -> {
+                    RedstonePortalEffects.play(level, departure, travelled);
                     if (travelled instanceof net.minecraft.server.level.ServerPlayer player) {
                         com.terrainlab.advancement.ModAdvancements.award(player, "redstone_portal");
                     }
@@ -152,5 +155,6 @@ public class RedstonePortalBlock extends Block implements Portal {
         return 1; // ticks; near-instant, unlike the Nether portal
     }
 
-    // TODO: override getLocalTransition() for a client-side transition effect.
+    // No getLocalTransition() override: vanilla's CONFUSION overlay needs a long wait to build up.
+    // The transition effect is RedstonePortalEffects, run from the TeleportTransition callback.
 }

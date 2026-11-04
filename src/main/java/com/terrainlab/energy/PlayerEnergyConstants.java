@@ -20,15 +20,12 @@ public final class PlayerEnergyConstants {
     public static final double BOOST_JUMP_HEIGHT_BLOCKS = 1.5;
     public static final double BOOST_SPRINT_SPEED_MODIFIER = 0.25;
 
-    public static final double ZERO_ENERGY_SHIELD_RAISE_MULTIPLIER = 1.5;
     // Extra drain per tick while a heavy wood shield is raised (by ShieldStats lightness); lightness 2+
     // has none.
     public static final float SHIELD_RAISED_DRAIN_PER_TICK_LIGHTNESS_0 = SPRINT_DRAIN_PER_TICK;
     public static final float SHIELD_RAISED_DRAIN_PER_TICK_LIGHTNESS_1 = 0.000125F;
 
     // Resting converts hunger into health first (until full), then energy (until REST_CAP).
-    // TODO: TICKS_PER_HUNGER_POINT is no longer read by PlayerRestingSystem; remove if unused.
-    public static final int TICKS_PER_HUNGER_POINT = 300; // 15 seconds
     public static final float HEALTH_PER_HUNGER_POINT = 1.0F; // half-heart
     public static final float ENERGY_PER_HUNGER_POINT = 0.25F; // 25%
     public static final int MIN_HUNGER_FOR_HEALTH_REST = 4;

@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Client-only seasonal leaf appearance: which "look" a leaf block at a position shows right now.
  * <p>
- * Only oak, birch and cherry leaves in any Overworld biome except jungles are affected; everything
+ * Only oak, birch, cherry and poplar leaves in any Overworld biome except jungles are affected; everything
  * else keeps its vanilla look ({@link Look#VANILLA}). Nothing here touches world state: the look is chosen
  * when a chunk section is meshed, by {@link SeasonalLeavesModel} (texture swaps) and the tint sources in
  * {@link SeasonalFoliageClient} (colour), and {@link SeasonalLeafRerender} re-meshes sections as trees change.
@@ -40,21 +40,25 @@ public final class SeasonalLeaves {
     /** Each leaf block changes look at a hashed moment within this many ticks after a season boundary (3 days). */
     public static final int STAGGER_TICKS = 72_000;
 
-    public enum Tree { OAK, BIRCH, CHERRY }
+    public enum Tree { OAK, BIRCH, CHERRY, POPLAR }
 
     public enum Look {
         /** Vanilla model and colour. */
         VANILLA,
         /** Oak: vanilla model, russet tint (one of {@link #SHADE_COUNT} shades per block). */
         BROWN,
-        /** Birch: pale, frost-speckled texture. */
+        /** Birch / poplar: pale, frost-speckled texture. */
         FROSTY,
         /** Birch: vanilla birch green with yellow flower clusters. */
         FLOWERING,
         /** Birch: golden texture (one of {@link #SHADE_COUNT} shades per block: gold, lemon, amber). */
         YELLOW,
         /** Cherry: crimson texture. */
-        CRIMSON
+        CRIMSON,
+        /** Poplar: greyscale texture tinted with the biome foliage colour. */
+        GREEN,
+        /** Poplar: orange or red poplar texture or the darker orange, one shade per block. */
+        ORANGE
     }
 
     // Per season, in Season ordinal order: MIDWINTER, EARLY_SPRING, LATE_SPRING, MIDSUMMER, EARLY_AUTUMN, LATE_AUTUMN.
@@ -64,6 +68,8 @@ public final class SeasonalLeaves {
             Look.YELLOW, Look.FLOWERING, Look.FLOWERING, Look.VANILLA, Look.VANILLA, Look.YELLOW};
     private static final Look[] CHERRY_LOOKS = {
             Look.CRIMSON, Look.VANILLA, Look.VANILLA, Look.VANILLA, Look.CRIMSON, Look.CRIMSON};
+    private static final Look[] POPLAR_LOOKS = {
+            Look.FROSTY, Look.FROSTY, Look.GREEN, Look.GREEN, Look.ORANGE, Look.ORANGE};
 
     /** Autumn looks come in this many shades, picked per leaf block from its position. */
     public static final int SHADE_COUNT = 3;
@@ -137,6 +143,9 @@ public final class SeasonalLeaves {
         if (block == Blocks.OAK_LEAVES) return Tree.OAK;
         if (block == Blocks.BIRCH_LEAVES) return Tree.BIRCH;
         if (block == Blocks.CHERRY_LEAVES) return Tree.CHERRY;
+        if (block == com.terrainlab.registry.ModBlocks.RED_POPLAR_LEAVES.get()
+                || block == com.terrainlab.registry.ModBlocks.ORANGE_POPLAR_LEAVES.get()
+                || block == com.terrainlab.registry.ModBlocks.YELLOW_POPLAR_LEAVES.get()) return Tree.POPLAR;
         return null;
     }
 
@@ -159,6 +168,7 @@ public final class SeasonalLeaves {
             case OAK -> OAK_LOOKS;
             case BIRCH -> BIRCH_LOOKS;
             case CHERRY -> CHERRY_LOOKS;
+            case POPLAR -> POPLAR_LOOKS;
         };
     }
 

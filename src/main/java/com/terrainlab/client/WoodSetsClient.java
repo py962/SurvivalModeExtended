@@ -15,7 +15,8 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 /**
- * Client registration for the Pine, Azalea and Enderwood wood sets.
+ * Client registration for the Pine, Azalea, Poplar and Enderwood wood sets, including the poplar
+ * falling-leaf particles (26.3's poplar leaves particle uses the same motion as pale oak's).
  *
  * <p>Signs need no renderer of their own: vanilla's sign and hanging sign renderers build a
  * model for every registered WoodType, and the sign atlas lists every namespace's
@@ -31,6 +32,8 @@ public final class WoodSetsClient {
     public static final ModelLayerLocation PINE_CHEST_BOAT = layer("chest_boat/pine");
     public static final ModelLayerLocation AZALEA_BOAT = layer("boat/azalea");
     public static final ModelLayerLocation AZALEA_CHEST_BOAT = layer("chest_boat/azalea");
+    public static final ModelLayerLocation POPLAR_BOAT = layer("boat/poplar");
+    public static final ModelLayerLocation POPLAR_CHEST_BOAT = layer("chest_boat/poplar");
     public static final ModelLayerLocation ENDERWOOD_BOAT = layer("boat/enderwood");
     public static final ModelLayerLocation ENDERWOOD_CHEST_BOAT = layer("chest_boat/enderwood");
 
@@ -47,6 +50,7 @@ public final class WoodSetsClient {
             Sheets.addWoodType(ModWoodTypes.PINE);
             Sheets.addWoodType(ModWoodTypes.AZALEA);
             Sheets.addWoodType(ModWoodTypes.ENDERWOOD);
+            Sheets.addWoodType(ModWoodTypes.POPLAR);
         });
     }
 
@@ -56,6 +60,8 @@ public final class WoodSetsClient {
         event.registerLayerDefinition(PINE_CHEST_BOAT, BoatModel::createChestBoatModel);
         event.registerLayerDefinition(AZALEA_BOAT, BoatModel::createBoatModel);
         event.registerLayerDefinition(AZALEA_CHEST_BOAT, BoatModel::createChestBoatModel);
+        event.registerLayerDefinition(POPLAR_BOAT, BoatModel::createBoatModel);
+        event.registerLayerDefinition(POPLAR_CHEST_BOAT, BoatModel::createChestBoatModel);
         event.registerLayerDefinition(ENDERWOOD_BOAT, BoatModel::createBoatModel);
         event.registerLayerDefinition(ENDERWOOD_CHEST_BOAT, BoatModel::createChestBoatModel);
     }
@@ -66,7 +72,16 @@ public final class WoodSetsClient {
         event.registerEntityRenderer(ModEntities.PINE_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, PINE_CHEST_BOAT));
         event.registerEntityRenderer(ModEntities.AZALEA_BOAT.get(), ctx -> new BoatRenderer(ctx, AZALEA_BOAT));
         event.registerEntityRenderer(ModEntities.AZALEA_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, AZALEA_CHEST_BOAT));
+        event.registerEntityRenderer(ModEntities.POPLAR_BOAT.get(), ctx -> new BoatRenderer(ctx, POPLAR_BOAT));
+        event.registerEntityRenderer(ModEntities.POPLAR_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, POPLAR_CHEST_BOAT));
         event.registerEntityRenderer(ModEntities.ENDERWOOD_BOAT.get(), ctx -> new BoatRenderer(ctx, ENDERWOOD_BOAT));
         event.registerEntityRenderer(ModEntities.ENDERWOOD_CHEST_BOAT.get(), ctx -> new BoatRenderer(ctx, ENDERWOOD_CHEST_BOAT));
+    }
+
+    @SubscribeEvent
+    static void onRegisterParticleProviders(net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(com.terrainlab.registry.ModParticles.RED_POPLAR_LEAVES.get(), net.minecraft.client.particle.FallingLeavesParticle.PaleOakProvider::new);
+        event.registerSpriteSet(com.terrainlab.registry.ModParticles.ORANGE_POPLAR_LEAVES.get(), net.minecraft.client.particle.FallingLeavesParticle.PaleOakProvider::new);
+        event.registerSpriteSet(com.terrainlab.registry.ModParticles.YELLOW_POPLAR_LEAVES.get(), net.minecraft.client.particle.FallingLeavesParticle.PaleOakProvider::new);
     }
 }

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_shelf_unconnected",
+  "textures": {
+    "all": "terrainlab:block/poplar_shelf",
+    "particle": "terrainlab:block/stripped_poplar_log"
+  }
+}

@@ -13,7 +13,15 @@
       },
       {
         "chance": 0.1,
+        "feature": "terrainlab:orange_poplar_leaf_litter"
+      },
+      {
+        "chance": 0.1,
         "feature": "minecraft:fancy_oak_checked"
+      },
+      {
+        "chance": 0.0125,
+        "feature": "terrainlab:fallen_poplar_tree"
       },
       {
         "chance": 0.0125,

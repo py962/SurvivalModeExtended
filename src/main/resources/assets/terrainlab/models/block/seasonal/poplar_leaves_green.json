@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "terrainlab:block/seasonal/poplar_leaves_green"
+  }
+}

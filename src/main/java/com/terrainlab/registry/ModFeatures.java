@@ -58,7 +58,23 @@ public class ModFeatures {
             FEATURES.register("sea_level_barrier_gap",
                     () -> new SeaLevelBarrierGapFeature(NoneFeatureConfiguration.CODEC));
 
+    // Tree placers backported from 26.3's poplar (see worldgen.poplar).
+    public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType<?>> TRUNK_PLACERS =
+            DeferredRegister.create(Registries.TRUNK_PLACER_TYPE, TerrainLab.MODID);
+    public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<?>> FOLIAGE_PLACERS =
+            DeferredRegister.create(Registries.FOLIAGE_PLACER_TYPE, TerrainLab.MODID);
+    public static final DeferredHolder<net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType<?>,
+            net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType<com.terrainlab.worldgen.poplar.PoplarTrunkPlacer>> POPLAR_TRUNK_PLACER =
+            TRUNK_PLACERS.register("poplar_trunk_placer",
+                    () -> new net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType<>(com.terrainlab.worldgen.poplar.PoplarTrunkPlacer.CODEC));
+    public static final DeferredHolder<net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<?>,
+            net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<com.terrainlab.worldgen.poplar.PoplarFoliagePlacer>> POPLAR_FOLIAGE_PLACER =
+            FOLIAGE_PLACERS.register("poplar_foliage_placer",
+                    () -> new net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<>(com.terrainlab.worldgen.poplar.PoplarFoliagePlacer.CODEC));
+
     public static void register(IEventBus eventBus) {
         FEATURES.register(eventBus);
+        TRUNK_PLACERS.register(eventBus);
+        FOLIAGE_PLACERS.register(eventBus);
     }
 }

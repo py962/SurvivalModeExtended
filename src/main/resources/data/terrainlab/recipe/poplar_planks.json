@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#terrainlab:poplar_logs"
+  ],
+  "result": {
+    "count": 4,
+    "id": "terrainlab:poplar_planks"
+  }
+}

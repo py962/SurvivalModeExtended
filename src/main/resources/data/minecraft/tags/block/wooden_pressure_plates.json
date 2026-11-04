@@ -3,6 +3,7 @@
   "values": [
     "terrainlab:pine_pressure_plate",
     "terrainlab:azalea_pressure_plate",
-    "terrainlab:enderwood_pressure_plate"
+    "terrainlab:enderwood_pressure_plate",
+    "terrainlab:poplar_pressure_plate"
   ]
 }

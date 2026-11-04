@@ -80,7 +80,7 @@ public final class WeaponsmithTrades {
 
     // Wood Planks: same wood per type as Shield 1.
     private static final Map<ResourceKey<VillagerType>, Item> PLANKS_BY_TYPE = Map.of(
-            VillagerType.PLAINS, Items.BIRCH_PLANKS,
+            VillagerType.PLAINS, ModItems.POPLAR_PLANKS.get(),
             VillagerType.SAVANNA, Items.ACACIA_PLANKS,
             VillagerType.DESERT, Items.OAK_PLANKS,
             VillagerType.TAIGA, Items.SPRUCE_PLANKS,
@@ -88,11 +88,11 @@ public final class WeaponsmithTrades {
             VillagerType.SWAMP, Items.BIRCH_PLANKS,
             VillagerType.JUNGLE, Items.BAMBOO_PLANKS
     );
-    private static final Item PLANKS_FALLBACK = Items.BIRCH_PLANKS;
+    private static final Item PLANKS_FALLBACK = ModItems.POPLAR_PLANKS.get();
 
-    // Shield 1 (Apprentice). Plains is Birch in 1.21.11; Poplar in 26.3.
+    // Shield 1 (Apprentice). Plains (and any other villager type) is Poplar, as in 26.3.
     private static final Map<ResourceKey<VillagerType>, Item> SHIELD_1_BY_TYPE = Map.of(
-            VillagerType.PLAINS, ModItems.BIRCH_SHIELD.get(),
+            VillagerType.PLAINS, ModItems.POPLAR_SHIELD.get(),
             VillagerType.SAVANNA, ModItems.ACACIA_SHIELD.get(),
             VillagerType.DESERT, ModItems.OAK_SHIELD.get(),
             VillagerType.TAIGA, ModItems.SPRUCE_SHIELD.get(),
@@ -100,7 +100,7 @@ public final class WeaponsmithTrades {
             VillagerType.SWAMP, ModItems.BIRCH_SHIELD.get(),
             VillagerType.JUNGLE, ModItems.BAMBOO_SHIELD.get()
     );
-    private static final Item SHIELD_1_FALLBACK = ModItems.BIRCH_SHIELD.get();
+    private static final Item SHIELD_1_FALLBACK = ModItems.POPLAR_SHIELD.get();
 
     // Shield 2 (Journeyman).
     private static final Map<ResourceKey<VillagerType>, Item> SHIELD_2_BY_TYPE = Map.of(

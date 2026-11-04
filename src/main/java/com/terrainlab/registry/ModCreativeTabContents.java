@@ -46,16 +46,21 @@ public class ModCreativeTabContents {
 
     private static void buildContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-            // Wood sets in vanilla's per-wood order. Pine follows its relative spruce; Azalea (no vanilla
-            // relative) joins the overworld woods after the last one, Pale Oak, matching where vanilla puts
-            // azalea leaves; Enderwood (planks only) follows the nether woods, keeping vanilla's
-            // overworld -> nether -> end order.
+            // Wood sets in vanilla's per-wood order. Pine follows its relative spruce; Poplar goes after Pale
+            // Oak, where 26.3's vanilla poplar sits; Azalea (no vanilla relative) joins the overworld woods
+            // after the last one, Poplar, as in 26.3; Enderwood (planks only) follows the nether woods,
+            // keeping vanilla's overworld -> nether -> end order.
             after(event, Items.SPRUCE_BUTTON,
                     ModItems.PINE_LOG, ModItems.PINE_WOOD, ModItems.STRIPPED_PINE_LOG, ModItems.STRIPPED_PINE_WOOD,
                     ModItems.PINE_PLANKS, ModItems.PINE_STAIRS, ModItems.PINE_SLAB, ModItems.PINE_FENCE,
                     ModItems.PINE_FENCE_GATE, ModItems.PINE_DOOR, ModItems.PINE_TRAPDOOR,
                     ModItems.PINE_PRESSURE_PLATE, ModItems.PINE_BUTTON);
             after(event, Items.PALE_OAK_BUTTON,
+                    ModItems.POPLAR_LOG, ModItems.POPLAR_WOOD, ModItems.STRIPPED_POPLAR_LOG, ModItems.STRIPPED_POPLAR_WOOD,
+                    ModItems.POPLAR_PLANKS, ModItems.POPLAR_STAIRS, ModItems.POPLAR_SLAB, ModItems.POPLAR_FENCE,
+                    ModItems.POPLAR_FENCE_GATE, ModItems.POPLAR_DOOR, ModItems.POPLAR_TRAPDOOR,
+                    ModItems.POPLAR_PRESSURE_PLATE, ModItems.POPLAR_BUTTON);
+            after(event, ModItems.POPLAR_BUTTON,
                     ModItems.AZALEA_LOG, ModItems.AZALEA_WOOD, ModItems.STRIPPED_AZALEA_LOG, ModItems.STRIPPED_AZALEA_WOOD,
                     ModItems.AZALEA_PLANKS, ModItems.AZALEA_STAIRS, ModItems.AZALEA_SLAB, ModItems.AZALEA_FENCE,
                     ModItems.AZALEA_FENCE_GATE, ModItems.AZALEA_DOOR, ModItems.AZALEA_TRAPDOOR,
@@ -73,7 +78,11 @@ public class ModCreativeTabContents {
             // Magnetite ore is a redstone-ore look-alike.
             after(event, Items.DEEPSLATE_REDSTONE_ORE, ModItems.MAGNETITE_ORE);
             after(event, Items.SPRUCE_LOG, ModItems.PINE_LOG);
-            after(event, Items.PALE_OAK_LOG, ModItems.AZALEA_LOG);
+            after(event, Items.PALE_OAK_LOG, ModItems.POPLAR_LOG);
+            after(event, ModItems.POPLAR_LOG, ModItems.AZALEA_LOG);
+            after(event, Items.PALE_OAK_LEAVES,
+                    ModItems.RED_POPLAR_LEAVES, ModItems.ORANGE_POPLAR_LEAVES, ModItems.YELLOW_POPLAR_LEAVES);
+            after(event, Items.PALE_OAK_SAPLING, ModItems.POPLAR_SAPLING);
             after(event, Items.SPRUCE_LEAVES, ModItems.PINE_LEAVES);
             after(event, Items.SPRUCE_SAPLING, ModItems.PINE_SAPLING);
             after(event, Items.RED_MUSHROOM, ModItems.NIGHTCAP_MUSHROOM);
@@ -107,7 +116,9 @@ public class ModCreativeTabContents {
             }
             after(event, Items.GLOW_ITEM_FRAME, ModItems.LARGE_ITEM_FRAME, ModItems.EXTRA_LARGE_ITEM_FRAME);
             after(event, Items.SPRUCE_HANGING_SIGN, ModItems.PINE_SIGN, ModItems.PINE_HANGING_SIGN);
-            after(event, Items.PALE_OAK_HANGING_SIGN, ModItems.AZALEA_SIGN, ModItems.AZALEA_HANGING_SIGN);
+            after(event, Items.PALE_OAK_SHELF, ModItems.POPLAR_SHELF);
+            after(event, Items.PALE_OAK_HANGING_SIGN, ModItems.POPLAR_SIGN, ModItems.POPLAR_HANGING_SIGN);
+            after(event, ModItems.POPLAR_HANGING_SIGN, ModItems.AZALEA_SIGN, ModItems.AZALEA_HANGING_SIGN);
             after(event, Items.WARPED_HANGING_SIGN, ModItems.ENDERWOOD_SIGN, ModItems.ENDERWOOD_HANGING_SIGN);
 
         } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
@@ -119,7 +130,8 @@ public class ModCreativeTabContents {
             // The howdah is the elephant's saddle.
             after(event, Items.SADDLE, ModItems.HOWDAH);
             after(event, Items.SPRUCE_CHEST_BOAT, ModItems.PINE_BOAT, ModItems.PINE_CHEST_BOAT);
-            after(event, Items.PALE_OAK_CHEST_BOAT, ModItems.AZALEA_BOAT, ModItems.AZALEA_CHEST_BOAT);
+            after(event, Items.PALE_OAK_CHEST_BOAT, ModItems.POPLAR_BOAT, ModItems.POPLAR_CHEST_BOAT);
+            after(event, ModItems.POPLAR_CHEST_BOAT, ModItems.AZALEA_BOAT, ModItems.AZALEA_CHEST_BOAT);
             after(event, Items.BAMBOO_CHEST_RAFT,
                     ModItems.ENDERWOOD_BOAT, ModItems.ENDERWOOD_CHEST_BOAT, ModItems.HOUSEBOAT_ITEM);
             after(event, Items.HOPPER_MINECART, ModItems.DISPENSER_MINECART, ModItems.DROPPER_MINECART);

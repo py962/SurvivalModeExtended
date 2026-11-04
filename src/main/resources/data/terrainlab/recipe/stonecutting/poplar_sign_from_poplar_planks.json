@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "terrainlab:poplar_planks",
+  "result": {
+    "count": 1,
+    "id": "terrainlab:poplar_sign"
+  }
+}

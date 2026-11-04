@@ -38,6 +38,14 @@ public final class ModParticles {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SANDSTORM_PUFF =
             PARTICLE_TYPES.register("sandstorm_puff", () -> new SimpleParticleType(false));
 
+    // Poplar falling leaves (backported from 26.3), drawn by vanilla's pale-oak-style falling-leaves particle.
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> RED_POPLAR_LEAVES =
+            PARTICLE_TYPES.register("red_poplar_leaves", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> ORANGE_POPLAR_LEAVES =
+            PARTICLE_TYPES.register("orange_poplar_leaves", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> YELLOW_POPLAR_LEAVES =
+            PARTICLE_TYPES.register("yellow_poplar_leaves", () -> new SimpleParticleType(false));
+
     private ModParticles() {
     }
 

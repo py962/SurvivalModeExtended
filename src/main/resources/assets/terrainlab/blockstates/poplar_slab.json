@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "terrainlab:block/poplar_slab"
+    },
+    "type=double": {
+      "model": "terrainlab:block/poplar_planks"
+    },
+    "type=top": {
+      "model": "terrainlab:block/poplar_slab_top"
+    }
+  }
+}

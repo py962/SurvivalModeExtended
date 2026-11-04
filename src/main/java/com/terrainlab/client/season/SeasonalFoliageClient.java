@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
  *   <li>block colours: oak turns russet (otherwise vanilla's foliage tint), birch tint follows its look for
  *       falling-leaf / break particles (otherwise vanilla's fixed birch tint);</li>
  *   <li>texture variants (standalone models) swapped in by {@link SeasonalLeavesModel}, which wraps the
- *       vanilla birch and cherry leaves models;</li>
+ *       vanilla birch and cherry leaves models and the poplar leaves models;</li>
  *   <li>the client tick that snapshots the season clock and drives {@link SeasonalLeafRerender}.</li>
  * </ul>
  */
@@ -79,6 +79,9 @@ public final class SeasonalFoliageClient {
     /** Per shade, matching the gold, lemon and amber textures. */
     private static final int[] BIRCH_YELLOW = {0xFFF2CC3A, 0xFFF6E05A, 0xFF8D6214};
 
+    /** Poplar summer green: a fixed fresh green, so poplars don't turn grey-green in taigas' muted foliage tint. */
+    private static final int POPLAR_GREEN = 0xFF64C034;
+
     /** Vanilla's leaf tints (BlockColors.createDefault), used outside the seasonal looks. */
     private static final int VANILLA_BIRCH = -8345771;
     private static final int VANILLA_FOLIAGE_DEFAULT = -12012264;
@@ -89,6 +92,11 @@ public final class SeasonalFoliageClient {
     private static final StandaloneModelKey<BlockModelPart> BIRCH_LEMON_MODEL = key("birch_leaves_lemon");
     private static final StandaloneModelKey<BlockModelPart> BIRCH_AMBER_MODEL = key("birch_leaves_amber");
     private static final StandaloneModelKey<BlockModelPart> CHERRY_CRIMSON_MODEL = key("cherry_leaves_crimson");
+    private static final StandaloneModelKey<BlockModelPart> POPLAR_FROSTY_MODEL = key("poplar_leaves_frosty");
+    private static final StandaloneModelKey<BlockModelPart> POPLAR_GREEN_MODEL = key("poplar_leaves_green");
+    private static final StandaloneModelKey<BlockModelPart> POPLAR_ORANGE_MODEL = key("orange_poplar_leaves");
+    private static final StandaloneModelKey<BlockModelPart> POPLAR_RED_MODEL = key("red_poplar_leaves");
+    private static final StandaloneModelKey<BlockModelPart> POPLAR_DARK_ORANGE_MODEL = key("poplar_leaves_dark_orange");
 
     private static StandaloneModelKey<BlockModelPart> key(String name) {
         return new StandaloneModelKey<>(() -> "terrainlab:seasonal/" + name);
@@ -108,6 +116,9 @@ public final class SeasonalFoliageClient {
     static void onRegisterBlockColors(RegisterColorHandlersEvent.Block event) {
         event.register(new SeasonalTint(Tree.OAK), Blocks.OAK_LEAVES);
         event.register(new SeasonalTint(Tree.BIRCH), Blocks.BIRCH_LEAVES);
+        // Poplar leaf models carry no tintindex, so this only colours the green variant (and its particles).
+        event.register(new SeasonalTint(Tree.POPLAR), com.terrainlab.registry.ModBlocks.RED_POPLAR_LEAVES.get(),
+                com.terrainlab.registry.ModBlocks.ORANGE_POPLAR_LEAVES.get(), com.terrainlab.registry.ModBlocks.YELLOW_POPLAR_LEAVES.get());
         // Cherry: no block colour; crimson is a texture.
     }
 
@@ -119,6 +130,11 @@ public final class SeasonalFoliageClient {
         register(event, BIRCH_LEMON_MODEL, seasonalModel("birch_leaves_lemon"));
         register(event, BIRCH_AMBER_MODEL, seasonalModel("birch_leaves_amber"));
         register(event, CHERRY_CRIMSON_MODEL, seasonalModel("cherry_leaves_crimson"));
+        register(event, POPLAR_FROSTY_MODEL, seasonalModel("poplar_leaves_frosty"));
+        register(event, POPLAR_GREEN_MODEL, seasonalModel("poplar_leaves_green"));
+        register(event, POPLAR_ORANGE_MODEL, Identifier.fromNamespaceAndPath(TerrainLab.MODID, "block/orange_poplar_leaves"));
+        register(event, POPLAR_RED_MODEL, Identifier.fromNamespaceAndPath(TerrainLab.MODID, "block/red_poplar_leaves"));
+        register(event, POPLAR_DARK_ORANGE_MODEL, seasonalModel("poplar_leaves_dark_orange"));
     }
 
     private static void register(ModelEvent.RegisterStandalone event, StandaloneModelKey<BlockModelPart> key, Identifier model) {
@@ -140,6 +156,16 @@ public final class SeasonalFoliageClient {
         Map<Look, BlockModelPart[]> cherry = new EnumMap<>(Look.class);
         put(cherry, Look.CRIMSON, baked.get(CHERRY_CRIMSON_MODEL));
         wrap(models, Blocks.CHERRY_LEAVES, Tree.CHERRY, cherry);
+
+        // All three poplar leaf blocks look alike in each season; in autumn each block picks the orange or
+        // red poplar leaves, or the darker orange, by position.
+        Map<Look, BlockModelPart[]> poplar = new EnumMap<>(Look.class);
+        put(poplar, Look.FROSTY, baked.get(POPLAR_FROSTY_MODEL));
+        put(poplar, Look.GREEN, baked.get(POPLAR_GREEN_MODEL));
+        put(poplar, Look.ORANGE, baked.get(POPLAR_ORANGE_MODEL), baked.get(POPLAR_DARK_ORANGE_MODEL), baked.get(POPLAR_RED_MODEL));
+        wrap(models, com.terrainlab.registry.ModBlocks.ORANGE_POPLAR_LEAVES.get(), Tree.POPLAR, poplar);
+        wrap(models, com.terrainlab.registry.ModBlocks.RED_POPLAR_LEAVES.get(), Tree.POPLAR, poplar);
+        wrap(models, com.terrainlab.registry.ModBlocks.YELLOW_POPLAR_LEAVES.get(), Tree.POPLAR, poplar);
         // Oak needs no texture swap: its seasonal look is purely a tint (shaded per block).
     }
 
@@ -199,8 +225,13 @@ public final class SeasonalFoliageClient {
                     break;
                 case YELLOW:
                     return BIRCH_YELLOW[pos != null ? SeasonalLeaves.shadeAt(pos) : 0];
+                case GREEN:
+                    return POPLAR_GREEN;
                 default:
                     break;
+            }
+            if (this.tree == Tree.POPLAR) {
+                return -1; // untinted, like 26.3's vanilla poplar leaves
             }
             if (this.tree == Tree.BIRCH) {
                 return VANILLA_BIRCH;

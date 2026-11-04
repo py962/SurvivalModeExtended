@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "terrainlab:potted_pine_sapling"
+    "terrainlab:potted_pine_sapling",
+    "terrainlab:potted_poplar_sapling"
   ]
 }

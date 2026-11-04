@@ -297,6 +297,10 @@ public class ModEntities {
             boat("azalea_boat", () -> ModItems.AZALEA_BOAT.get());
     public static final DeferredHolder<EntityType<?>, EntityType<ChestBoat>> AZALEA_CHEST_BOAT =
             chestBoat("azalea_chest_boat", () -> ModItems.AZALEA_CHEST_BOAT.get());
+    public static final DeferredHolder<EntityType<?>, EntityType<Boat>> POPLAR_BOAT =
+            boat("poplar_boat", () -> ModItems.POPLAR_BOAT.get());
+    public static final DeferredHolder<EntityType<?>, EntityType<ChestBoat>> POPLAR_CHEST_BOAT =
+            chestBoat("poplar_chest_boat", () -> ModItems.POPLAR_CHEST_BOAT.get());
     public static final DeferredHolder<EntityType<?>, EntityType<Boat>> ENDERWOOD_BOAT =
             boat("enderwood_boat", () -> ModItems.ENDERWOOD_BOAT.get());
     public static final DeferredHolder<EntityType<?>, EntityType<ChestBoat>> ENDERWOOD_CHEST_BOAT =

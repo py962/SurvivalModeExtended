@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:random_selector",
+  "config": {
+    "default": "terrainlab:orange_poplar_leaf_litter",
+    "features": []
+  }
+}

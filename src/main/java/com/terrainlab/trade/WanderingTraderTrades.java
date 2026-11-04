@@ -110,6 +110,8 @@ public final class WanderingTraderTrades {
             TradeListings.SimpleTradeListing.selling(Items.MANGROVE_PROPAGULE, 1, 5, MAX_USES, NO_XP),
             TradeListings.SimpleTradeListing.selling(Items.OAK_SAPLING, 1, 5, MAX_USES, NO_XP),
             TradeListings.SimpleTradeListing.selling(Items.PALE_OAK_SAPLING, 1, 5, MAX_USES, NO_XP),
+            TradeListings.SimpleTradeListing.selling(ModItems.PINE_SAPLING.get(), 1, 5, MAX_USES, NO_XP),
+            TradeListings.SimpleTradeListing.selling(ModItems.POPLAR_SAPLING.get(), 1, 5, MAX_USES, NO_XP),
             TradeListings.SimpleTradeListing.selling(Items.SPRUCE_SAPLING, 1, 5, MAX_USES, NO_XP),
             TradeListings.SimpleTradeListing.selling(Items.NAUTILUS_SHELL, 1, 5, MAX_USES, NO_XP),
             TradeListings.SimpleTradeListing.selling(Items.RESIN_CLUMP, 1, 5, MAX_USES, NO_XP),
