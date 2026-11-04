@@ -334,5 +334,11 @@ public class ModEntities {
         ENTITY_TYPES.addAlias(
                 net.minecraft.resources.Identifier.fromNamespaceAndPath(MODID, "cushion"),
                 net.minecraft.resources.Identifier.withDefaultNamespace("cushion"));
+        // The 1.21.11 version's backported poplar boats become vanilla's poplar boats on upgrade.
+        for (String id : java.util.List.of("poplar_boat", "poplar_chest_boat")) {
+            ENTITY_TYPES.addAlias(
+                    net.minecraft.resources.Identifier.fromNamespaceAndPath(MODID, id),
+                    net.minecraft.resources.Identifier.withDefaultNamespace(id));
+        }
     }
 }

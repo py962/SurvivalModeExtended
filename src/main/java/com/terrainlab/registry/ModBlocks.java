@@ -468,7 +468,16 @@ public class ModBlocks {
                         .forceSolidOn().noCollision().strength(1.0F));
     }
 
+    /** The 1.21.11 version's backported poplar blocks (terrainlab ids there) become vanilla's poplar on upgrade. */
+    public static final java.util.List<String> BACKPORTED_POPLAR_BLOCKS = java.util.List.of(
+            "poplar_log", "poplar_wood", "stripped_poplar_log", "stripped_poplar_wood", "poplar_planks", "poplar_stairs", "poplar_slab", "poplar_fence", "poplar_fence_gate", "poplar_door", "poplar_trapdoor", "poplar_button", "poplar_pressure_plate", "poplar_sign", "poplar_wall_sign", "poplar_hanging_sign", "poplar_wall_hanging_sign", "poplar_shelf", "red_poplar_leaves", "orange_poplar_leaves", "yellow_poplar_leaves", "poplar_sapling", "potted_poplar_sapling");
+
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
+        for (String id : BACKPORTED_POPLAR_BLOCKS) {
+            BLOCKS.addAlias(
+                    net.minecraft.resources.Identifier.fromNamespaceAndPath(TerrainLab.MODID, id),
+                    net.minecraft.resources.Identifier.withDefaultNamespace(id));
+        }
     }
 }

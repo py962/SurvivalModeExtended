@@ -11,7 +11,7 @@ import net.minecraft.resources.Identifier;
  * Graduated sky exposure fraction: a weighted 3x3 sample of columns around a position (centre 4,
  * orthogonal 2, diagonal 1). Submerged sample points count as unexposed, and glass at a sample point
  * counts as exposed. A submerged centre is handled by LocalTemperatureService.
- * TODO: cache results per position and invalidate on block changes; this rescans on every call.
+ * Uncached: SkyExposureService caches the results per chunk.
  */
 public final class SkyExposureSampler {
 

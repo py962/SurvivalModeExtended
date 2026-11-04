@@ -121,26 +121,48 @@ public class OwlEntity extends Parrot {
     }
 
     /**
-     * Daytime resting:
-     * finds an air block above leaves with open sky and moves the owl there.
-     * If no roost is found, the owl yields to the circling goal for 600 ticks
-     * before trying the search again.
+     * Daytime resting: flies to the top of a nearby tree canopy and sits there until dusk.
+     * <p>
+     * Roosts are the topmost leaves of nearby columns (the heightmap top, so always open sky). Only a roost the
+     * owl's flying pathfinding can actually reach is chosen, and the owl flies there along that path rather than
+     * in a straight line, so it never pushes into the underside of a canopy or a trunk. On arrival it lands on
+     * the leaves with gravity, stops and keeps its head still. If it stops making progress for about 5 seconds
+     * it gives up on that roost and circles for a while (see OwlCircleGoal) before searching again.
      */
     private static class OwlNocturnalGoal extends Goal {
         private static final int SEARCH_RADIUS = 16;
-        private static final int SEARCH_VERTICAL = 16;
+        private static final int SEARCH_INTERVAL_TICKS = 40;
+        private static final int MAX_PATH_TRIES = 8;
         private static final double REST_SPEED = 1.0D;
-        private static final double ARRIVAL_DISTANCE = 0.45D;
+        private static final double LAND_DISTANCE = 1.2D;
+        private static final int PROGRESS_CHECK_TICKS = 100;
+        private static final double MIN_PROGRESS = 1.0D;
+        private static final long FALLBACK_CIRCLE_TICKS = 600L;
 
         private final OwlEntity owl;
 
         private BlockPos restPos;
+        private net.minecraft.world.level.pathfinder.Path path;
         private boolean resting;
-        private boolean previousNoGravity;
+        private long nextSearchAt;
+        private int progressTimer;
+        private double lastDistance;
+        private boolean stuck;
 
         OwlNocturnalGoal(OwlEntity owl) {
             this.owl = owl;
-            this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+        }
+
+        /**
+         * Tick every tick, not every other tick (the goal selector's default). The flying move control runs every
+         * tick and drops back to WAIT, with gravity on, whenever no new wanted position arrived that tick, so a
+         * goal steering it every other tick makes the owl alternately lift and fall in place and turn back and
+         * forth: the hovering, spinning owl that never leaves its block.
+         */
+        @Override
+        public boolean requiresUpdateEveryTick() {
+            return true;
         }
 
         @Override
@@ -151,15 +173,16 @@ public class OwlEntity extends Parrot {
                     || this.owl.isDaytimeCircleFallbackActive()) {
                 return false;
             }
-
-            this.restPos = findRestPosition();
-
-            if (this.restPos == null) {
-                this.owl.daytimeCircleUntil =
-                        this.owl.level().getGameTime() + 600L;
+            long now = this.owl.level().getGameTime();
+            if (now < this.nextSearchAt) {
                 return false;
             }
+            this.nextSearchAt = now + SEARCH_INTERVAL_TICKS;
 
+            if (!findReachableRoost()) {
+                this.owl.daytimeCircleUntil = now + FALLBACK_CIRCLE_TICKS;
+                return false;
+            }
             return true;
         }
 
@@ -167,6 +190,7 @@ public class OwlEntity extends Parrot {
         public boolean canContinueToUse() {
             return isDayTime(this.owl.level())
                     && !this.owl.isOrderedToSit()
+                    && !this.stuck
                     && this.restPos != null
                     && AnchoredPets.isAllowedTarget(this.owl, this.restPos)
                     && isValidRestPosition(this.restPos);
@@ -175,9 +199,10 @@ public class OwlEntity extends Parrot {
         @Override
         public void start() {
             this.resting = false;
-            this.previousNoGravity = this.owl.isNoGravity();
-            this.owl.getNavigation().stop();
-            moveTowardRestPosition();
+            this.stuck = false;
+            this.progressTimer = 0;
+            this.lastDistance = distanceToRoost();
+            this.owl.getNavigation().moveTo(this.path, REST_SPEED);
         }
 
         @Override
@@ -185,101 +210,114 @@ public class OwlEntity extends Parrot {
             if (this.restPos == null) {
                 return;
             }
-
             Vec3 target = Vec3.atBottomCenterOf(this.restPos);
+            double distance = distanceToRoost();
 
-            if (this.owl.position().distanceToSqr(target)
-                    <= ARRIVAL_DISTANCE * ARRIVAL_DISTANCE) {
+            if (this.resting) {
+                // Sit still on the leaves: no drifting, no head turning.
+                this.owl.getNavigation().stop();
+                this.owl.setDeltaMovement(0.0D, Math.min(0.0D, this.owl.getDeltaMovement().y), 0.0D);
+                if (distance > LAND_DISTANCE * 2.0D) {
+                    this.resting = false; // pushed off: fly back
+                    repath();
+                }
+                return;
+            }
 
-                if (!this.resting) {
+            if (distance <= LAND_DISTANCE) {
+                // Close enough: settle onto the leaf surface under normal gravity.
+                this.owl.getNavigation().stop();
+                this.owl.getMoveControl().setWantedPosition(target.x, target.y, target.z, 0.5D);
+                if (this.owl.onGround()) {
                     this.resting = true;
-                    this.owl.getNavigation().stop();
-                    this.owl.setNoGravity(true);
                 }
+                return;
+            }
 
-                this.owl.setDeltaMovement(Vec3.ZERO);
-                this.owl.setPos(target.x, target.y, target.z);
-            } else {
-                if (this.resting) {
-                    this.resting = false;
-                    this.owl.setNoGravity(this.previousNoGravity);
+            if (this.owl.getNavigation().isDone()) {
+                repath();
+            }
+            this.owl.getLookControl().setLookAt(target.x, target.y, target.z);
+
+            if (++this.progressTimer >= PROGRESS_CHECK_TICKS) {
+                this.progressTimer = 0;
+                if (this.lastDistance - distance < MIN_PROGRESS) {
+                    this.stuck = true;
+                    this.owl.daytimeCircleUntil = this.owl.level().getGameTime() + FALLBACK_CIRCLE_TICKS;
                 }
-
-                moveTowardRestPosition();
+                this.lastDistance = distance;
             }
         }
 
         @Override
         public void stop() {
             this.owl.getNavigation().stop();
-            this.owl.setNoGravity(this.previousNoGravity);
-            this.owl.setDeltaMovement(Vec3.ZERO);
-
             this.resting = false;
             this.restPos = null;
+            this.path = null;
         }
 
-        private void moveTowardRestPosition() {
-            if (this.restPos == null) {
-                return;
+        private double distanceToRoost() {
+            return this.restPos == null ? 0.0D
+                    : Math.sqrt(this.owl.position().distanceToSqr(Vec3.atBottomCenterOf(this.restPos)));
+        }
+
+        private void repath() {
+            net.minecraft.world.level.pathfinder.Path fresh = this.owl.getNavigation().createPath(this.restPos, 0);
+            if (fresh != null && fresh.canReach()) {
+                this.path = fresh;
+                this.owl.getNavigation().moveTo(fresh, REST_SPEED);
+            } else {
+                this.stuck = true;
+                this.owl.daytimeCircleUntil = this.owl.level().getGameTime() + FALLBACK_CIRCLE_TICKS;
             }
-
-            Vec3 target = Vec3.atBottomCenterOf(this.restPos);
-
-            // Ground-style navigation may fail to route to an air block
-            // above the canopy, so use the movement controller directly.
-            this.owl.moveControl.setWantedPosition(
-                    target.x,
-                    target.y,
-                    target.z,
-                    REST_SPEED
-            );
         }
 
         private boolean isValidRestPosition(BlockPos pos) {
             Level level = this.owl.level();
-
             if (!level.isLoaded(pos) || !level.isLoaded(pos.below())) {
                 return false;
             }
-
-            BlockState air = level.getBlockState(pos);
-            BlockState leaves = level.getBlockState(pos.below());
-
             // Roost on top of the canopy, not inside the leaves.
-            return air.isAir()
-                    && leaves.is(BlockTags.LEAVES)
+            return level.getBlockState(pos).isAir()
+                    && level.getBlockState(pos.below()).is(BlockTags.LEAVES)
                     && level.canSeeSky(pos);
         }
 
-        private BlockPos findRestPosition() {
+        /**
+         * Nearest canopy tops first (one candidate per column: the block above its topmost leaves), keeping the
+         * first that pathfinding can reach. Cheap: one heightmap read per column, a few path searches at most.
+         */
+        private boolean findReachableRoost() {
+            Level level = this.owl.level();
             BlockPos origin = this.owl.blockPosition();
-            BlockPos best = null;
-            double bestDistance = Double.MAX_VALUE;
-
-            for (int dy = -SEARCH_VERTICAL; dy <= SEARCH_VERTICAL; dy++) {
-                for (int dx = -SEARCH_RADIUS; dx <= SEARCH_RADIUS; dx++) {
-                    for (int dz = -SEARCH_RADIUS; dz <= SEARCH_RADIUS; dz++) {
-                        BlockPos candidate = origin.offset(dx, dy, dz);
-
-                        if (!isValidRestPosition(candidate)
-                                || !AnchoredPets.isAllowedTarget(
-                                this.owl, candidate)) {
-                            continue;
-                        }
-
-                        double distance =
-                                candidate.distToCenterSqr(this.owl.position());
-
-                        if (distance < bestDistance) {
-                            bestDistance = distance;
-                            best = candidate.immutable();
-                        }
+            java.util.List<BlockPos> candidates = new java.util.ArrayList<>();
+            for (int dx = -SEARCH_RADIUS; dx <= SEARCH_RADIUS; dx++) {
+                for (int dz = -SEARCH_RADIUS; dz <= SEARCH_RADIUS; dz++) {
+                    int x = origin.getX() + dx;
+                    int z = origin.getZ() + dz;
+                    BlockPos top = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z), z);
+                    if (isValidRestPosition(top) && AnchoredPets.isAllowedTarget(this.owl, top)) {
+                        candidates.add(top);
                     }
                 }
             }
-
-            return best;
+            candidates.sort(java.util.Comparator.comparingDouble(p -> p.distToCenterSqr(this.owl.position())));
+            int tries = 0;
+            for (BlockPos candidate : candidates) {
+                if (tries++ >= MAX_PATH_TRIES) {
+                    break;
+                }
+                net.minecraft.world.level.pathfinder.Path found = this.owl.getNavigation().createPath(candidate, 0);
+                if (found != null && found.canReach()) {
+                    this.restPos = candidate;
+                    this.path = found;
+                    return true;
+                }
+            }
+            this.restPos = null;
+            this.path = null;
+            return false;
         }
     }
 
@@ -612,21 +650,16 @@ public class OwlEntity extends Parrot {
             BlockPos pos,
             RandomSource random
     ) {
+        // Owls only spawn on tree tops (the spawn placement uses the MOTION_BLOCKING heightmap, so this is the
+        // top of the canopy), so a new owl starts out on a roost: on leaves, or on a snow layer lying on leaves.
         BlockState below = level.getBlockState(pos.below());
-
-        boolean onSnow =
-                below.is(Blocks.SNOW)
-                        || below.is(Blocks.SNOW_BLOCK);
-
-        boolean onGround =
-                below.is(Blocks.GRASS_BLOCK)
-                        || below.is(Blocks.DIRT)
-                        || below.is(Blocks.PODZOL)
-                        || below.is(Blocks.COARSE_DIRT);
 
         boolean onLeaves = below.is(BlockTags.LEAVES);
 
-        boolean result = onSnow || onGround || onLeaves;
+        boolean onSnowyLeaves = below.is(Blocks.SNOW)
+                && level.getBlockState(pos.below(2)).is(BlockTags.LEAVES);
+
+        boolean result = onLeaves || onSnowyLeaves;
 
         if (DEBUG_LOGGING) {
             // TerrainLab.LOGGER.info(

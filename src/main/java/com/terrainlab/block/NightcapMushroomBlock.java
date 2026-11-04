@@ -10,8 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * White nightcap mushroom; survives only on mossy cobblestone. Biome restrictions belong to
  * worldgen placement, not to {@code canSurvive}.
  *
- * <p>TODO: add the configured/placed feature for Old Growth Taiga biomes, and optional
- * bonemeal spreading. Not yet generated in the world.
+ * <p>Generated in the old growth taigas by the nightcap_mushroom_patch feature.
  */
 public class NightcapMushroomBlock extends BushBlock {
 

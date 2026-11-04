@@ -91,8 +91,19 @@ public final class SeasonalPlantService {
     /** A game-time step larger than this (or backwards) is treated as a time jump. */
     private static final long JUMP_THRESHOLD = 1_200L;
 
-    /** Removal: no drops; neighbours are updated so nothing is left floating. */
-    private static final int REMOVE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS;
+    /** Removal: no drops; neighbours are notified but their shapes aren't re-checked (see RESTORE_FLAGS). */
+    private static final int REMOVE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
+    /**
+     * Restores skip neighbour shape updates too. Without UPDATE_KNOWN_SHAPE every removal or restore re-checks
+     * the neighbours' survival, and vanilla lets that check drop items regardless of UPDATE_SUPPRESS_DROPS
+     * (Level.setBlock clears it for neighbours): a sunlit worldgen mushroom beside a flower going dormant
+     * popped out as an item. Neighbours are still notified (UPDATE_NEIGHBORS), so water still flows in.
+     * Pumpkins (full solid blocks that fences, panes and redstone connect to, and that torches or carpet can
+     * sit on) keep vanilla's normal shape updates: PUMPKIN_REMOVE_FLAGS and PUMPKIN_RESTORE_FLAGS.
+     */
+    private static final int RESTORE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_KNOWN_SHAPE;
+    private static final int PUMPKIN_REMOVE_FLAGS = Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS;
+    private static final int PUMPKIN_RESTORE_FLAGS = Block.UPDATE_ALL;
     /** Removal of the upper half of a tall flower, done first and without shape updates. */
     private static final int REMOVE_UPPER_FLAGS = Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_SUPPRESS_DROPS;
 
@@ -115,6 +126,7 @@ public final class SeasonalPlantService {
         final LongLinkedOpenHashSet loadQueue = new LongLinkedOpenHashSet();
         final LongLinkedOpenHashSet sweepQueue = new LongLinkedOpenHashSet();
         long lastGameTime = Long.MIN_VALUE;
+        long lastOffset = Long.MIN_VALUE;
         long lastSweepAt = Long.MIN_VALUE;
         long closingSweepState = Long.MIN_VALUE;
         /** Chunks to process again next tick (boost extras waiting for placement budget). */
@@ -178,7 +190,8 @@ public final class SeasonalPlantService {
         LevelState st = state(level);
 
         long gameTime = level.getGameTime();
-        long total = gameTime + SeasonSavedData.get(level).getSeasonalOffset();
+        long offset = SeasonSavedData.get(level).getSeasonalOffset();
+        long total = gameTime + offset;
         long absState = Math.floorDiv(total, Season.STATE_LENGTH_TICKS);
         long intoState = Math.floorMod(total, Season.STATE_LENGTH_TICKS);
         long yearTick = Math.floorMod(total, Season.YEAR_LENGTH_TICKS);
@@ -186,9 +199,12 @@ public final class SeasonalPlantService {
         Season previous = Season.values()[(current.ordinal() + Season.STATE_COUNT - 1) % Season.STATE_COUNT];
         boolean boundaryMatters = SeasonalPlantCategory.anyChange(previous, current);
 
+        // A change of seasonal offset (/terrainlab season set) moves the calendar like a time jump does.
         boolean jumped = st.lastGameTime != Long.MIN_VALUE
-                && (gameTime < st.lastGameTime || gameTime - st.lastGameTime > JUMP_THRESHOLD);
+                && (gameTime < st.lastGameTime || gameTime - st.lastGameTime > JUMP_THRESHOLD
+                    || (st.lastOffset != Long.MIN_VALUE && offset != st.lastOffset));
         st.lastGameTime = gameTime;
+        st.lastOffset = offset;
 
         if (jumped) {
             refill(st, gameTime);
@@ -535,7 +551,8 @@ public final class SeasonalPlantService {
                 level.setBlock(upper, Blocks.AIR.defaultBlockState(), REMOVE_UPPER_FLAGS);
             }
         }
-        level.setBlock(lower, Blocks.AIR.defaultBlockState(), REMOVE_FLAGS);
+        level.setBlock(lower, Blocks.AIR.defaultBlockState(),
+                category == SeasonalPlantCategory.PUMPKINS ? PUMPKIN_REMOVE_FLAGS : REMOVE_FLAGS);
         data.dormant.put(packed, lowerState);
         return true;
     }
@@ -614,9 +631,10 @@ public final class SeasonalPlantService {
             return RestoreResult.DEFER; // something standing in the pumpkin's spot; try next scan
         }
         if (doubleBlock) {
-            DoublePlantBlock.placeAt(level, state, pos, Block.UPDATE_ALL);
+            DoublePlantBlock.placeAt(level, state, pos, RESTORE_FLAGS);
         } else {
-            level.setBlock(pos, state, Block.UPDATE_ALL);
+            level.setBlock(pos, state, SeasonalPlantCategory.of(state) == SeasonalPlantCategory.PUMPKINS
+                    ? PUMPKIN_RESTORE_FLAGS : RESTORE_FLAGS);
         }
         return RestoreResult.RESTORED;
     }

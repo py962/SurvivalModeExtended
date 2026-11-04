@@ -27,6 +27,16 @@ public class FrostbittenEntity extends Zombie {
         super(entityType, level);
     }
 
+    /**
+     * Frostbitten are always adults: no baby spawns, spawn-egg babies or chicken jockeys, and a baby
+     * loaded from an older save grows up. (There is no baby Frostbitten texture; 26.3's baby zombie
+     * model would need one, and the Frostbitten is due to be replaced in 27.1.)
+     */
+    @Override
+    public void setBaby(boolean baby) {
+        super.setBaby(false);
+    }
+
     @Override
     public void aiStep() {
         super.aiStep();

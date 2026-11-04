@@ -103,7 +103,6 @@ public final class PlayerInternalTemperature {
 
         boolean warmthActive = hasWarmthEffect(player);
         boolean fireResistActive = player.hasEffect(MobEffects.FIRE_RESISTANCE);
-        boolean amuletActive = isAmuletActive(player);
 
         boolean wouldCool = delta < 0;
         boolean wouldHeat = delta > 0;
@@ -124,10 +123,6 @@ public final class PlayerInternalTemperature {
                         internalTemp - EFFECT_RESTORE_RATE
                 );
             }
-        } else if (amuletActive
-                && ((internalTemp < COMFORTABLE_RESTING_VALUE && wouldCool)
-                || (internalTemp > COMFORTABLE_RESTING_VALUE && wouldHeat))) {
-            // Amulet blocks drift away from comfortable only.
         } else {
             internalTemp += delta * rate;
         }
@@ -303,10 +298,6 @@ public final class PlayerInternalTemperature {
                 "body",
                 com.terrainlab.registry.ModItems.FUR_CLOAK.get()
         );
-    }
-
-    private static boolean isAmuletActive(ServerPlayer player) {
-        return false; // TODO: amulet item not implemented yet
     }
 
     private static boolean hasWarmthEffect(ServerPlayer player) {

@@ -760,6 +760,12 @@ public class ModItems {
         ITEMS.addAlias(
                 net.minecraft.resources.Identifier.fromNamespaceAndPath(TerrainLab.MODID, "oak_shield"),
                 net.minecraft.resources.Identifier.withDefaultNamespace("shield"));
+        // The 1.21.11 version's backported poplar items become vanilla's poplar on upgrade.
+        for (String id : java.util.List.of("poplar_log", "poplar_wood", "stripped_poplar_log", "stripped_poplar_wood", "poplar_planks", "poplar_stairs", "poplar_slab", "poplar_fence", "poplar_fence_gate", "poplar_door", "poplar_trapdoor", "poplar_button", "poplar_pressure_plate", "poplar_sign", "poplar_hanging_sign", "poplar_shelf", "red_poplar_leaves", "orange_poplar_leaves", "yellow_poplar_leaves", "poplar_sapling", "poplar_boat", "poplar_chest_boat")) {
+            ITEMS.addAlias(
+                    net.minecraft.resources.Identifier.fromNamespaceAndPath(TerrainLab.MODID, id),
+                    net.minecraft.resources.Identifier.withDefaultNamespace(id));
+        }
         // The 1.21.11 version's backported cushions become vanilla cushions on upgrade.
         for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
             ITEMS.addAlias(

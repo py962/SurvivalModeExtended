@@ -33,19 +33,36 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Server-side forest floor: fallen leaves pile up beside the trunks of seasonal trees (thin in
- * early autumn, deepest at the end of late autumn, thinning through midwinter); a spring flower
- * carpet covers forests, plains, meadows and marshes (peak in late spring, gone by the end of
- * early autumn); and once per season it tops up baseline mushrooms (late autumn to early
- * spring) and flowers (spring) in forest, windswept forest and birch forest, and puts
- * pumpkin patches in temperate biomes for the autumn only (wild pumpkins otherwise grow
- * only in cold biomes; see the remove_wild_pumpkins biome modifier).
+ * Server-side forest floor: fallen leaves pile up beside the trunks of seasonal trees once they
+ * have turned (deepest at the end of late autumn, thinning through midwinter); a spring flower
+ * carpet covers forests, plains, meadows and marshes (building through early spring, peak in late
+ * spring, gone by the end of midsummer); once per season it tops up baseline mushrooms (late
+ * autumn and midwinter) and flowers (spring) in forest, windswept forest and birch forest; and it
+ * grows pumpkin patches in temperate biomes (building through early autumn, peak in late autumn,
+ * gone by the end of midwinter; wild pumpkins otherwise grow only in cold biomes, see the
+ * remove_wild_pumpkins biome modifier).
  *
  * Works a few loaded chunks per tick around players; chunks that load are queued so
  * stale leaves left in unloaded chunks are cleared promptly.
  */
 public final class ForestFloorService {
     private ForestFloorService() {}
+
+    /**
+     * Block changes made here skip neighbour shape updates (UPDATE_KNOWN_SHAPE). Worldgen places mushrooms with
+     * no light yet, so marshes and forests are full of mushrooms standing in daylight, which they can't survive
+     * (light 13+ off mycelium or podzol). They sit there harmlessly until a neighbour shape update re-checks
+     * them, and vanilla always lets that check drop the mushroom as an item (Level.setBlock clears the
+     * suppress-drops flag for neighbours). Placing or removing fallen leaves, carpet flowers and mushrooms
+     * doesn't change any neighbour's shape (none of them is solid or supports anything), so the update is
+     * skipped; neighbours are still notified. Pumpkins are the exception (see PUMPKIN_FLAGS).
+     */
+    private static final int FOREST_FLOOR_FLAGS = Block.UPDATE_ALL | Block.UPDATE_KNOWN_SHAPE;
+    /**
+     * Pumpkins are full solid blocks: fences, walls, panes and redstone connect to them and torches or carpet
+     * can sit on them, so their placement and removal keep vanilla's normal neighbour shape updates.
+     */
+    private static final int PUMPKIN_FLAGS = Block.UPDATE_ALL;
 
     private static final int CHUNKS_PER_TICK = 4;
     private static final int PLAYER_CHUNK_RADIUS = 6;
@@ -54,6 +71,15 @@ public final class ForestFloorService {
     private static final int MUSHROOMS_PER_CHUNK = 3;
     private static final int FLOWERS_PER_CHUNK = 8;
     private static final int MUSHROOM_CAP = 6;       // skip the top-up if the chunk already has this many
+    // Windswept forest, late autumn: a dense crop of red mushrooms in place of the baseline top-up.
+    private static final int WINDSWEPT_AUTUMN_MUSHROOMS_PER_CHUNK = 10;
+    private static final int WINDSWEPT_AUTUMN_MUSHROOM_CAP = 16;
+    /**
+     * Leaves start falling this far into the season a tree turns in: SeasonalLeaves staggers each leaf
+     * block's change over its first 3 days (STAGGER_TICKS, 72,000 ticks of a 240,000-tick state), so by
+     * then the whole canopy shows its autumn colour. Must match SeasonalLeaves.STAGGER_TICKS (client-only).
+     */
+    private static final double TURN_COMPLETE = 72_000.0 / Season.STATE_LENGTH_TICKS;
     private static final int FLOWER_CAP = 16;
     private static final int AUTUMN_PUMPKIN_CHUNK_CHANCE = 4; // about 1 chunk in 4 gets a patch
 
@@ -81,8 +107,12 @@ public final class ForestFloorService {
         long yearTick = SeasonManager.yearRelativeTick(gameTime, offset);
         Season season = Season.fromYearTick(yearTick);
         double stateProgress = SeasonManager.getStateProgress(gameTime, offset);
-        double progress = litterLevel(season, stateProgress);
+        double[] progress = new double[LeafSource.values().length];
+        for (LeafSource tree : LeafSource.values()) {
+            progress[tree.ordinal()] = litterLevel(tree, season, stateProgress);
+        }
         double carpet = carpetLevel(season, stateProgress);
+        double pumpkins = pumpkinLevel(season, stateProgress);
         long runKey = Math.floorDiv(gameTime + offset, Season.YEAR_LENGTH_TICKS) * 8 + season.ordinal();
 
         RandomSource random = level.getRandom();
@@ -98,7 +128,7 @@ public final class ForestFloorService {
             if (key == null) break;
             LevelChunk chunk = level.getChunkSource().getChunkNow(ChunkPos.getX(key), ChunkPos.getZ(key));
             if (chunk == null) continue;
-            processChunk(level, chunk, season, progress, carpet, runKey, random);
+            processChunk(level, chunk, season, progress, carpet, pumpkins, runKey, random);
             budget--;
         }
 
@@ -108,34 +138,45 @@ public final class ForestFloorService {
             int cz = (player.getBlockZ() >> 4) + random.nextInt(PLAYER_CHUNK_RADIUS * 2 + 1) - PLAYER_CHUNK_RADIUS;
             LevelChunk chunk = level.getChunkSource().getChunkNow(cx, cz);
             if (chunk == null) continue;
-            processChunk(level, chunk, season, progress, carpet, runKey, random);
+            processChunk(level, chunk, season, progress, carpet, pumpkins, runKey, random);
         }
     }
 
-    private static void processChunk(ServerLevel level, LevelChunk chunk, Season season, double progress,
-                                     double carpet, long runKey, RandomSource random) {
-        if (progress > 0.0) {
+    private static void processChunk(ServerLevel level, LevelChunk chunk, Season season, double[] progress,
+                                     double carpet, double pumpkins, long runKey, RandomSource random) {
+        if (Arrays.stream(progress).anyMatch(p -> p > 0.0)) {
             accumulate(level, chunk, progress);
         } else {
             clear(level, chunk);
         }
         updateCarpet(level, chunk, carpet);
-        boolean autumn = season == Season.EARLY_AUTUMN || season == Season.LATE_AUTUMN;
-        if (!autumn && !chunk.getData(ForestFloor.AUTUMN_PUMPKINS).isEmpty()) {
+        if (pumpkins > 0.0) {
+            updateAutumnPumpkins(level, chunk, pumpkins);
+        } else if (!chunk.getData(ForestFloor.AUTUMN_PUMPKINS).isEmpty()) {
             removeAutumnPumpkins(level, chunk);
         }
         boolean spring = season == Season.EARLY_SPRING || season == Season.LATE_SPRING;
-        boolean mushroomSeason = season == Season.LATE_AUTUMN || season == Season.MIDWINTER || season == Season.EARLY_SPRING;
-        if ((spring || mushroomSeason || season == Season.EARLY_AUTUMN) && chunk.getData(ForestFloor.EXTRAS_RUN) != runKey) {
+        // Same window as SeasonalPlantCategory.MUSHROOMS, which then fades these in and out like natural ones.
+        boolean mushroomSeason = season == Season.LATE_AUTUMN || season == Season.MIDWINTER;
+        boolean patchSeason = season == Season.EARLY_AUTUMN || season == Season.LATE_AUTUMN;
+        if ((spring || mushroomSeason || patchSeason) && chunk.getData(ForestFloor.EXTRAS_RUN) != runKey) {
             ChunkPos cp = chunk.getPos();
             BlockPos centre = new BlockPos(cp.getMiddleBlockX(), level.getSeaLevel(), cp.getMiddleBlockZ());
             Holder<Biome> biome = level.getBiome(centre);
-            if (season == Season.EARLY_AUTUMN && biome.is(ForestFloor.AUTUMN_PUMPKIN_BIOMES)
-                    && random.nextInt(AUTUMN_PUMPKIN_CHUNK_CHANCE) == 0) {
-                addAutumnPumpkins(level, chunk, random);
+            // New patches are planned in autumn only; midwinter just lets the existing ones fade out.
+            if (patchSeason && chunk.getData(ForestFloor.AUTUMN_PUMPKINS).isEmpty()
+                    && biome.is(ForestFloor.AUTUMN_PUMPKIN_BIOMES)
+                    && hasPumpkinPatchThisYear(level, chunk, runKey)) {
+                planAutumnPumpkins(level, chunk, runKey);
+                updateAutumnPumpkins(level, chunk, pumpkins);
             }
             if (biome.is(ForestFloor.FOREST_FLOOR_EXTRAS)) {
-                if (mushroomSeason) addMushrooms(level, chunk, random);
+                if (season == Season.LATE_AUTUMN && biome.is(Biomes.WINDSWEPT_FOREST)) {
+                    addMushrooms(level, chunk, random, WINDSWEPT_AUTUMN_MUSHROOMS_PER_CHUNK,
+                            WINDSWEPT_AUTUMN_MUSHROOM_CAP, true);
+                } else if (mushroomSeason) {
+                    addMushrooms(level, chunk, random, MUSHROOMS_PER_CHUNK, MUSHROOM_CAP, false);
+                }
                 if (spring) addFlowers(level, chunk, biome, random);
             }
             chunk.setData(ForestFloor.EXTRAS_RUN, runKey);
@@ -158,7 +199,7 @@ public final class ForestFloorService {
             for (int dz = 0; dz < 16; dz++) {
                 pos.set(bx + dx, surfaceY(chunk, bx + dx, bz + dz), bz + dz);
                 if (chunk.getBlockState(pos).is(ForestFloor.FALLEN_LEAVES.get())) {
-                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), FOREST_FLOOR_FLAGS);
                 }
             }
         }
@@ -169,7 +210,7 @@ public final class ForestFloorService {
     /** Light scatter: 2 layers under the canopy, fading to nothing at REACH. */
     private static final double CANOPY_LAYERS = 2.0;
 
-    private static void accumulate(ServerLevel level, LevelChunk chunk, double progress) {
+    private static void accumulate(ServerLevel level, LevelChunk chunk, double[] progress) {
         int bx = chunk.getPos().getMinBlockX();
         int bz = chunk.getPos().getMinBlockZ();
         int cx = bx >> 4, cz = bz >> 4;
@@ -241,23 +282,23 @@ public final class ForestFloorService {
                 double depth = Math.max(trunkDepth, canopyDepth);
                 LeafSource tree = trunkDepth >= canopyDepth && trunkTree[i] != null ? trunkTree[i] : canopyTree[i];
                 double noise = (hash(wx, wz) - 0.5) * 2.0;
-                int target = Math.min(MAX_LAYERS, (int) Math.round(progress * (depth + noise)));
+                int target = Math.min(MAX_LAYERS, (int) Math.round(progress[tree.ordinal()] * (depth + noise)));
 
                 pos.set(wx, surfaceY(chunk, wx, wz), wz);
                 BlockState here = chunk.getBlockState(pos);
                 if (here.is(fallen)) {
                     int layers = here.getValue(FallenLeavesBlock.LAYERS);
                     if (target < 1) {
-                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), FOREST_FLOOR_FLAGS);
                     } else if (layers < target) {
-                        level.setBlock(pos, here.setValue(FallenLeavesBlock.LAYERS, layers + 1), Block.UPDATE_CLIENTS);
+                        level.setBlock(pos, here.setValue(FallenLeavesBlock.LAYERS, layers + 1), FOREST_FLOOR_FLAGS);
                     } else if (layers > target) {
-                        level.setBlock(pos, here.setValue(FallenLeavesBlock.LAYERS, layers - 1), Block.UPDATE_CLIENTS);
+                        level.setBlock(pos, here.setValue(FallenLeavesBlock.LAYERS, layers - 1), FOREST_FLOOR_FLAGS);
                     }
                 } else if (target >= 1 && (here.isAir() || here.is(Blocks.SHORT_GRASS) || here.is(Blocks.FERN))) {
                     BlockState state = fallen.defaultBlockState().setValue(FallenLeavesBlock.TREE, tree);
                     if (validGround(level, pos) && state.canSurvive(level, pos)) {
-                        level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+                        level.setBlock(pos, state, FOREST_FLOOR_FLAGS);
                     }
                 }
             }
@@ -292,23 +333,43 @@ public final class ForestFloorService {
 
     // ---------------------------------------------------------------- seasonal curves
 
-    /** Leaf-litter fill (0..1): thin in early autumn, peaking at the end of late autumn, thinning through midwinter. */
-    private static double litterLevel(Season season, double p) {
+    /**
+     * Leaf-litter fill (0..1) under one kind of tree. Nothing falls until the tree has fully turned (see
+     * {@link #TURN_COMPLETE}): oak, cherry and poplar turn at the start of early autumn, birch (green
+     * through early autumn) at the start of late autumn. From there the litter builds to its peak at the
+     * end of late autumn, then thins through midwinter.
+     */
+    private static double litterLevel(LeafSource tree, Season season, double p) {
+        boolean lateTurner = tree == LeafSource.BIRCH;
         return switch (season) {
-            case EARLY_AUTUMN -> 0.35 * p;
-            case LATE_AUTUMN -> 0.35 + 0.65 * p;
+            case EARLY_AUTUMN -> lateTurner ? 0.0 : 0.35 * sinceTurned(p);
+            case LATE_AUTUMN -> lateTurner ? sinceTurned(p) : 0.35 + 0.65 * p;
             case MIDWINTER -> 0.6 * (1.0 - p);
             default -> 0.0;
         };
     }
 
-    /** Spring flower carpet (0..1): builds through early spring, peaks in late spring, thins through midsummer, gone by the end of early autumn. */
+    /** 0 until {@link #TURN_COMPLETE} into the state, then rising linearly to 1 at its end. */
+    private static double sinceTurned(double p) {
+        return Math.max(0.0, (p - TURN_COMPLETE) / (1.0 - TURN_COMPLETE));
+    }
+
+    /** Spring flower carpet (0..1): builds through early spring, peaks in late spring, gone by the end of midsummer. */
     private static double carpetLevel(Season season, double p) {
         return switch (season) {
             case EARLY_SPRING -> p;
             case LATE_SPRING -> 1.0;
-            case MIDSUMMER -> 1.0 - 0.5 * p;
-            case EARLY_AUTUMN -> 0.5 * (1.0 - p);
+            case MIDSUMMER -> 1.0 - p;
+            default -> 0.0;
+        };
+    }
+
+    /** Autumn pumpkin patches (0..1): build through early autumn, peak in late autumn, gone by the end of midwinter. */
+    private static double pumpkinLevel(Season season, double p) {
+        return switch (season) {
+            case EARLY_AUTUMN -> p;
+            case LATE_AUTUMN -> 1.0;
+            case MIDWINTER -> 1.0 - p;
             default -> 0.0;
         };
     }
@@ -365,7 +426,7 @@ public final class ForestFloorService {
             }
             if (changes >= CARPET_CHANGES_PER_PASS) continue;
             if (carpetHash(pos.getX(), pos.getZ()) >= carpet * carpetDensity(level.getBiome(pos))) {
-                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), FOREST_FLOOR_FLAGS);
                 mine.remove(packed);
                 changed = true;
                 changes++;
@@ -387,7 +448,7 @@ public final class ForestFloorService {
                     if (!chunk.getBlockState(pos).isAir() || !chunk.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) continue;
                     BlockState flower = carpetFlower(carpetPalette(biome), x, z);
                     if (!flower.canSurvive(level, pos)) continue;
-                    level.setBlock(pos, flower, Block.UPDATE_CLIENTS);
+                    level.setBlock(pos, flower, FOREST_FLOOR_FLAGS);
                     long packed = pos.asLong();
                     mine.add(packed);
                     if (plants == null) plants = chunk.getData(ModAttachments.SEASONAL_PLANTS.get());
@@ -425,13 +486,14 @@ public final class ForestFloorService {
 
     // ---------------------------------------------------------------- mushrooms and flowers
 
-    private static void addMushrooms(ServerLevel level, LevelChunk chunk, RandomSource random) {
+    private static void addMushrooms(ServerLevel level, LevelChunk chunk, RandomSource random,
+                                     int perChunk, int cap, boolean allRed) {
         int existing = countSurface(level, chunk, s -> s.is(Blocks.BROWN_MUSHROOM) || s.is(Blocks.RED_MUSHROOM));
-        if (existing >= MUSHROOM_CAP) return;
+        if (existing >= cap) return;
         int bx = chunk.getPos().getMinBlockX(), bz = chunk.getPos().getMinBlockZ();
         int placed = 0;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        for (int attempt = 0; attempt < 32 && placed < MUSHROOMS_PER_CHUNK; attempt++) {
+        for (int attempt = 0; attempt < perChunk * 10 && placed < Math.min(perChunk, cap - existing); attempt++) {
             int x = bx + random.nextInt(16), z = bz + random.nextInt(16);
             // Shaded ground only: under a canopy.
             if (chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x & 15, z & 15)
@@ -439,9 +501,9 @@ public final class ForestFloorService {
             pos.set(x, surfaceY(chunk, x, z), z);
             BlockState here = level.getBlockState(pos);
             if (!here.isAir() && !here.is(ForestFloor.FALLEN_LEAVES.get())) continue;
-            BlockState mushroom = (random.nextInt(3) == 0 ? Blocks.RED_MUSHROOM : Blocks.BROWN_MUSHROOM).defaultBlockState();
+            BlockState mushroom = (allRed || random.nextInt(3) == 0 ? Blocks.RED_MUSHROOM : Blocks.BROWN_MUSHROOM).defaultBlockState();
             if (!mushroom.canSurvive(level, pos)) continue;
-            level.setBlock(pos, mushroom, Block.UPDATE_CLIENTS);
+            level.setBlock(pos, mushroom, FOREST_FLOOR_FLAGS);
             placed++;
         }
     }
@@ -469,39 +531,83 @@ public final class ForestFloorService {
                 pos.set(x, surfaceY(chunk, x, z), z);
                 if (!level.getBlockState(pos).isAir() || !level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) continue;
                 if (!flower.canSurvive(level, pos)) continue;
-                level.setBlock(pos, flower, Block.UPDATE_CLIENTS);
+                level.setBlock(pos, flower, FOREST_FLOOR_FLAGS);
                 inClump++;
                 placed++;
             }
         }
     }
 
-    /** A patch of 3-8 pumpkins on open grass, remembered so midwinter can take them away. */
-    private static void addAutumnPumpkins(ServerLevel level, LevelChunk chunk, RandomSource random) {
+    /**
+     * Whether this chunk grows a pumpkin patch this year: about 1 in {@link #AUTUMN_PUMPKIN_CHUNK_CHANCE},
+     * decided once per chunk per year (a hash, not a roll per pass, so the odds don't stack up across the
+     * two seasons a patch can be planned in).
+     */
+    private static boolean hasPumpkinPatchThisYear(ServerLevel level, LevelChunk chunk, long runKey) {
+        long year = Math.floorDiv(runKey, 8);
+        int cx = chunk.getPos().getMinBlockX() >> 4, cz = chunk.getPos().getMinBlockZ() >> 4;
+        return (int) (hash(cx * 31 + (int) year * 7919, cz * 17 - (int) year * 104729) * AUTUMN_PUMPKIN_CHUNK_CHANCE) == 0;
+    }
+
+    /**
+     * Picks the spots for a patch of 3-8 pumpkins on open grass and remembers them; nothing is placed here.
+     * {@link #updateAutumnPumpkins} then shows each one while its fixed threshold is below the season's
+     * pumpkin level, so the patch fills in through early autumn and thins out through midwinter.
+     */
+    private static void planAutumnPumpkins(ServerLevel level, LevelChunk chunk, long runKey) {
         int bx = chunk.getPos().getMinBlockX(), bz = chunk.getPos().getMinBlockZ();
+        RandomSource random = RandomSource.create(chunk.getPos().getMinBlockX() * 341873128712L
+                + chunk.getPos().getMinBlockZ() * 132897987541L + Math.floorDiv(runKey, 8));
         int cx = bx + 3 + random.nextInt(10), cz = bz + 3 + random.nextInt(10);
         int want = 3 + random.nextInt(6);
-        java.util.List<Long> placed = new java.util.ArrayList<>(chunk.getData(ForestFloor.AUTUMN_PUMPKINS));
+        java.util.List<Long> planned = new java.util.ArrayList<>();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        BlockState pumpkin = Blocks.PUMPKIN.defaultBlockState();
         for (int attempt = 0; attempt < 40 && want > 0; attempt++) {
             int x = cx + random.nextInt(7) - 3, z = cz + random.nextInt(7) - 3;
             if ((x >> 4) != (bx >> 4) || (z >> 4) != (bz >> 4)) continue;
             pos.set(x, surfaceY(chunk, x, z), z);
-            BlockState here = level.getBlockState(pos);
-            if (!(here.isAir() || here.is(Blocks.SHORT_GRASS)) || !level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) continue;
-            level.setBlock(pos, pumpkin, Block.UPDATE_CLIENTS);
-            placed.add(pos.asLong());
+            if (planned.contains(pos.asLong()) || !pumpkinSpot(level, pos)) continue;
+            planned.add(pos.asLong());
             want--;
         }
-        chunk.setData(ForestFloor.AUTUMN_PUMPKINS, java.util.List.copyOf(placed));
+        if (planned.isEmpty()) return;
+        chunk.setData(ForestFloor.AUTUMN_PUMPKINS, java.util.List.copyOf(planned));
+        chunk.markUnsaved();
+    }
+
+    private static boolean pumpkinSpot(ServerLevel level, BlockPos pos) {
+        BlockState here = level.getBlockState(pos);
+        return (here.isAir() || here.is(Blocks.SHORT_GRASS)) && level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK);
+    }
+
+    /**
+     * Shows or hides each planned pumpkin of this chunk's patch for the current pumpkin level. Pumpkins this
+     * service places are marked as player-placed for the seasonal plant service, so it leaves them to this one.
+     */
+    private static void updateAutumnPumpkins(ServerLevel level, LevelChunk chunk, double pumpkins) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        BlockState pumpkin = Blocks.PUMPKIN.defaultBlockState();
+        SeasonalPlantChunkData plants = null;
+        for (long packed : chunk.getData(ForestFloor.AUTUMN_PUMPKINS)) {
+            pos.set(BlockPos.getX(packed), BlockPos.getY(packed), BlockPos.getZ(packed));
+            boolean shown = hash(pos.getX() - 4271, pos.getZ() + 9973) < pumpkins;
+            boolean present = level.getBlockState(pos).is(Blocks.PUMPKIN);
+            if (shown && !present && pumpkinSpot(level, pos)) {
+                level.setBlock(pos, pumpkin, PUMPKIN_FLAGS);
+                if (plants == null) plants = chunk.getData(ModAttachments.SEASONAL_PLANTS.get());
+                plants.markPlayerPlaced(packed);
+                chunk.markUnsaved();
+            } else if (!shown && present) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), PUMPKIN_FLAGS);
+            }
+        }
     }
 
     private static void removeAutumnPumpkins(ServerLevel level, LevelChunk chunk) {
         for (long packed : chunk.getData(ForestFloor.AUTUMN_PUMPKINS)) {
             BlockPos pos = BlockPos.of(packed);
             if (level.getBlockState(pos).is(Blocks.PUMPKIN)) {
-                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), PUMPKIN_FLAGS);
             }
         }
         chunk.setData(ForestFloor.AUTUMN_PUMPKINS, java.util.List.of());

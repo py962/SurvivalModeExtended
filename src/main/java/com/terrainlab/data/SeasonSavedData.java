@@ -51,6 +51,16 @@ public class SeasonSavedData extends SavedData {
     }
 
     /**
+     * Sets the offset (the /terrainlab season command). 0 means "not generated yet" to
+     * generateOffsetIfAbsent, so a zero offset is stored as one full year, which is equivalent.
+     */
+    public void setSeasonalOffset(long offset) {
+        long normalised = Math.floorMod(offset, Season.YEAR_LENGTH_TICKS);
+        this.seasonalOffset = normalised == 0L ? Season.YEAR_LENGTH_TICKS : normalised;
+        setDirty();
+    }
+
+    /**
      * Generates the offset from the world seed if none has been stored yet.
      */
     public void generateOffsetIfAbsent(long worldSeed) {

@@ -18,10 +18,14 @@ import java.util.EnumSet;
  */
 public enum SeasonalPlantCategory {
     LEAF_LITTER("seasonal/leaf_litter", EnumSet.of(Season.MIDWINTER, Season.EARLY_AUTUMN, Season.LATE_AUTUMN)),
-    // Flowers come and go gradually across a whole season (early spring in, early autumn out).
-    FLOWERS("seasonal/flowers", EnumSet.of(Season.EARLY_SPRING, Season.LATE_SPRING, Season.MIDSUMMER), Season.STATE_LENGTH_TICKS),
-    PUMPKINS("seasonal/pumpkins", EnumSet.of(Season.MIDSUMMER, Season.EARLY_AUTUMN, Season.LATE_AUTUMN)),
-    MUSHROOMS("seasonal/mushrooms", EnumSet.of(Season.LATE_AUTUMN, Season.MIDWINTER, Season.EARLY_SPRING));
+    // Flowers, pumpkins and mushrooms each come in gradually across the season before their peak and go
+    // out gradually across the season after it (a whole-season stagger): flowers build through early
+    // spring, peak in late spring and are gone by the end of midsummer; pumpkins build through early
+    // autumn, peak in late autumn and are gone by the end of midwinter; mushrooms build through late autumn,
+    // peak in midwinter and are gone by the end of early spring.
+    FLOWERS("seasonal/flowers", EnumSet.of(Season.EARLY_SPRING, Season.LATE_SPRING), Season.STATE_LENGTH_TICKS),
+    PUMPKINS("seasonal/pumpkins", EnumSet.of(Season.EARLY_AUTUMN, Season.LATE_AUTUMN), Season.STATE_LENGTH_TICKS),
+    MUSHROOMS("seasonal/mushrooms", EnumSet.of(Season.LATE_AUTUMN, Season.MIDWINTER), Season.STATE_LENGTH_TICKS);
 
     /** Biomes whose naturally generated ground plants follow the seasons. */
     public static final TagKey<Biome> AFFECTED_BIOMES =

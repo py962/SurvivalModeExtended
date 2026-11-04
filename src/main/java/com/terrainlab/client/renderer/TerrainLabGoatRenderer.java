@@ -18,6 +18,8 @@ import net.minecraft.world.entity.animal.goat.Goat;
 public class TerrainLabGoatRenderer extends AgeableMobRenderer<Goat, TerrainLabGoatRenderState, TerrainLabGoatModel> {
 
     private static final Identifier GOAT_LOCATION = Identifier.withDefaultNamespace("textures/entity/goat/goat.png");
+    /** Vanilla's baby goat texture, laid out for the GOAT_BABY model the kids are baked from. */
+    private static final Identifier BABY_GOAT_LOCATION = Identifier.withDefaultNamespace("textures/entity/goat/goat_baby.png");
     private static final Identifier SHEARED_TEXTURE =
             Identifier.fromNamespaceAndPath(TerrainLab.MODID, "textures/entity/goat_sheared.png");
 
@@ -50,6 +52,7 @@ public class TerrainLabGoatRenderer extends AgeableMobRenderer<Goat, TerrainLabG
 
     @Override
     public Identifier getTextureLocation(TerrainLabGoatRenderState state) {
+        if (state.isBaby) return BABY_GOAT_LOCATION;
         return state.sheared ? SHEARED_TEXTURE : GOAT_LOCATION;
     }
 }

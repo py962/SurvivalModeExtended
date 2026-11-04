@@ -137,7 +137,6 @@
     "DebugProfileCoordinatesMixin",
     "WolfModelCarpetSleepMixin",
     "SkyRendererAccessor",
-    "SkyRendererInvoker",
     "HouseboatClientPaddleSyncMixin",
     "BorrowingSleepScreenSuppressMixin",
     "BorrowingSleepScreenCloseMixin",

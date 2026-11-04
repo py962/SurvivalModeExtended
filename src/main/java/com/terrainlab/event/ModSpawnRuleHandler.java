@@ -2,7 +2,13 @@ package com.terrainlab.event;
 
 import com.terrainlab.registry.ModAttachments;
 import com.terrainlab.registry.ModEntities;
+import java.util.List;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.random.Weighted;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -11,12 +17,34 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.minecraft.world.entity.EntityTypes;
 
 /**
- * Spawn placement rules: blocks daytime phantom spawns and enforces one living guide trader
+ * Spawn placement rules: phantom-only hostile spawns above y 200, blocks daytime phantom spawns and enforces one living guide trader
  * of each type per world.
  */
 public class ModSpawnRuleHandler {
 
     private static final boolean DEBUG_LOGGING = false;
+
+    /** Natural hostile spawns at or above this height are phantoms only. */
+    private static final int PHANTOM_ONLY_MIN_Y = 200;
+
+    private static final Weighted<MobSpawnSettings.SpawnerData> HIGH_ALTITUDE_PHANTOMS =
+            new Weighted<>(new MobSpawnSettings.SpawnerData(EntityTypes.PHANTOM, UniformInt.of(2, 4)), 100);
+
+    // Above y 200 in the Overworld the natural hostile spawn list (biome and structure entries) is
+    // swapped for phantoms in packs of 2-4. Caps, spacing and the night-only rule below still apply.
+    // Spawners, structures' own placed mobs and events don't go through this list.
+    @SubscribeEvent
+    public static void onPotentialSpawns(LevelEvent.PotentialSpawns event) {
+        if (event.getMobCategory() != MobCategory.MONSTER) return;
+        if (event.getPos().getY() < PHANTOM_ONLY_MIN_Y) return;
+        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
+
+        List<Weighted<MobSpawnSettings.SpawnerData>> current = List.copyOf(event.getSpawnerDataList());
+        for (Weighted<MobSpawnSettings.SpawnerData> entry : current) {
+            event.removeSpawnerData(entry);
+        }
+        event.addSpawnerData(HIGH_ALTITUDE_PHANTOMS);
+    }
 
     @SubscribeEvent
     public static void onCheckSpawn(MobSpawnEvent.SpawnPlacementCheck event) {

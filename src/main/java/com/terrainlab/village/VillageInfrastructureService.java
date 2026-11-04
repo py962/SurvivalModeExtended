@@ -15,7 +15,6 @@ public final class VillageInfrastructureService {
     public static int computeScore(ServerLevel level, BlockPos bellPos) {
         int score = VillageConstants.INFRASTRUCTURE_BELL_POINTS;
 
-        // TODO: add hearth and fountain points once those blocks exist.
 
         return score;
     }

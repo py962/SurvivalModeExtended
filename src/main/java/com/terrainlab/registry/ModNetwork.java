@@ -151,5 +151,10 @@ public class ModNetwork {
                 com.terrainlab.network.AccomplishmentCardPacket.STREAM_CODEC,
                 com.terrainlab.network.AccomplishmentCardPacket::handle
         );
+        registrar.playToClient(
+                com.terrainlab.network.RedstonePortalFlashPacket.TYPE,
+                com.terrainlab.network.RedstonePortalFlashPacket.STREAM_CODEC,
+                com.terrainlab.network.RedstonePortalFlashPacket::handle
+        );
     }
 }
