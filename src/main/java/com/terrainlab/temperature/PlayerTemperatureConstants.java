@@ -20,7 +20,7 @@ public final class PlayerTemperatureConstants {
     public static final double FUR_HEATING_RATE_MODIFIER = 1.6;
 
     // Instant food pushes, degrees C; only applied within FOOD_PUSH_MIN/MAX_TEMP.
-    public static final double COOLING_FOOD_PUSH = -3.0; // melon/water
+    public static final double COOLING_FOOD_PUSH = -5.0; // melon/water
     public static final double WARMING_FOOD_PUSH = 5.0;  // stews/soup
     public static final double FOOD_PUSH_MIN_TEMP = 10.0;
     public static final double FOOD_PUSH_MAX_TEMP = 30.0;

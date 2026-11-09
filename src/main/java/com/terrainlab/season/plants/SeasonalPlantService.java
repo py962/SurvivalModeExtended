@@ -127,6 +127,7 @@ public final class SeasonalPlantService {
         final LongLinkedOpenHashSet sweepQueue = new LongLinkedOpenHashSet();
         long lastGameTime = Long.MIN_VALUE;
         long lastOffset = Long.MIN_VALUE;
+        long lastStateLength = Long.MIN_VALUE;
         long lastSweepAt = Long.MIN_VALUE;
         long closingSweepState = Long.MIN_VALUE;
         /** Chunks to process again next tick (boost extras waiting for placement budget). */
@@ -192,9 +193,9 @@ public final class SeasonalPlantService {
         long gameTime = level.getGameTime();
         long offset = SeasonSavedData.get(level).getSeasonalOffset();
         long total = gameTime + offset;
-        long absState = Math.floorDiv(total, Season.STATE_LENGTH_TICKS);
-        long intoState = Math.floorMod(total, Season.STATE_LENGTH_TICKS);
-        long yearTick = Math.floorMod(total, Season.YEAR_LENGTH_TICKS);
+        long absState = Math.floorDiv(total, Season.stateLengthTicks());
+        long intoState = Math.floorMod(total, Season.stateLengthTicks());
+        long yearTick = Math.floorMod(total, Season.yearLengthTicks());
         Season current = Season.fromYearTick(yearTick);
         Season previous = Season.values()[(current.ordinal() + Season.STATE_COUNT - 1) % Season.STATE_COUNT];
         boolean boundaryMatters = SeasonalPlantCategory.anyChange(previous, current);
@@ -202,9 +203,11 @@ public final class SeasonalPlantService {
         // A change of seasonal offset (/terrainlab season set) moves the calendar like a time jump does.
         boolean jumped = st.lastGameTime != Long.MIN_VALUE
                 && (gameTime < st.lastGameTime || gameTime - st.lastGameTime > JUMP_THRESHOLD
-                    || (st.lastOffset != Long.MIN_VALUE && offset != st.lastOffset));
+                    || (st.lastOffset != Long.MIN_VALUE && offset != st.lastOffset)
+                    || (st.lastStateLength != Long.MIN_VALUE && Season.stateLengthTicks() != st.lastStateLength));
         st.lastGameTime = gameTime;
         st.lastOffset = offset;
+        st.lastStateLength = Season.stateLengthTicks();
 
         if (jumped) {
             refill(st, gameTime);
@@ -258,7 +261,7 @@ public final class SeasonalPlantService {
     }
 
     static Season effectiveSeason(long packedPos, long yearTick, SeasonalPlantCategory category) {
-        return Season.fromYearTick(Math.floorMod(yearTick - delayTicks(packedPos, category.stagger()), Season.YEAR_LENGTH_TICKS));
+        return Season.fromYearTick(Math.floorMod(yearTick - delayTicks(packedPos, category.stagger()), Season.yearLengthTicks()));
     }
 
     private static Season seasonOfState(long absState) {
@@ -271,7 +274,7 @@ public final class SeasonalPlantService {
      * {@code Long.MIN_VALUE} when the category is out of season there.
      */
     static long inSeasonRun(SeasonalPlantCategory category, long packedPos, long total) {
-        long abs = Math.floorDiv(total - delayTicks(packedPos, category.stagger()), Season.STATE_LENGTH_TICKS);
+        long abs = Math.floorDiv(total - delayTicks(packedPos, category.stagger()), Season.stateLengthTicks());
         if (!category.isInSeason(seasonOfState(abs))) {
             return Long.MIN_VALUE;
         }
@@ -284,7 +287,7 @@ public final class SeasonalPlantService {
     // ---------------------------------------------------------------- chunk processing
 
     private static void processChunk(ServerLevel level, LevelState st, LevelChunk chunk, long total) {
-        long yearTick = Math.floorMod(total, Season.YEAR_LENGTH_TICKS);
+        long yearTick = Math.floorMod(total, Season.yearLengthTicks());
         SeasonalPlantChunkData data = chunk.getExistingDataOrNull(ModAttachments.SEASONAL_PLANTS.get());
         boolean changed = false;
 

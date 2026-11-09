@@ -23,9 +23,9 @@ public enum SeasonalPlantCategory {
     // spring, peak in late spring and are gone by the end of midsummer; pumpkins build through early
     // autumn, peak in late autumn and are gone by the end of midwinter; mushrooms build through late autumn,
     // peak in midwinter and are gone by the end of early spring.
-    FLOWERS("seasonal/flowers", EnumSet.of(Season.EARLY_SPRING, Season.LATE_SPRING), Season.STATE_LENGTH_TICKS),
-    PUMPKINS("seasonal/pumpkins", EnumSet.of(Season.EARLY_AUTUMN, Season.LATE_AUTUMN), Season.STATE_LENGTH_TICKS),
-    MUSHROOMS("seasonal/mushrooms", EnumSet.of(Season.LATE_AUTUMN, Season.MIDWINTER), Season.STATE_LENGTH_TICKS);
+    FLOWERS("seasonal/flowers", EnumSet.of(Season.EARLY_SPRING, Season.LATE_SPRING), true),
+    PUMPKINS("seasonal/pumpkins", EnumSet.of(Season.EARLY_AUTUMN, Season.LATE_AUTUMN), true),
+    MUSHROOMS("seasonal/mushrooms", EnumSet.of(Season.LATE_AUTUMN, Season.MIDWINTER), true);
 
     /** Biomes whose naturally generated ground plants follow the seasons. */
     public static final TagKey<Biome> AFFECTED_BIOMES =
@@ -36,20 +36,27 @@ public enum SeasonalPlantCategory {
     private final TagKey<Block> tag;
     private final EnumSet<Season> inSeason;
     private final long stagger;
+    private final boolean wholeSeasonStagger;
 
     SeasonalPlantCategory(String tagPath, EnumSet<Season> inSeason) {
-        this(tagPath, inSeason, SeasonalPlantService.STAGGER_TICKS);
+        this(tagPath, inSeason, SeasonalPlantService.STAGGER_TICKS, false);
     }
 
-    SeasonalPlantCategory(String tagPath, EnumSet<Season> inSeason, long stagger) {
+    /** A whole-season stagger: the flip spread is one calendar state, whatever the year length. */
+    SeasonalPlantCategory(String tagPath, EnumSet<Season> inSeason, boolean wholeSeasonStagger) {
+        this(tagPath, inSeason, 0L, wholeSeasonStagger);
+    }
+
+    SeasonalPlantCategory(String tagPath, EnumSet<Season> inSeason, long stagger, boolean wholeSeasonStagger) {
         this.tag = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(TerrainLab.MODID, tagPath));
         this.inSeason = inSeason;
         this.stagger = stagger;
+        this.wholeSeasonStagger = wholeSeasonStagger;
     }
 
     /** Spread of the per-position flip delay after a boundary for this group. */
     public long stagger() {
-        return stagger;
+        return wholeSeasonStagger ? Season.stateLengthTicks() : stagger;
     }
 
     /** Longest flip spread among the groups that change between {@code from} and {@code to}; 0 if none change. */
@@ -57,7 +64,7 @@ public enum SeasonalPlantCategory {
         long window = 0L;
         for (SeasonalPlantCategory category : VALUES) {
             if (category.isInSeason(from) != category.isInSeason(to)) {
-                window = Math.max(window, category.stagger);
+                window = Math.max(window, category.stagger());
             }
         }
         return window;

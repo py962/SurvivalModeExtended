@@ -31,22 +31,22 @@ public final class MarshMistClient {
     private static final float MIST_START = 40.0F;
     private static final float MIST_END = 50.0F;
 
-    // Mist is full when looking horizontally or down, and fades to zero
-    // when looking 40 degrees up.
-    private static final float FULL_MIST_PITCH = 40.0F;
+    // Mist is full when looking horizontally, down, or up to 45 degrees above
+    // the horizon, and fades to zero as the view rises from 45 degrees to
+    // straight up.
+    private static final float FADE_START_PITCH = 45.0F;
+    private static final float FADE_END_PITCH = 90.0F;
 
     // Eye height above terrain over which the mist clears.
     private static final float CLEAR_FROM_HEIGHT = 2.5F;
     private static final float CLEAR_AT_HEIGHT = 10.0F;
 
-    // Solar-time windows:
+    // Solar-time window for the whole night (sunset is 12000, sunrise 0):
     // {fade-in start, full strength, fade-out start, fade-out end}.
-    private static final long[] MORNING = {
-            22800L, 23600L, 800L, 2800L
-    };
-
-    private static final long[] EVENING = {
-            10200L, 11600L, 13000L, 14200L
+    // The mist builds before dusk, stays at full strength all night and
+    // thins through the morning after dawn.
+    private static final long[] NIGHT = {
+            10200L, 11600L, 800L, 2800L
     };
 
     private static final int SAMPLE_INTERVAL = 10;
@@ -76,13 +76,14 @@ public final class MarshMistClient {
     }
 
     /**
-     * Mist stays at full strength looking horizontally or down; looking
-     * up thins it (pitch is negative when looking up).
+     * Mist stays at full strength until the view is 45 degrees above the
+     * horizon; looking higher thins it (pitch is negative when looking up).
      * The transition is eased to avoid flickering.
      */
     private static float gaze(float pitchDegrees) {
         float target = 1.0F - smoothstep(
-                Math.max(0.0F, -pitchDegrees) / FULL_MIST_PITCH
+                (Math.max(0.0F, -pitchDegrees) - FADE_START_PITCH)
+                        / (FADE_END_PITCH - FADE_START_PITCH)
         );
 
         long now = System.nanoTime();
@@ -206,13 +207,10 @@ public final class MarshMistClient {
     }
 
     /**
-     * Returns the stronger of the morning and evening mist curves.
+     * Returns the mist curve for the time of day: full strength all night.
      */
     static float timeOfDayFactor(long solarTime) {
-        return Math.max(
-                window(solarTime, MORNING),
-                window(solarTime, EVENING)
-        );
+        return window(solarTime, NIGHT);
     }
 
     /**

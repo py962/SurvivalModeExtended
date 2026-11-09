@@ -146,7 +146,6 @@ public final class VillageDailyTickHandler {
                 VillageChestService.ensureChest(level, bell);
             }
             if (record.getLastCheckedDay() != solarDay) {
-                VillageHungerService.runDailyCheck(level, id, members);
                 VillageTierService.runDailyCheck(level, id, members);
                 record.setLastCheckedDay(solarDay);
             }

@@ -16,6 +16,7 @@ import com.terrainlab.worldgen.LargeSpringFeature;
 import com.terrainlab.worldgen.InlandRiverFloodFeature;
 import com.terrainlab.worldgen.MagnetiteOreFeature;
 import com.terrainlab.worldgen.SeaLevelBarrierGapFeature;
+import com.terrainlab.worldgen.SuspiciousSandPatchFeature;
 
 /**
  * Worldgen feature type registrations. Since 26.x a feature "type" is just the codec of a
@@ -53,6 +54,9 @@ public class ModFeatures {
 
     public static final DeferredHolder<MapCodec<? extends Feature>, MapCodec<SeaLevelBarrierGapFeature>> SEA_LEVEL_BARRIER_GAP =
             FEATURES.register("sea_level_barrier_gap", () -> SeaLevelBarrierGapFeature.CODEC);
+
+    public static final DeferredHolder<MapCodec<? extends Feature>, MapCodec<SuspiciousSandPatchFeature>> SUSPICIOUS_SAND_PATCH =
+            FEATURES.register("suspicious_sand_patch", () -> SuspiciousSandPatchFeature.CODEC);
 
     public static void register(IEventBus eventBus) {
         FEATURES.register(eventBus);

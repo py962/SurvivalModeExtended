@@ -94,8 +94,17 @@ public final class RecipeUnlockIndex {
             }
 
             Set<Item> ingredientItems = new HashSet<>();
+            boolean unobtainable = false;
             for (Ingredient ingredient : recipe.placementInfo().ingredients()) {
+                // A barrier-only ingredient is how vanilla recipes are disabled in survival, so never unlock them.
+                if (ingredient.items().allMatch(h -> h.value() == Items.BARRIER)) {
+                    unobtainable = true;
+                    break;
+                }
                 ingredient.items().forEach(h -> ingredientItems.add(h.value()));
+            }
+            if (unobtainable) {
+                continue;
             }
             ingredientItems.remove(Items.AIR);
 

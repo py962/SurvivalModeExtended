@@ -76,10 +76,15 @@ public final class ForestFloorService {
     private static final int WINDSWEPT_AUTUMN_MUSHROOM_CAP = 16;
     /**
      * Leaves start falling this far into the season a tree turns in: SeasonalLeaves staggers each leaf
-     * block's change over its first 3 days (STAGGER_TICKS, 72,000 ticks of a 240,000-tick state), so by
+     * block's change over its first 3 days (STAGGER_TICKS, 72,000 ticks), so by
      * then the whole canopy shows its autumn colour. Must match SeasonalLeaves.STAGGER_TICKS (client-only).
      */
-    private static final double TURN_COMPLETE = 72_000.0 / Season.STATE_LENGTH_TICKS;
+    private static final double TURN_COMPLETE_TICKS = 72_000.0;
+
+    /** {@link #TURN_COMPLETE_TICKS} as a fraction of the current world's calendar state. */
+    private static double turnComplete() {
+        return TURN_COMPLETE_TICKS / Season.stateLengthTicks();
+    }
     private static final int FLOWER_CAP = 16;
     private static final int AUTUMN_PUMPKIN_CHUNK_CHANCE = 4; // about 1 chunk in 4 gets a patch
 
@@ -113,7 +118,7 @@ public final class ForestFloorService {
         }
         double carpet = carpetLevel(season, stateProgress);
         double pumpkins = pumpkinLevel(season, stateProgress);
-        long runKey = Math.floorDiv(gameTime + offset, Season.YEAR_LENGTH_TICKS) * 8 + season.ordinal();
+        long runKey = Math.floorDiv(gameTime + offset, Season.yearLengthTicks()) * 8 + season.ordinal();
 
         RandomSource random = level.getRandom();
         int budget = CHUNKS_PER_TICK;
@@ -335,7 +340,7 @@ public final class ForestFloorService {
 
     /**
      * Leaf-litter fill (0..1) under one kind of tree. Nothing falls until the tree has fully turned (see
-     * {@link #TURN_COMPLETE}): oak, cherry and poplar turn at the start of early autumn, birch (green
+     * {@link #turnComplete()}): oak, cherry and poplar turn at the start of early autumn, birch (green
      * through early autumn) at the start of late autumn. From there the litter builds to its peak at the
      * end of late autumn, then thins through midwinter.
      */
@@ -349,9 +354,9 @@ public final class ForestFloorService {
         };
     }
 
-    /** 0 until {@link #TURN_COMPLETE} into the state, then rising linearly to 1 at its end. */
+    /** 0 until {@link #turnComplete()} into the state, then rising linearly to 1 at its end. */
     private static double sinceTurned(double p) {
-        return Math.max(0.0, (p - TURN_COMPLETE) / (1.0 - TURN_COMPLETE));
+        return Math.max(0.0, (p - turnComplete()) / (1.0 - turnComplete()));
     }
 
     /** Spring flower carpet (0..1): builds through early spring, peaks in late spring, gone by the end of midsummer. */

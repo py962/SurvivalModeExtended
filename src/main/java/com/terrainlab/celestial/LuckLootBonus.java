@@ -61,10 +61,11 @@ public final class LuckLootBonus {
      */
     public static @Nullable LootTable luckySubstitute(LootTable table, LootContext context) {
         if (DEPTH.get()[0] != 0) return null;
-        net.minecraft.resources.Identifier id;
-        try {
-            id = table.getLootTableId();
-        } catch (NullPointerException e) {
+        net.minecraft.resources.Identifier id = table.getLootTableId();
+        if (id == null) return null;
+
+        if (!id.getNamespace().equals("minecraft")
+                || !id.getPath().startsWith(VILLAGE_PREFIX)) {
             return null;
         }
         if (!id.getNamespace().equals("minecraft") || !id.getPath().startsWith(VILLAGE_PREFIX)) return null;

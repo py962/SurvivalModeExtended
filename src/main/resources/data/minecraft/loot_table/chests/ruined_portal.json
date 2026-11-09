@@ -60,6 +60,15 @@
         {
           "type": "minecraft:item",
           "modifier": {
+            "type": "minecraft:set_potion",
+            "id": "minecraft:awkward"
+          },
+          "name": "minecraft:potion",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "modifier": {
             "type": "minecraft:set_count",
             "count": {
               "type": "minecraft:uniform",

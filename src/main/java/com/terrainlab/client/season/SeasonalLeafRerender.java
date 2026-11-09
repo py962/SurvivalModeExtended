@@ -62,7 +62,7 @@ final class SeasonalLeafRerender {
         }
         counter = 0;
 
-        long elapsed = Math.floorMod(now - lastYearTick, Season.YEAR_LENGTH_TICKS);
+        long elapsed = Math.floorMod(now - lastYearTick, Season.yearLengthTicks());
         if (elapsed > JUMP_TICKS) {
             refresh(minecraft, level, player);
         } else if (elapsed > 0) {

@@ -8,6 +8,7 @@ import com.terrainlab.village.VillagerChestMealService;
 import com.terrainlab.village.VillagerFearService;
 import com.terrainlab.village.VillagerHealthService;
 import com.terrainlab.village.VillagerMoodService;
+import com.terrainlab.village.VillagerMorningChestService;
 import com.terrainlab.village.VillagerScheduleService;
 import com.terrainlab.village.VillagerThermalService;
 import com.terrainlab.village.VillagerTiredService;
@@ -75,7 +76,8 @@ public final class VillagerBehaviorHandler {
                 VillagerHealthService.update(villager, gameTime);
                 // Last, so it sees this read's thermal/tired/trapped/fear results.
                 VillagerMoodService.update(villager, gameTime);
-                // Eat from the village chest if needed, using the mood just computed.
+                // Morning trip past the bell and its food chest, then eat there if needed.
+                VillagerMorningChestService.update(villager, level, gameTime);
                 VillagerChestMealService.update(villager, level, gameTime);
             }
         }

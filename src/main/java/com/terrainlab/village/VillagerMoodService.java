@@ -24,7 +24,21 @@ public final class VillagerMoodService {
     private VillagerMoodService() {
     }
 
-    /** An adult whose own food store (eaten + carried) is below one day's need. Babies are never hungry. */
+    /** A villager only shows as hungry (mood, sounds, happiness, info screen) after this long hungry. */
+    public static final long HUNGER_REPORT_DELAY_TICKS = 24000L;
+
+    /**
+     * Shown hunger: hungry for at least {@link #HUNGER_REPORT_DELAY_TICKS}. Read from the mood
+     * flags, which {@link #update} keeps current.
+     */
+    public static boolean isReportedHungry(Villager villager) {
+        return (villager.getData(ModAttachments.VILLAGER_MOOD_FLAGS.get()) & HUNGRY) != 0;
+    }
+
+    /**
+     * Actual hunger, used to decide whether to eat: an adult whose own food store (eaten + carried)
+     * is below one day's need. Babies are never hungry.
+     */
     public static boolean isHungry(Villager villager) {
         return !villager.isBaby()
                 && VillagerFoodAccess.getFoodPoints(villager) < VillageConstants.FOOD_PER_VILLAGER_PER_DAY;
@@ -64,7 +78,16 @@ public final class VillagerMoodService {
         if (VillagerTrappedService.isTrapped(villager)) {
             flags |= TRAPPED;
         }
-        if (isHungry(villager)) {
+        boolean hungryNow = isHungry(villager);
+        long since = villager.getData(ModAttachments.VILLAGER_HUNGRY_SINCE.get());
+        if (hungryNow && since < 0L) {
+            since = gameTime;
+            villager.setData(ModAttachments.VILLAGER_HUNGRY_SINCE.get(), since);
+        } else if (!hungryNow && since >= 0L) {
+            since = -1L;
+            villager.setData(ModAttachments.VILLAGER_HUNGRY_SINCE.get(), since);
+        }
+        if (hungryNow && gameTime - since >= HUNGER_REPORT_DELAY_TICKS) {
             flags |= HUNGRY;
         }
         if (isInjured(villager)) {
@@ -74,5 +97,6 @@ public final class VillagerMoodService {
         if (villager.getData(ModAttachments.VILLAGER_MOOD_FLAGS.get()) != flags) {
             villager.setData(ModAttachments.VILLAGER_MOOD_FLAGS.get(), flags);
         }
+        VillagerHungerDebug.observe(villager, hungryNow, (flags & HUNGRY) != 0);
     }
 }

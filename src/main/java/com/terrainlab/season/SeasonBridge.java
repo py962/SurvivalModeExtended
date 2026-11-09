@@ -32,11 +32,16 @@ public final class SeasonBridge {
     public static double yearFraction(Level level) {
         long offset = level.isClientSide() ? ClientSeasonState.getSeasonalOffset() : serverOffset(level);
         long yearTick = SeasonManager.yearRelativeTick(level.getGameTime(), offset);
-        return yearTick / (double) Season.YEAR_LENGTH_TICKS;
+        return yearTick / (double) Season.yearLengthTicks();
     }
 
     public static double midsummerFraction() {
         return MIDSUMMER_CENTRE;
+    }
+
+    /** Drops the cached server offset so the next read picks up a changed offset or year length at once. */
+    public static void invalidateServerOffset() {
+        serverOffsetCheckedAt = Long.MIN_VALUE;
     }
 
     private static long serverOffset(Level level) {

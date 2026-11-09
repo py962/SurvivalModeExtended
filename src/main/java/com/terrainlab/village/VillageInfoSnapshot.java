@@ -121,7 +121,7 @@ public final class VillageInfoSnapshot {
                     );
 
             boolean hungry =
-                    VillagerMoodService.isHungry(villager);
+                    VillagerMoodService.isReportedHungry(villager);
 
             boolean injured =
                     VillagerMoodService.isInjured(villager);

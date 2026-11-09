@@ -114,7 +114,7 @@
             "id": "minecraft:night_vision"
           },
           "name": "minecraft:potion",
-          "weight": 10
+          "weight": 30
         },
         {
           "type": "minecraft:item",
@@ -145,50 +145,6 @@
             "count": 2
           },
           "name": "minecraft:wild_armor_trim_smithing_template"
-        }
-      ],
-      "rolls": 1
-    },
-    {
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "modifier": [
-            {
-              "type": "minecraft:exploration_map",
-              "destination": "#terrainlab:locate/ancient_city",
-              "decoration": "minecraft:ancient_city",
-              "zoom": 2,
-              "search_radius": 100,
-              "skip_existing_chunks": true
-            },
-            {
-              "type": "minecraft:filtered",
-              "item_filter": {
-                "predicates": {
-                  "minecraft:map_id": {}
-                }
-              },
-              "on_fail": {
-                "type": "minecraft:discard"
-              }
-            },
-            {
-              "type": "minecraft:set_custom_data",
-              "tag": {
-                "terrainlab_relic_map": "temple_map"
-              }
-            },
-            {
-              "type": "minecraft:set_name",
-              "name": {
-                "translate": "item.terrainlab.temple_map"
-              },
-              "target": "item_name"
-            }
-          ],
-          "name": "minecraft:buried_ancient_city_map",
-          "weight": 1
         }
       ],
       "rolls": 1

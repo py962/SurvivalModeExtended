@@ -25,7 +25,7 @@ public final class VillageHappinessService {
             boolean fearful = VillagerFearService.isFearful(villager, gameTime);
             boolean tired = VillagerTiredService.isTired(villager, gameTime);
             boolean trapped = VillagerTrappedService.isTrapped(villager);
-            boolean hungry = VillagerMoodService.isHungry(villager);
+            boolean hungry = VillagerMoodService.isReportedHungry(villager);
             boolean injured = VillagerMoodService.isInjured(villager);
 
             if (thermal != VillagerThermalState.COMFORTABLE || fearful || tired || trapped || hungry || injured) {

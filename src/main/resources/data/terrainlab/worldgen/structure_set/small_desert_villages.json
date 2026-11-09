@@ -1,0 +1,18 @@
+{
+  "structures": [
+    {
+      "structure": "terrainlab:small_village_desert",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 73561208,
+    "spacing": 8,
+    "separation": 4,
+    "exclusion_zone": {
+      "other_set": "minecraft:villages",
+      "chunk_count": 6
+    }
+  }
+}
