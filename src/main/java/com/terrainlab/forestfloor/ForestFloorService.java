@@ -66,8 +66,8 @@ public final class ForestFloorService {
 
     private static final int CHUNKS_PER_TICK = 4;
     private static final int PLAYER_CHUNK_RADIUS = 6;
-    private static final int REACH = 8;              // leaves fall up to 8 blocks from a canopy column
-    private static final int MAX_LAYERS = 8;
+    private static final int REACH = 10;             // leaves fall up to 10 blocks from a canopy column
+    private static final int MAX_LAYERS = 6;
     private static final int MUSHROOMS_PER_CHUNK = 3;
     private static final int FLOWERS_PER_CHUNK = 8;
     private static final int MUSHROOM_CAP = 6;       // skip the top-up if the chunk already has this many
@@ -210,9 +210,13 @@ public final class ForestFloorService {
         }
     }
 
-    /** Piles beside trunks: a full block next to the log, about 2 layers 4 blocks out. */
+    /** Trunks are looked for this far out (for the tree colour beside them). */
     private static final double TRUNK_REACH = 4.0;
-    /** Light scatter: 2 layers under the canopy, fading to nothing at REACH. */
+    /** Layered piles (2+ layers) only in columns touching a trunk or a fallen log (8-neighbourhood). */
+    private static final double PILE_REACH = 1.5;
+    /** Share of floor columns that never get fallen leaves (fixed per column), to keep block counts down. */
+    private static final double THIN_OUT = 0.25;
+    /** Under the canopy, away from logs: flat leaf litter (layer 1 only), thinning out towards REACH. */
     private static final double CANOPY_LAYERS = 2.0;
 
     private static void accumulate(ServerLevel level, LevelChunk chunk, double[] progress) {
@@ -241,6 +245,23 @@ public final class ForestFloorService {
                 canopy[ax * size + az] = src;
                 pos.set(wx, ground, wz);
                 trunk[ax * size + az] = c.getBlockState(pos).is(BlockTags.LOGS);
+            }
+        }
+
+        // Fallen logs (a horizontal log as the top non-leaf block) in the chunk plus a 1-block ring.
+        boolean[] fallenLog = new boolean[18 * 18];
+        for (int ax = 0; ax < 18; ax++) {
+            for (int az = 0; az < 18; az++) {
+                int wx = bx - 1 + ax;
+                int wz = bz - 1 + az;
+                LevelChunk c = (wx >> 4) == cx && (wz >> 4) == cz
+                        ? chunk : level.getChunkSource().getChunkNow(wx >> 4, wz >> 4);
+                if (c == null) continue;
+                pos.set(wx, c.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, wx & 15, wz & 15), wz);
+                BlockState top = c.getBlockState(pos);
+                fallenLog[ax * 18 + az] = top.is(BlockTags.LOGS)
+                        && top.hasProperty(net.minecraft.world.level.block.RotatedPillarBlock.AXIS)
+                        && top.getValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS) != net.minecraft.core.Direction.Axis.Y;
             }
         }
 
@@ -280,14 +301,29 @@ public final class ForestFloorService {
                 int i = dx * 16 + dz;
                 if (canopyTree[i] == null) continue;
                 int wx = bx + dx, wz = bz + dz;
-                double dt = trunkDist[i];
-                double trunkDepth = dt <= 1.5 ? MAX_LAYERS
-                        : dt <= TRUNK_REACH ? MAX_LAYERS - (MAX_LAYERS - 2) * (dt - 1.5) / (TRUNK_REACH - 1.5) : 0.0;
+                boolean onLog = fallenLog[(dx + 1) * 18 + (dz + 1)];
+                boolean besideLog = false;
+                for (int ox = 0; ox <= 2 && !besideLog; ox++) {
+                    for (int oz = 0; oz <= 2; oz++) {
+                        if (fallenLog[(dx + ox) * 18 + (dz + oz)] && !(ox == 1 && oz == 1)) {
+                            besideLog = true;
+                            break;
+                        }
+                    }
+                }
+                // Piles only right beside a trunk or a fallen log (not on top of the log itself).
+                boolean pile = !onLog && (trunkDist[i] <= PILE_REACH || besideLog);
                 double canopyDepth = CANOPY_LAYERS * (1.0 - canopyDist[i] / REACH);
-                double depth = Math.max(trunkDepth, canopyDepth);
-                LeafSource tree = trunkDepth >= canopyDepth && trunkTree[i] != null ? trunkTree[i] : canopyTree[i];
+                double depth = pile ? Math.max(MAX_LAYERS, canopyDepth) : canopyDepth;
+                LeafSource tree = trunkDist[i] <= PILE_REACH && trunkTree[i] != null ? trunkTree[i] : canopyTree[i];
                 double noise = (hash(wx, wz) - 0.5) * 2.0;
                 int target = Math.min(MAX_LAYERS, (int) Math.round(progress[tree.ordinal()] * (depth + noise)));
+                if (!pile) {
+                    target = Math.min(target, 1); // flat leaf litter only, away from trunks and fallen logs
+                }
+                if (hash(wz * 7 + 13, wx * 5 - 29) < THIN_OUT) {
+                    target = 0; // thinned-out column: stays bare (existing leaves here are cleared)
+                }
 
                 pos.set(wx, surfaceY(chunk, wx, wz), wz);
                 BlockState here = chunk.getBlockState(pos);

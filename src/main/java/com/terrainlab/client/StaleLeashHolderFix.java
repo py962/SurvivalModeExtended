@@ -25,7 +25,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 @EventBusSubscriber(modid = TerrainLab.MODID, value = Dist.CLIENT)
 public final class StaleLeashHolderFix {
 
-    private static final boolean DEBUG_LOGGING = true;
+    private static final boolean DEBUG_LOGGING = false;
     private static final int CHECK_INTERVAL_TICKS = 10;
 
     private static int tickCounter;

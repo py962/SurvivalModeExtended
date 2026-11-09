@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public final class VillagerHungerDebug {
 
-    public static final boolean ENABLED = true;
+    public static final boolean ENABLED = false;
 
     /** Last read per villager: eaten, carried, hungry (0/1). */
     private static final Map<Villager, int[]> LAST = new WeakHashMap<>();

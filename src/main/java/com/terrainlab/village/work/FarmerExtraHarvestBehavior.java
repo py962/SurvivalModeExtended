@@ -8,11 +8,14 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.schedule.Activity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -20,16 +23,25 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Farmer: harvests what vanilla's HarvestFarmland ignores, within the work area around the job site.
- * Mature pumpkins and melons (the fruit block next to an attached stem; the stem stays) and sugar cane
+ * Farmer: harvests crops across the whole work area around the job site, not just the patch vanilla's
+ * HarvestFarmland reaches. Mature wheat, carrots, potatoes and beetroot (replanted at once from the
+ * drops, so the field never goes bare); mature pumpkins and melons (the fruit block next to an attached stem; the stem stays) and sugar cane
  * (everything from the 2nd block of a column up; the bottom block stays to regrow). Drops go straight
  * into the farmer's inventory (overflow is dropped). Needs mobGriefing, a village chest (the produce
  * is for it) and a free inventory slot. Up to {@link VillagerWorkConstants#FARMER_MAX_HARVESTS_PER_RUN}
  * blocks per run, nearest first.
  */
 public class FarmerExtraHarvestBehavior extends AbstractVillagerWorkBehavior {
+
+    /** Farmland crops harvested at full age, and the item that replants each. */
+    private static final Map<Block, Item> CROP_SEEDS = Map.of(
+            Blocks.WHEAT, Items.WHEAT_SEEDS,
+            Blocks.CARROTS, Items.CARROT,
+            Blocks.POTATOES, Items.POTATO,
+            Blocks.BEETROOTS, Items.BEETROOT_SEEDS);
 
     private final List<BlockPos> targets = new ArrayList<>();
     private @Nullable BlockPos current;
@@ -85,9 +97,12 @@ public class FarmerExtraHarvestBehavior extends AbstractVillagerWorkBehavior {
         }
     }
 
-    /** A stem-grown pumpkin/melon, or the 2nd block of a sugar cane column. */
+    /** A fully grown farmland crop, a stem-grown pumpkin/melon, or the 2nd block of a sugar cane column. */
     private static boolean isTarget(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
+        if (CROP_SEEDS.containsKey(state.getBlock())) {
+            return state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state);
+        }
         if (state.is(Blocks.PUMPKIN) || state.is(Blocks.MELON)) {
             return stemFor(level, pos) != null;
         }
@@ -155,7 +170,9 @@ public class FarmerExtraHarvestBehavior extends AbstractVillagerWorkBehavior {
         }
         BlockState state = level.getBlockState(current);
         BlockPos walk = current;
-        if (state.is(Blocks.PUMPKIN) || state.is(Blocks.MELON)) {
+        if (CROP_SEEDS.containsKey(state.getBlock())) {
+            walk = current; // beside or on the crop
+        } else if (state.is(Blocks.PUMPKIN) || state.is(Blocks.MELON)) {
             BlockPos stem = stemFor(level, current);
             walk = stem != null ? stem : current; // stand on the stem, next to the fruit
         } else {
@@ -177,9 +194,28 @@ public class FarmerExtraHarvestBehavior extends AbstractVillagerWorkBehavior {
             for (BlockPos p = top; p.getY() >= target.getY(); p = p.below()) {
                 breakInto(level, body, p);
             }
+        } else if (CROP_SEEDS.containsKey(state.getBlock())) {
+            breakInto(level, body, target);
+            // Replant from the inventory (the drops just went in).
+            if (takeOne(body, CROP_SEEDS.get(state.getBlock()))) {
+                level.setBlock(target, state.getBlock().defaultBlockState(), Block.UPDATE_ALL);
+            }
         } else {
             breakInto(level, body, target);
         }
+    }
+
+    private static boolean takeOne(Villager body, Item item) {
+        var inventory = body.getInventory();
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (stack.is(item)) {
+                stack.shrink(1);
+                inventory.setChanged();
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void breakInto(ServerLevel level, Villager body, BlockPos pos) {
