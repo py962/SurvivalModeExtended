@@ -78,7 +78,7 @@ public final class DualWield {
     private static final int SERVER_CHARGE_TOLERANCE = 5;
 
     /** Debug logging for the strike flow (client input + server handling). Turn off once tested. */
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     private DualWield() {}
 

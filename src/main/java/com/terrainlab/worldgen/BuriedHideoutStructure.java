@@ -337,10 +337,16 @@ public class BuriedHideoutStructure extends Structure {
         // 3. Rear escape, east along the rail line, falling until it reaches a cave or the surface.
         Direction rear = rotation.rotate(Direction.EAST);
         BlockPos rearStart = origin.offset(StructureTemplate.calculateRelativePosition(settings, REAR_START));
-        // The escape tunnel never rejects a location: it runs as far as it can (see planRear).
+        // The escape tunnel must lead somewhere: open air or a cave. Otherwise this rotation fails.
+        terrain.rearExit = false;
         BuriedHideoutPieces.TunnelPlan rearPlan = planRear(terrain, rearStart, rear);
         terrain.trace.append(", rear ").append(rearPlan == null ? 0 : rearPlan.steps().size()).append(" steps")
-                .append(terrain.lastTunnelReason.isEmpty() ? "" : " (" + terrain.lastTunnelReason + ")").append(", ");
+                .append(terrain.lastTunnelReason.isEmpty() ? "" : " (" + terrain.lastTunnelReason + ")");
+        if (rearPlan == null || !terrain.rearExit) {
+            terrain.trace.append(", rear tunnel reaches neither a cave nor open air");
+            return Optional.empty();
+        }
+        terrain.trace.append(", ");
 
         // Vanilla's final biome check reads the biome at this point, so it is set at ground level above
         // the room centre (not down at the chest, where the biome can read as a cave biome).
@@ -414,9 +420,10 @@ public class BuriedHideoutStructure extends Structure {
     }
 
     /**
-     * The escape tunnel is never a reason to reject a location: when it cannot go on (water or lava
-     * ahead, the step limit, a bridge too long or running into water, the hillside over a drop),
-     * the track simply ends where it got to, against a hay bale bumper. Fluids beside the carved
+     * Where the escape tunnel stops short (water or lava ahead, the step limit, the structure's reach),
+     * the rotation is rejected unless it already reached open air or a large cave (Terrain#rearExit).
+     * A bridge too long or running into water, or the hillside over a drop, still counts as an exit:
+     * the track ends where it got to, against a hay bale bumper. Fluids beside the carved
      * tunnel are sealed off as it is built. Null only if there is no room for even one step.
      */
     private static BuriedHideoutPieces.TunnelPlan endHere(Terrain terrain, List<int[]> steps, Direction dir,
@@ -459,6 +466,7 @@ public class BuriedHideoutStructure extends Structure {
             boolean overDrop = groundTop < rail - 1;
 
             if (outside) {
+                terrain.rearExit = true;
                 if (!overDrop) {
                     steps.add(new int[]{x, z, rail, ground, flags, Integer.MIN_VALUE});
                     return new BuriedHideoutPieces.TunnelPlan(false, dir, i, steps);
@@ -477,6 +485,7 @@ public class BuriedHideoutStructure extends Structure {
                     continue;
                 }
                 steps.add(new int[]{x, z, rail, ground, flags, Integer.MIN_VALUE});
+                terrain.rearExit = true; // a cave too big to cross
                 if (!overDrop) {
                     return new BuriedHideoutPieces.TunnelPlan(false, dir, i, steps);
                 }
@@ -613,6 +622,8 @@ public class BuriedHideoutStructure extends Structure {
         /** Debug: what was tried at this location, logged when debugging is on. */
         final StringBuilder trace = new StringBuilder();
         String lastTunnelReason = "";
+        /** Set when the rear escape tunnel reaches open air or a cave larger than a small crossing. */
+        boolean rearExit;
 
         private final net.minecraft.world.level.ChunkPos startChunk;
 

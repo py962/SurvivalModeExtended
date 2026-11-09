@@ -38,13 +38,13 @@ import java.util.function.Supplier;
 
 /**
  * Butcher husbandry within the work area around the job site. Per species (chicken, sheep, pig, cow,
- * caribou), counting all adults present:
+ * caribou):
  * <ul>
- *   <li>fewer than {@link VillagerWorkConstants#BREED_BELOW} but at least
+ *   <li>fewer than {@link VillagerWorkConstants#BREED_BELOW} animals (adults and babies) and at least
  *       {@link VillagerWorkConstants#BREED_MIN_ADULTS}: fetch 2 feed (own inventory first, else walk to
  *       the village chest), walk to two eligible adults and put each in love — once per species per
  *       {@link VillagerWorkConstants#BREED_COOLDOWN_TICKS};</li>
- *   <li>more than {@link VillagerWorkConstants#SLAUGHTER_ABOVE}: walk to the oldest eligible adult and
+ *   <li>more than {@link VillagerWorkConstants#SLAUGHTER_ABOVE} adults: walk to the oldest eligible adult and
  *       kill it with one blow (villager as the damage source, so normal mob-kill loot drops); the fresh
  *       drops go into the butcher's inventory, raw food smoked instantly. At most once per
  *       {@link VillagerWorkConstants#SLAUGHTER_COOLDOWN_TICKS}. {@link DepositProduceBehavior} then
@@ -150,16 +150,17 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
         int r = VillagerWorkConstants.RANGE;
         AABB box = new AABB(site).inflate(r, VillagerWorkConstants.RANGE_VERTICAL, r);
         List<Animal> animals = level.getEntitiesOfClass(Animal.class, box,
-                a -> a.isAlive() && !a.isBaby() && VillagerWork.inWorkArea(site, a.position()));
+                a -> a.isAlive() && VillagerWork.inWorkArea(site, a.position()));
 
         VillagerWorkState state = VillagerWork.state(body);
         List<Species> order = new ArrayList<>(List.of(Species.values()));
         Collections.shuffle(order, new java.util.Random(level.getRandom().nextLong()));
 
         for (Species s : order) {
-            List<Animal> adults = animals.stream().filter(a -> a.getType() == s.type.get()).toList();
-            int count = adults.size();
-            if (count < VillagerWorkConstants.BREED_BELOW && count >= VillagerWorkConstants.BREED_MIN_ADULTS
+            List<Animal> adults = animals.stream().filter(a -> a.getType() == s.type.get() && !a.isBaby()).toList();
+            // Babies count towards the breeding limit, so the herd does not overshoot while they grow.
+            int count = (int) animals.stream().filter(a -> a.getType() == s.type.get()).count();
+            if (count < VillagerWorkConstants.BREED_BELOW && adults.size() >= VillagerWorkConstants.BREED_MIN_ADULTS
                     && VillagerWorkState.elapsed(state.lastBreed(s.key), now, VillagerWorkConstants.BREED_COOLDOWN_TICKS)
                     && planBreed(level, body, s, adults, now)) {
                 return true;
@@ -168,7 +169,7 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
         if (VillagerWorkState.elapsed(state.lastSlaughter(), now, VillagerWorkConstants.SLAUGHTER_COOLDOWN_TICKS)
                 && VillagerWork.freeSlots(body.getInventory()) >= 2) {
             for (Species s : order) {
-                List<Animal> adults = animals.stream().filter(a -> a.getType() == s.type.get()).toList();
+                List<Animal> adults = animals.stream().filter(a -> a.getType() == s.type.get() && !a.isBaby()).toList();
                 if (adults.size() > VillagerWorkConstants.SLAUGHTER_ABOVE) {
                     Optional<Animal> victim = adults.stream()
                             .filter(a -> isFreeAnimal(a) && !a.isInLove())

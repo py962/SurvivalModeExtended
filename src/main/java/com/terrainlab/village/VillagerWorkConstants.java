@@ -53,12 +53,12 @@ public final class VillagerWorkConstants {
 
     // ---------------------------------------------------------------- butcher
 
-    /** Breed a species when fewer adults than this are near the job site... */
-    public static final int BREED_BELOW = 4;
+    /** Breed a species when fewer animals than this (adults and babies) are near the job site... */
+    public static final int BREED_BELOW = 12;
     /** ...and at least this many are present. */
     public static final int BREED_MIN_ADULTS = 2;
     /** Slaughter one adult when more than this many are near the job site. */
-    public static final int SLAUGHTER_ABOVE = 8;
+    public static final int SLAUGHTER_ABOVE = 6;
     /** Per-species pause between two breedings by the same butcher. */
     public static final int BREED_COOLDOWN_TICKS = 3600;
     /** Pause between two slaughters by the same butcher. */
@@ -70,8 +70,8 @@ public final class VillagerWorkConstants {
 
     // ---------------------------------------------------------------- fisherman
 
-    public static final int FISH_MIN_TICKS = 1800;
-    public static final int FISH_MAX_TICKS = 4200;
+    public static final int FISH_MIN_TICKS = 500;
+    public static final int FISH_MAX_TICKS = 700;
     /** Mean of the uniform wait above (documentation only). */
     public static final int FISH_MEAN_TICKS = (FISH_MIN_TICKS + FISH_MAX_TICKS) / 2;
     /** Catch items carried before the fisherman delivers to the chest. */
