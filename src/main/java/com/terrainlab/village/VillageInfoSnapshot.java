@@ -99,7 +99,7 @@ public final class VillageInfoSnapshot {
             boolean tired = VillagerTiredService.isTired(villager, gameTime);
             boolean trapped = VillagerTrappedService.isTrapped(villager);
             VillagerThermalState thermal = villager.getData(ModAttachments.VILLAGER_THERMAL_STATE.get());
-            boolean hungry = VillagerMoodService.isHungry(villager);
+            boolean hungry = VillagerMoodService.isReportedHungry(villager);
             boolean injured = VillagerMoodService.isInjured(villager);
             rows.add(new Row(professionKey, level_, scared, tired, trapped, hungry, injured, thermal));
         }

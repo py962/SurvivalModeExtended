@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "minecraft:ruined_portal_jungle",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 61904437,
+    "spacing": 26,
+    "separation": 10
+  }
+}

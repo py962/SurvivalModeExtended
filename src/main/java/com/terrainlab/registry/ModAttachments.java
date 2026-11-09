@@ -432,6 +432,21 @@ public class ModAttachments {
                             .build());
 
     // Game time of the villager's last meal from the village chest (meal cooldown); -1 = never.
+    // Game time a villager first counted as hungry in its current spell of hunger (-1 = not hungry).
+    // It only shows as hungry (mood, sounds, happiness) once this is a full day old.
+    public static final Supplier<AttachmentType<Long>> VILLAGER_HUNGRY_SINCE =
+            ATTACHMENT_TYPES.register("villager_hungry_since", () ->
+                    AttachmentType.builder(() -> -1L)
+                            .serialize(Codec.LONG.fieldOf("villager_hungry_since"), t -> t >= 0L)
+                            .build());
+
+    // Game time of the villager's last morning trip to its bell (VillagerMorningChestService).
+    public static final Supplier<AttachmentType<Long>> VILLAGER_MORNING_CHEST_TICK =
+            ATTACHMENT_TYPES.register("villager_morning_chest_tick", () ->
+                    AttachmentType.builder(() -> -1L)
+                            .serialize(Codec.LONG.fieldOf("villager_morning_chest_tick"), t -> t >= 0L)
+                            .build());
+
     public static final Supplier<AttachmentType<Long>> VILLAGER_LAST_CHEST_MEAL_TICK =
             ATTACHMENT_TYPES.register("villager_last_chest_meal_tick", () ->
                     AttachmentType.builder(() -> -1L)

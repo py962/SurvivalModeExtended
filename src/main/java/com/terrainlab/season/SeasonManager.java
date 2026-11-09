@@ -16,8 +16,8 @@ public final class SeasonManager {
      */
     public static long yearRelativeTick(long levelGameTime, long seasonalOffset) {
         long total = levelGameTime + seasonalOffset;
-        long mod = total % Season.YEAR_LENGTH_TICKS;
-        return mod < 0 ? mod + Season.YEAR_LENGTH_TICKS : mod;
+        long mod = total % Season.yearLengthTicks();
+        return mod < 0 ? mod + Season.yearLengthTicks() : mod;
     }
 
     public static Season getCurrentSeason(long levelGameTime, long seasonalOffset) {
@@ -33,17 +33,17 @@ public final class SeasonManager {
     }
 
     /**
-     * Progress through the current 10-day calendar state, as a fraction [0.0, 1.0).
+     * Progress through the current calendar state, as a fraction [0.0, 1.0).
      * Useful for cross-fading visuals or interpolating toward the next state.
      */
     public static double getStateProgress(long levelGameTime, long seasonalOffset) {
         long yearTick = yearRelativeTick(levelGameTime, seasonalOffset);
         long intoState = Season.ticksIntoCurrentState(yearTick);
-        return intoState / (double) Season.STATE_LENGTH_TICKS;
+        return intoState / (double) Season.stateLengthTicks();
     }
 
     /**
-     * Which in-game day number (0-9) within the current 10-day calendar state.
+     * Which in-game day number (counting from 0) within the current calendar state.
      */
     public static int getDayInState(long levelGameTime, long seasonalOffset) {
         long yearTick = yearRelativeTick(levelGameTime, seasonalOffset);

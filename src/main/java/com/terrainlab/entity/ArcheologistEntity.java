@@ -89,7 +89,7 @@ public class ArcheologistEntity extends AbstractTrailTraderEntity {
         return "message.terrainlab.trail_trader.archeologist";
     }
 
-    /** Temple Map: found in Jungle Temple chests. */
+    /** Temple Map: found framed on the wall of the Jungle Temple's hidden room. */
     @Override
     protected String getRequiredRelicMap() {
         return "temple_map";

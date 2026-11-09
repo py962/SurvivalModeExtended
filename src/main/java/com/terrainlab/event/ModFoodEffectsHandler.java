@@ -33,7 +33,7 @@ public class ModFoodEffectsHandler {
         Item item = event.getItem().getItem();
         FoodCategory category = FoodCategoryTable.getCategory(item);
 
-        if (category == null) {
+        if (category == null && !isBlueOrchidStew(event.getItem())) {
             return;
         }
 
@@ -109,12 +109,19 @@ public class ModFoodEffectsHandler {
                 throw ex;
             }
 
+            syncFoodToClient(player);
             return;
         }
 
         // Suspicious Stew: Blue Orchid and Oxeye Daisy are remapped here; Dandelion's WARMTH is a real effect vanilla applies.
         if (item == net.minecraft.world.item.Items.SUSPICIOUS_STEW) {
             String flower = stack.get(com.terrainlab.registry.ModDataComponents.STEW_FLOWER.get());
+            if ("blue_orchid".equals(flower)) {
+                // An ENERGY food: no hunger, like cocoa beans (snapshot taken in onItemStartUsing).
+                player.getFoodData().setFoodLevel(player.getData(ModAttachments.PLAYER_PRE_EAT_HUNGER.get()));
+                player.getFoodData().setSaturation(player.getData(ModAttachments.PLAYER_PRE_EAT_SATURATION.get()));
+                syncFoodToClient(player);
+            }
             if ("blue_orchid".equals(flower)
                     && com.terrainlab.energy.PlayerEnergyFoodCap.tryConsumeUse(player)) {
                 float energy = player.getData(com.terrainlab.registry.ModAttachments.PLAYER_ENERGY.get());
@@ -131,5 +138,23 @@ public class ModFoodEffectsHandler {
             return;
         }
 
+    }
+
+    private static boolean isBlueOrchidStew(ItemStack stack) {
+        return stack.getItem() == net.minecraft.world.item.Items.SUSPICIOUS_STEW
+                && "blue_orchid".equals(stack.get(com.terrainlab.registry.ModDataComponents.STEW_FLOWER.get()));
+    }
+
+    /**
+     * The client eats the food too (it predicts the hunger gain locally), but the server only sends
+     * hunger when its own value differs from the last one it sent. Putting hunger back to the
+     * pre-eat value leaves the server's value unchanged, so without this the client keeps showing
+     * the predicted gain (e.g. +2 from a melon slice) until hunger next changes.
+     */
+    private static void syncFoodToClient(ServerPlayer player) {
+        player.connection.send(new net.minecraft.network.protocol.game.ClientboundSetHealthPacket(
+                player.getHealth(),
+                player.getFoodData().getFoodLevel(),
+                player.getFoodData().getSaturationLevel()));
     }
 }

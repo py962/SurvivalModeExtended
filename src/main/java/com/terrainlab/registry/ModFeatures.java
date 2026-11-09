@@ -16,6 +16,7 @@ import com.terrainlab.worldgen.LargeSpringFeature;
 import com.terrainlab.worldgen.InlandRiverFloodFeature;
 import com.terrainlab.worldgen.MagnetiteOreFeature;
 import com.terrainlab.worldgen.SeaLevelBarrierGapFeature;
+import com.terrainlab.worldgen.SuspiciousSandPatchFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.UnderwaterMagmaConfiguration;
 /** Worldgen feature registrations. */
 public class ModFeatures {
@@ -57,6 +58,10 @@ public class ModFeatures {
     public static final DeferredHolder<Feature<?>, SeaLevelBarrierGapFeature> SEA_LEVEL_BARRIER_GAP =
             FEATURES.register("sea_level_barrier_gap",
                     () -> new SeaLevelBarrierGapFeature(NoneFeatureConfiguration.CODEC));
+
+    public static final DeferredHolder<Feature<?>, SuspiciousSandPatchFeature> SUSPICIOUS_SAND_PATCH =
+            FEATURES.register("suspicious_sand_patch",
+                    () -> new SuspiciousSandPatchFeature(NoneFeatureConfiguration.CODEC));
 
     // Tree placers backported from 26.3's poplar (see worldgen.poplar).
     public static final DeferredRegister<net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType<?>> TRUNK_PLACERS =

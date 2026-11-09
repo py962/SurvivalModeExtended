@@ -1,5 +1,5 @@
 {
-  "feature": "minecraft:ore_gold",
+  "feature": "terrainlab:ore_gold_extra",
   "placement": [
     {
       "type": "minecraft:count",

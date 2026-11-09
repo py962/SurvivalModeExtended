@@ -81,7 +81,12 @@ public final class VillagerChestMealService {
     public static void update(Villager villager, ServerLevel level, long gameTime) {
         finishStaleMeal(villager, gameTime);
 
+        int flags = villager.getData(ModAttachments.VILLAGER_MOOD_FLAGS.get());
+        // Eats on actual hunger; the HUNGRY mood flag only shows after a day of it.
+        boolean hungry = VillagerMoodService.isHungry(villager);
+
         if (villager.isSleeping() || villager.isTrading() || !villager.isAlive()) {
+            if (hungry) VillagerHungerDebug.skip(villager, villager.isSleeping() ? "asleep" : "trading");
             return;
         }
         if (villager.getData(ModAttachments.VILLAGER_EATING_UNTIL.get()) > 0L) {
@@ -89,27 +94,33 @@ public final class VillagerChestMealService {
         }
         long last = villager.getData(ModAttachments.VILLAGER_LAST_CHEST_MEAL_TICK.get());
         if (last >= 0L && gameTime - last < MEAL_COOLDOWN_TICKS) {
+            if (hungry) VillagerHungerDebug.skip(villager, "meal cooldown");
             return;
         }
 
-        int flags = villager.getData(ModAttachments.VILLAGER_MOOD_FLAGS.get());
-        int needs = flags & (VillagerMoodService.INJURED | VillagerMoodService.COLD
-                | VillagerMoodService.HOT | VillagerMoodService.HUNGRY);
+        int needs = (flags & (VillagerMoodService.INJURED | VillagerMoodService.COLD
+                | VillagerMoodService.HOT)) | (hungry ? VillagerMoodService.HUNGRY : 0);
         if (needs == 0) {
             return;
         }
 
         Optional<BlockPos> bell = bellInReach(villager, level);
         if (bell.isEmpty()) {
+            if (hungry) VillagerHungerDebug.skip(villager,
+                    villager.getBrain().getMemory(MemoryModuleType.MEETING_POINT).isEmpty()
+                            ? "no bell (meeting point) remembered" : "not within " + BELL_REACH + " blocks of its bell");
             return;
         }
 
         ItemStack food = takeFood(level, bell.get(), needs);
         if (food.isEmpty()) {
+            if (hungry) VillagerHungerDebug.skip(villager, "no suitable food in the chest at its bell");
             return;
         }
 
+        int storeBefore = VillagerFoodAccess.getFoodPoints(villager);
         applyEffects(villager, level, food, gameTime);
+        VillagerHungerDebug.meal(villager, food, storeBefore, VillagerFoodAccess.getFoodPoints(villager));
         returnRemainder(villager, level, bell.get(), food);
         startEating(villager, level, food, gameTime);
         villager.setData(ModAttachments.VILLAGER_LAST_CHEST_MEAL_TICK.get(), gameTime);

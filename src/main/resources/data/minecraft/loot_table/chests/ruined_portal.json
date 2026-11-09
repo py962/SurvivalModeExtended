@@ -71,6 +71,17 @@
           "type": "minecraft:item",
           "functions": [
             {
+              "function": "minecraft:set_potion",
+              "id": "minecraft:awkward"
+            }
+          ],
+          "name": "minecraft:potion",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
               "add": false,
               "count": {
                 "type": "minecraft:uniform",

@@ -110,11 +110,22 @@ public class HouseboatEntity extends Boat {
         return super.hurtServer(level, source, amount * 0.1F);
     }
 
-    // Pick radius also affects attack raycasts; larger values made swings at nearby
-    // blocks hit the boat instead.
+    // Pick radius inflates the area the crosshair can target. A seated rider's eyes are about
+    // 1.22 above the boat's base; with 1.2 the area reaches 1.76, so the rider's eyes are inside it
+    // and the game targets this boat wherever they look (right-clicks with bows, food and shields
+    // and every left-click went to the boat). 0.5 keeps the area (top 1.06) below the rider's eyes,
+    // and vanilla never targets a rider's own vehicle from outside. The old 1.2 is kept only while
+    // a rider has both hands empty, so the empty-hand click to sleep still reaches the boat.
     @Override
     public float getPickRadius() {
-        return 1.2F;
+        for (Entity passenger : this.getPassengers()) {
+            if (passenger instanceof Player rider
+                    && rider.getMainHandItem().isEmpty()
+                    && rider.getOffhandItem().isEmpty()) {
+                return 1.2F;
+            }
+        }
+        return 0.5F;
     }
 
     // getControllingPassenger() is deliberately not overridden: AbstractBoat.tick() treats

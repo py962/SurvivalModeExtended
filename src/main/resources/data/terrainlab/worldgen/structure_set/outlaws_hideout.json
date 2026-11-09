@@ -2,6 +2,7 @@
   "structures": [{"structure": "terrainlab:outlaws_hideout", "weight": 1}],
   "placement": {
     "type": "minecraft:random_spread",
+    "frequency": 0.5,
     "salt": 728391642,
     "exclusion_zone": {
       "other_set": "minecraft:villages",

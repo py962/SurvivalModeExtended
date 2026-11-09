@@ -20,16 +20,20 @@ public class SeasonSavedData extends SavedData {
             level -> RecordCodecBuilder.create(instance -> instance.group(
                     RecordCodecBuilder.point(level),
                     com.mojang.serialization.Codec.LONG.fieldOf("seasonal_offset")
-                            .forGetter(sd -> sd.seasonalOffset)
-            ).apply(instance, (lvl, offset) -> {
+                            .forGetter(sd -> sd.seasonalOffset),
+                    com.mojang.serialization.Codec.INT.optionalFieldOf("year_length_days", Season.DEFAULT_YEAR_LENGTH_DAYS)
+                            .forGetter(sd -> sd.yearLengthDays)
+            ).apply(instance, (lvl, offset, yearDays) -> {
                 SeasonSavedData data = new SeasonSavedData(lvl);
                 data.seasonalOffset = offset;
+                data.yearLengthDays = yearDays;
                 return data;
             }))
     );
 
     private final ServerLevel level;
     private long seasonalOffset;
+    private int yearLengthDays = Season.DEFAULT_YEAR_LENGTH_DAYS;
 
     public SeasonSavedData() {
         this.level = null;
@@ -50,13 +54,23 @@ public class SeasonSavedData extends SavedData {
         return seasonalOffset;
     }
 
+    /** The world's seasonal year length in days (60 to 360); worlds that never set one have 60. */
+    public int getYearLengthDays() {
+        return Season.isValidYearLength(yearLengthDays) ? yearLengthDays : Season.DEFAULT_YEAR_LENGTH_DAYS;
+    }
+
+    public void setYearLengthDays(int days) {
+        this.yearLengthDays = days;
+        setDirty();
+    }
+
     /**
      * Sets the offset (the /terrainlab season command). 0 means "not generated yet" to
      * generateOffsetIfAbsent, so a zero offset is stored as one full year, which is equivalent.
      */
     public void setSeasonalOffset(long offset) {
-        long normalised = Math.floorMod(offset, Season.YEAR_LENGTH_TICKS);
-        this.seasonalOffset = normalised == 0L ? Season.YEAR_LENGTH_TICKS : normalised;
+        long normalised = Math.floorMod(offset, Season.yearLengthTicks());
+        this.seasonalOffset = normalised == 0L ? Season.yearLengthTicks() : normalised;
         setDirty();
     }
 
@@ -67,7 +81,7 @@ public class SeasonSavedData extends SavedData {
         if (seasonalOffset != 0L) return;
         // Distinct seed mix from CodexSavedData so the two are uncorrelated.
         Random rng = new Random(worldSeed ^ 0x5345415359L);
-        this.seasonalOffset = rng.nextLong(Season.YEAR_LENGTH_TICKS);
+        this.seasonalOffset = rng.nextLong(Season.yearLengthTicks());
         setDirty();
     }
 }

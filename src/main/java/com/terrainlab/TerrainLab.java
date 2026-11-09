@@ -108,7 +108,6 @@ public class TerrainLab {
         com.terrainlab.registry.ModBlockPredicateTypes.register(modEventBus);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.RecallDeathDropHandler.class);
         NeoForge.EVENT_BUS.register(this);
-        NeoForge.EVENT_BUS.register(ModStructureHandler.class);
         NeoForge.EVENT_BUS.register(ModOceanMonumentRoomHandler.class);
         NeoForge.EVENT_BUS.register(ModAuroraHandler.class);
         modEventBus.addListener(this::onEntityAttributeCreation);

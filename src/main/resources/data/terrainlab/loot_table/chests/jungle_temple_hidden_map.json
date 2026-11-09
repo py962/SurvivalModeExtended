@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:map",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:exploration_map",
+              "destination": "terrainlab:locate/ancient_city",
+              "decoration": "minecraft:red_x",
+              "zoom": 2,
+              "search_radius": 100,
+              "skip_existing_chunks": true
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": {
+                "terrainlab_relic_map": "temple_map"
+              }
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "item.terrainlab.temple_map"
+              },
+              "target": "item_name"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
