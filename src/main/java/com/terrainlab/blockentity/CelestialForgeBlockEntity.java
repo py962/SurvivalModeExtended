@@ -84,7 +84,9 @@ public class CelestialForgeBlockEntity extends BlockEntity implements Container,
     // ---- readiness ----------------------------------------------------------
 
     public static boolean isReady(Level level, BlockPos pos) {
-        return ModAuroraHandler.isAuroraActive(level.dimension()) && level.canSeeSky(pos.above());
+        return level.canSeeSky(pos.above())
+                && level instanceof ServerLevel serverLevel
+                && ModAuroraHandler.isAuroraOver(serverLevel, pos);
     }
 
     /** Live readiness check used when opening the GUI; the client defers to the server. */

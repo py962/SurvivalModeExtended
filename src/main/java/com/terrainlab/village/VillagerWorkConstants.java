@@ -61,17 +61,17 @@ public final class VillagerWorkConstants {
     public static final int SLAUGHTER_ABOVE = 6;
     /** Per-species pause between two breedings by the same butcher. */
     public static final int BREED_COOLDOWN_TICKS = 3600;
+    /** Wheat and pig feed (each) a butcher tops up to whenever it visits the chest for feed. */
+    public static final int FEED_RESERVE = 8;
     /** Pause between two slaughters by the same butcher. */
     public static final int SLAUGHTER_COOLDOWN_TICKS = 2400;
-    /** The two parents must be at most this far apart (vanilla BreedGoal searches 8 blocks). */
-    public static final double BREED_PARTNER_RADIUS = 8.0D;
     /** Time between animal scans. */
     public static final int BUTCHER_SCAN_INTERVAL_TICKS = 200;
 
     // ---------------------------------------------------------------- fisherman
 
-    public static final int FISH_MIN_TICKS = 500;
-    public static final int FISH_MAX_TICKS = 700;
+    public static final int FISH_MIN_TICKS = 600;
+    public static final int FISH_MAX_TICKS = 840;
     /** Mean of the uniform wait above (documentation only). */
     public static final int FISH_MEAN_TICKS = (FISH_MIN_TICKS + FISH_MAX_TICKS) / 2;
     /** Catch items carried before the fisherman delivers to the chest. */

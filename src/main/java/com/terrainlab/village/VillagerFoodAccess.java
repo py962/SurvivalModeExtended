@@ -68,6 +68,43 @@ public final class VillagerFoodAccess {
         }
     }
 
+    /** Spends eaten food first, then inventory food; change from the last item goes back to foodLevel. */
+    public static void spendFood(Villager villager, int points) {
+        if (points <= 0) {
+            return;
+        }
+        int level = getFoodLevel(villager);
+        int fromLevel = Math.min(level, points);
+        if (fromLevel > 0) {
+            setFoodLevel(villager, level - fromLevel);
+            points -= fromLevel;
+        }
+        SimpleContainer inventory = villager.getInventory();
+        for (int slot = 0; slot < inventory.getContainerSize() && points > 0; slot++) {
+            net.minecraft.world.item.ItemStack stack = inventory.getItem(slot);
+            VillagerFood food = stack.get(DataComponents.VILLAGER_FOOD);
+            int value = food == null ? 0 : food.nutrition();
+            while (value > 0 && !stack.isEmpty() && points > 0) {
+                stack.shrink(1);
+                points -= value;
+            }
+        }
+        if (points < 0) {
+            addFoodLevel(villager, -points);
+        }
+    }
+
+    private static void setFoodLevel(Villager villager, int value) {
+        if (FOOD_LEVEL_FIELD == null) {
+            return;
+        }
+        try {
+            FOOD_LEVEL_FIELD.setInt(villager, Math.max(0, Math.min(MAX_FOOD_LEVEL, value)));
+        } catch (IllegalAccessException e) {
+            com.terrainlab.TerrainLab.LOGGER.warn("[VILLAGER_FOOD_ACCESS] setInt failed on {}: {}", villager, e.toString());
+        }
+    }
+
     private static Field resolveFoodLevelField() {
         try {
             Field f = Villager.class.getDeclaredField("foodLevel");

@@ -2,11 +2,11 @@ package com.terrainlab.client.renderer;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.client.model.ElephantModel;
+import com.terrainlab.client.model.ElephantSaddleModel;
 import com.terrainlab.client.model.HowdahModel;
 import com.terrainlab.entity.ElephantEntity;
 import com.terrainlab.registry.ModItems;
 import com.terrainlab.registry.ModModelLayers;
-import net.minecraft.client.model.animal.camel.CamelSaddleModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.AgeableMobRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -31,15 +31,15 @@ public class ElephantRenderer extends AgeableMobRenderer<ElephantEntity, CamelRe
         this.addLayer(createHowdahLayer(context));
     }
 
-    // Vanilla camel saddle geometry, drawn only when the saddle slot holds a plain Saddle.
-    private SimpleEquipmentLayer<CamelRenderState, ElephantModel, CamelSaddleModel> createSaddleLayer(
+    // Vanilla camel saddle geometry raised onto the back, drawn only when the saddle slot holds a plain Saddle.
+    private SimpleEquipmentLayer<CamelRenderState, ElephantModel, ElephantSaddleModel> createSaddleLayer(
             EntityRendererProvider.Context context) {
         return new SimpleEquipmentLayer<>(
                 this,
                 context.getEquipmentRenderer(),
                 EquipmentClientInfo.LayerType.CAMEL_SADDLE,
                 state -> state.saddle.is(net.minecraft.world.item.Items.SADDLE) ? state.saddle : ItemStack.EMPTY,
-                new CamelSaddleModel(context.bakeLayer(ModelLayers.CAMEL_SADDLE)),
+                new ElephantSaddleModel(context.bakeLayer(ModelLayers.CAMEL_SADDLE)),
                 null
         );
     }

@@ -84,7 +84,8 @@
             ]
           },
           "name": "minecraft:book",
-          "weight": 2
+          "weight": 2,
+          "quality": 3
         },
         {
           "type": "minecraft:item",
@@ -95,11 +96,13 @@
             }
           },
           "name": "minecraft:book",
-          "weight": 2
+          "weight": 2,
+          "quality": 3
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_block"
+          "name": "minecraft:diamond_block",
+          "quality": 3
         }
       ],
       "rolls": 1

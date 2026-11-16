@@ -21,7 +21,8 @@ import static com.terrainlab.energy.PlayerEnergyConstants.*;
  */
 public final class PlayerEnergyEffects {
 
-    private static final int WEAKNESS_REFRESH_DURATION_TICKS = 5;
+    // Longer than the HUD's 10 s fade-out, so the badge stays solid; cleared once energy returns.
+    private static final int WEAKNESS_REFRESH_DURATION_TICKS = 260;
     private static final int WEAKNESS_AMPLIFIER = 0;
 
     private static final double JUMP_STRENGTH_DELTA = 0.2253; // see class javadoc
@@ -77,6 +78,12 @@ public final class PlayerEnergyEffects {
                     false,
                     true
             ));
+        } else {
+            MobEffectInstance weakness = player.getEffect(MobEffects.WEAKNESS);
+            if (weakness != null && !weakness.isVisible() && weakness.getAmplifier() == WEAKNESS_AMPLIFIER
+                    && weakness.getDuration() <= WEAKNESS_REFRESH_DURATION_TICKS) {
+                player.removeEffect(MobEffects.WEAKNESS);
+            }
         }
     }
 }

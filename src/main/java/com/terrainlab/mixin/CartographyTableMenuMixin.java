@@ -36,6 +36,7 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu {
     @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",
             at = @At("TAIL"))
     private void terrainlab$replaceSlots(int containerId, Inventory inventory, ContainerLevelAccess access, CallbackInfo ci) {
+        this.slots.set(0, new MapTargetCopying.SourceSlot(this.slots.get(0), this.container));
         this.slots.set(1, new MapTargetCopying.RecipientSlot(this.slots.get(1), this.container));
         this.slots.set(2, new MapTargetCopying.ResultSlot(this.slots.get(2), this.resultContainer, this, access));
     }

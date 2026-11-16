@@ -2,7 +2,8 @@
   "type": "neoforge:add_spawns",
   "biomes": [
     "minecraft:swamp",
-    "terrainlab:marsh"
+    "terrainlab:marsh",
+    "minecraft:jungle"
   ],
   "spawners": [
     {

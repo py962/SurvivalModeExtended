@@ -12,7 +12,8 @@ public final class PlayerTemperatureConstants {
     public static final double COMFORTABLE_BAND_HIGH = 25.0;
     public static final double FREEZING_EFFECT_THRESHOLD = -0.0;
     public static final double HEATSTROKE_EFFECT_THRESHOLD = 40.0;
-    public static final int EFFECT_REFRESH_TICKS = 5;
+    // Longer than the HUD's 10 s fade-out, so the badge stays solid; cleared once the condition ends.
+    public static final int EFFECT_REFRESH_TICKS = 260;
     public static final double BASE_DRIFT_RATE = 0.001; // ~2 min to approach ambient from 20C
 
     // Fur multiplies the rate of cooling (strongly slowed) and heating (sped up).

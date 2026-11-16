@@ -75,22 +75,13 @@
           ],
           "monster": [
             {
-              "type": "minecraft:stray",
-              "count": {
-                "type": "minecraft:uniform",
-                "max_inclusive": 4,
-                "min_inclusive": 1
-              },
-              "weight": 10
-            },
-            {
               "type": "terrainlab:frostbitten",
               "count": {
                 "type": "minecraft:uniform",
                 "max_inclusive": 4,
                 "min_inclusive": 1
               },
-              "weight": 20
+              "weight": 10
             }
           ],
           "underground_water_creature": [

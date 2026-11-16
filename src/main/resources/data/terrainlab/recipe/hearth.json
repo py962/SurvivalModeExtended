@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BCB",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:brick",
+    "C": "minecraft:campfire"
+  },
+  "result": {
+    "id": "terrainlab:hearth",
+    "count": 1
+  }
+}

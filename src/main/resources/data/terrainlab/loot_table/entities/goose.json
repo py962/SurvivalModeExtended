@@ -16,7 +16,11 @@
           "name": "terrainlab:goose_feather"
         }
       ],
-      "rolls": 1
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:random_chance",
+        "chance": 0.5
+      }
     }
   ]
 }

@@ -20,13 +20,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import javax.annotation.Nullable;
 
 /**
- * Celestial Forge block. Its gem slot opens only while an aurora is active and the top is open to
- * the sky, and not while a ritual is under way; see {@link CelestialForgeBlockEntity}.
+ * Celestial Forge block. Its gem slot opens only while an aurora is active, the forge stands in a
+ * cold enough biome and its top is open to the sky, and not while a ritual is under way; see
+ * {@link CelestialForgeBlockEntity}.
  */
 public class CelestialForgeBlock extends BaseEntityBlock {
 
 
-    /** True while the forge is usable (aurora active and open to sky); selects the top-face model. */
+    /** True while the forge is usable (aurora, cold biome, open sky); selects the top-face model. */
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     public CelestialForgeBlock(BlockBehaviour.Properties properties) {

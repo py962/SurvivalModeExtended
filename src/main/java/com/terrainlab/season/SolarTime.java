@@ -217,6 +217,11 @@ public final class SolarTime {
         );
     }
 
+    /** Solar time of day where the sun warps, otherwise the clock time. */
+    public static long sunTimeOfDay(Level level) {
+        return warps(level) ? solarTimeOfDay(level) : Math.floorMod(level.getOverworldClockTime(), 24000L);
+    }
+
     /** Day by the warped sun. */
     public static boolean isSolarDay(Level level) {
         if (!warps(level)) {
@@ -232,10 +237,12 @@ public final class SolarTime {
      */
     public static final long TEMPERATURE_TRANSITION_TICKS = 2000L;
 
+    /** 06:00 to 10:00 */
+    public static final long MORNING_WARMUP_TICKS = 4000L;
+
     /**
-     * How far into "night" the temperature is, 0 (full day) to 1 (full night). Ramps smoothly across
-     * TEMPERATURE_TRANSITION_TICKS centred on solar sunset (12000) and sunrise (0/24000), so day and
-     * night temperatures blend instead of switching at once. Uses the warped sun, like isSolarDay.
+     * Temperature night fraction, 0 (day) to 1 (night). Mornings stay at night temperature until
+     * sunrise, then warm over MORNING_WARMUP_TICKS.
      */
     public static double nightFraction(Level level) {
         long s = warps(level)
@@ -247,12 +254,10 @@ public final class SolarTime {
         if (s >= 12000L - half && s < 12000L + half) {
             // Dusk: day -> night.
             linear = (s - (12000L - half)) / (double) TEMPERATURE_TRANSITION_TICKS;
-        } else if (s >= 12000L + half && s < 24000L - half) {
+        } else if (s >= 12000L + half) {
             linear = 1.0;
-        } else if (s >= 24000L - half || s < half) {
-            // Dawn: night -> day, wrapping past 0.
-            long u = Math.floorMod(s - (24000L - half), 24000L);
-            linear = 1.0 - u / (double) TEMPERATURE_TRANSITION_TICKS;
+        } else if (s < MORNING_WARMUP_TICKS) {
+            linear = 1.0 - s / (double) MORNING_WARMUP_TICKS;
         } else {
             linear = 0.0;
         }

@@ -70,6 +70,7 @@ public class TerrainLab {
 
     public TerrainLab(IEventBus modEventBus, ModContainer modContainer) {
         ModBlocks.register(modEventBus);
+        com.terrainlab.hearth.ModHearth.register(modEventBus);
         NeoForge.EVENT_BUS.register(ModSpawnHandler.class);
         ModBlockEntities.register(modEventBus);
         ModEntities.register(modEventBus);
@@ -109,6 +110,8 @@ public class TerrainLab {
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.register(ModOceanMonumentRoomHandler.class);
         NeoForge.EVENT_BUS.register(ModAuroraHandler.class);
+        NeoForge.EVENT_BUS.register(com.terrainlab.event.MobEffectAiHandler.class);
+        NeoForge.EVENT_BUS.register(com.terrainlab.entity.VehicleSleepGuard.class);
         modEventBus.addListener(this::onEntityAttributeCreation);
         modEventBus.addListener(this::onSpawnPlacementRegister);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.VillageInfoInteractionHandler.class);

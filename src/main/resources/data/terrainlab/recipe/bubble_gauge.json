@@ -2,14 +2,24 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    " I ",
-    "GRG",
-    " I "
+    "CGG",
+    "WKP",
+    "CGG"
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "G": "minecraft:glass",
-    "R": "minecraft:redstone"
+    "C": "minecraft:copper_ingot",
+    "G": "minecraft:glass_pane",
+    "K": "minecraft:ink_sac",
+    "P": "minecraft:paper",
+    "W": {
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "minecraft:potion",
+      "components": {
+        "minecraft:potion_contents": {
+          "potion": "minecraft:water"
+        }
+      }
+    }
   },
   "result": {
     "id": "terrainlab:bubble_gauge",

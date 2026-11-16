@@ -26,14 +26,14 @@ import java.util.UUID;
  * starts, up to four adults near the bell sing their village type's tune (melody, bass and up to
  * two harmony parts), once per village per day and only when a player is within earshot.
  * <p>
- * Uses the unwarped day clock, matching VillagerScheduleService.
+ * Timed on solar time, matching VillagerScheduleService.
  */
 public final class VillageSongService {
 
     private VillageSongService() {
     }
 
-    /** Gathering starts at 13000 (VillagerScheduleService); allows ~10s to arrive. */
+    /** Partway through the 12000-14000 gathering (VillagerScheduleService), once villagers have arrived. */
     private static final long SONG_START_TICK = 13_200L;
     /** Retry window (ticks) in case nobody has reached the bell yet. */
     private static final long START_WINDOW_TICKS = 400L;
@@ -69,7 +69,7 @@ public final class VillageSongService {
         if (level.getGameTime() % 20 != 0) {
             return;
         }
-        long timeOfDay = Math.floorMod(level.getOverworldClockTime(), 24000L);
+        long timeOfDay = com.terrainlab.season.SolarTime.solarTimeOfDay(level);
         if (timeOfDay < SONG_START_TICK || timeOfDay >= SONG_START_TICK + START_WINDOW_TICKS) {
             return;
         }
@@ -88,14 +88,16 @@ public final class VillageSongService {
                     LISTENER_RADIUS, false) == null) {
                 continue;
             }
+            // The evening gathering is at the village's lit hearth if it has one.
+            BlockPos spot = com.terrainlab.hearth.HearthService.gatheringPoint(level, bell);
             List<Villager> gathered = level.getEntitiesOfClass(Villager.class,
-                    new AABB(bell).inflate(SINGER_RADIUS),
+                    new AABB(spot).inflate(SINGER_RADIUS),
                     v -> v.isAlive() && !v.isBaby() && !v.isSleeping());
             if (gathered.isEmpty()) {
-                continue; // nobody at the bell yet; retry next second
+                continue; // nobody gathered yet; retry next second
             }
             lastSungDay.put(id, day);
-            start(level, bell, gathered);
+            start(level, spot, gathered);
         }
     }
 

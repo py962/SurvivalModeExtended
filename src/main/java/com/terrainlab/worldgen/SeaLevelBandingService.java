@@ -1,7 +1,7 @@
 package com.terrainlab.worldgen;
 
 /**
- * Banded sea level: columns farther inland get a higher water level, from 63 up to 75 in 0.05 steps of
+ * Banded sea level: columns farther inland get a higher water level, from 63 up to 89 in 0.05 steps of
  * {@code score = continentalness - erosion} starting at 0.75. Columns with continentalness below -0.1
  * always stay at 63. Both noises span roughly -1..1, so every tier is reachable.
  */
@@ -10,23 +10,25 @@ public final class SeaLevelBandingService {
     public static final int BASE_SEA_LEVEL = 63;
 
     /** Highest banded level; must equal the last entry of LEVELS. Not the barrier window (see BARRIER_MIN_Y). */
-    public static final int MAX_BANDED_LEVEL = 75;
+    public static final int MAX_BANDED_LEVEL = 89;
 
     /**
-     * Y range the sea-level barrier system observes and edits. Wider than 63..75 because vanilla centres a
+     * Y range the sea-level barrier system observes and edits. Wider than 63..89 because vanilla centres a
      * barrier on the average of two cells' levels plus barrier noise, so e.g. a 63/64 junction can place
      * barrier blocks at y=62.
      */
     public static final int BARRIER_MIN_Y = 50;
-    public static final int BARRIER_MAX_Y = 80;
+    public static final int BARRIER_MAX_Y = 94;
 
     private static final double CONTINENTALNESS_FLOOR = -0.1;
 
     private static final double[] THRESHOLDS = {
-            0.75, 0.80, 0.85, 0.90, 0.95, 1.00, 1.05, 1.10, 1.15, 1.20, 1.25, 1.30
+            0.75, 0.80, 0.85, 0.90, 0.95, 1.00, 1.05, 1.10, 1.15, 1.20, 1.25, 1.30,
+            1.35, 1.40, 1.45, 1.50, 1.55, 1.60, 1.65, 1.70, 1.75, 1.80, 1.85, 1.90, 1.95, 2.00
     };
     private static final int[] LEVELS = {
-            64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75
+            64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
+            76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89
     };
 
     private SeaLevelBandingService() {
@@ -36,7 +38,7 @@ public final class SeaLevelBandingService {
      * @param continentalness raw continentalness sample for a column - used only for the
      *                        hard floor gate.
      * @param combinedScore   continentalness - erosion for a column.
-     * @return the banded sea level for that column, one of 63..75.
+     * @return the banded sea level for that column, one of 63..89.
      */
     public static int bandedLevel(double continentalness, double combinedScore) {
         if (continentalness < CONTINENTALNESS_FLOOR) {

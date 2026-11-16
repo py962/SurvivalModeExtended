@@ -16,7 +16,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 public class GooseFeatherShedHandler {
 
     // Per-tick 1-in-N chance.
-    private static final int SHED_CHANCE_DENOMINATOR = 1000;
+    private static final int SHED_CHANCE_DENOMINATOR = 2000;
 
     @SubscribeEvent
     public static void onGooseTick(EntityTickEvent.Post event) {

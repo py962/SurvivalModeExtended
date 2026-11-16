@@ -195,6 +195,15 @@
         }
       ],
       "rolls": 1
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "terrainlab:diamond_upgrade_smithing_template"
+        }
+      ]
     }
   ],
   "random_sequence": "terrainlab:chests/outlaws_hideout_chest"

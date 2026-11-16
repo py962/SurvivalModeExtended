@@ -25,7 +25,7 @@
           ],
           "monster": [
             {
-              "type": "terrainlab:frostbitten",
+              "type": "minecraft:stray",
               "count": {
                 "type": "minecraft:uniform",
                 "max_inclusive": 4,

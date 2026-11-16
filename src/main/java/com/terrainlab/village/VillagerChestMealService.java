@@ -52,6 +52,10 @@ public final class VillagerChestMealService {
     public static final double BELL_REACH = 4.0D;
     private static final double BELL_REACH_VERTICAL = 3.0D;
 
+    /** Vanilla's breeding threshold. */
+    public static final int TOP_UP_BELOW_POINTS = 12;
+    private static final String TOP_UP_DAY_KEY = "terrainlab_top_up_day";
+
     /** Food temperature offsets last this long, decaying linearly to 0. */
     public static final long FOOD_TEMP_OFFSET_TICKS = 12000L;
     /** Stacked food offsets are capped at this many single (already doubled) pushes. */
@@ -98,8 +102,14 @@ public final class VillagerChestMealService {
             return;
         }
 
+        // One extra meal a day while below breeding level.
+        long day = Math.floorDiv(level.getOverworldClockTime(), VillageConstants.DAY_LENGTH_TICKS);
+        boolean topUp = !hungry && !villager.isBaby()
+                && VillagerFoodAccess.getFoodPoints(villager) < TOP_UP_BELOW_POINTS
+                && villager.getPersistentData().getLongOr(TOP_UP_DAY_KEY, -1L) != day;
+
         int needs = (flags & (VillagerMoodService.INJURED | VillagerMoodService.COLD
-                | VillagerMoodService.HOT)) | (hungry ? VillagerMoodService.HUNGRY : 0);
+                | VillagerMoodService.HOT)) | (hungry || topUp ? VillagerMoodService.HUNGRY : 0);
         if (needs == 0) {
             return;
         }
@@ -124,6 +134,9 @@ public final class VillagerChestMealService {
         returnRemainder(villager, level, bell.get(), food);
         startEating(villager, level, food, gameTime);
         villager.setData(ModAttachments.VILLAGER_LAST_CHEST_MEAL_TICK.get(), gameTime);
+        if (topUp) {
+            villager.getPersistentData().putLong(TOP_UP_DAY_KEY, day);
+        }
     }
 
     private static Optional<BlockPos> bellInReach(Villager villager, ServerLevel level) {

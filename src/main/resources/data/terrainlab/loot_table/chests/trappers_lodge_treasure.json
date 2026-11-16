@@ -45,17 +45,6 @@
         {
           "type": "minecraft:item",
           "modifier": {
-            "type": "minecraft:set_components",
-            "components": {
-              "minecraft:instrument": "minecraft:ponder_goat_horn"
-            }
-          },
-          "name": "minecraft:goat_horn",
-          "weight": 20
-        },
-        {
-          "type": "minecraft:item",
-          "modifier": {
             "type": "minecraft:set_count",
             "count": {
               "type": "minecraft:uniform",
@@ -90,6 +79,21 @@
         }
       ],
       "rolls": 1
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "modifier": {
+            "type": "minecraft:set_components",
+            "components": {
+              "minecraft:instrument": "minecraft:ponder_goat_horn"
+            }
+          },
+          "name": "minecraft:goat_horn"
+        }
+      ]
     }
   ],
   "random_sequence": "terrainlab:chests/trappers_lodge_treasure"

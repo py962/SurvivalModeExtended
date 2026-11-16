@@ -1,7 +1,6 @@
 {
   "wants": {
-    "id": "minecraft:lava_bucket",
-    "count": 2
+    "id": "minecraft:lava_bucket"
   },
   "gives": {
     "id": "minecraft:emerald"

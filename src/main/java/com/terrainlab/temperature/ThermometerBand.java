@@ -13,8 +13,9 @@ public enum ThermometerBand {
     MILD(10.0, 20.0),
     WARM(20.0, 30.0),
     HOT(30.0, 40.0),
-    SCORCHING(40.0, 50.0),
-    DEADLYHOT(50.0, Double.POSITIVE_INFINITY);
+    VERYHOT(40.0, 50.0),
+    SCORCHING(50.0, 60.0),
+    DEADLYHOT(60.0, Double.POSITIVE_INFINITY);
 
     public final double lowerBound;
     public final double upperBound;

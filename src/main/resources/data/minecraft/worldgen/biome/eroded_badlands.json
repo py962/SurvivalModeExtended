@@ -47,11 +47,6 @@
           ],
           "monster": [
             {
-              "type": "minecraft:husk",
-              "count": 4,
-              "weight": 20
-            },
-            {
               "type": "minecraft:parched",
               "count": 4,
               "weight": 10

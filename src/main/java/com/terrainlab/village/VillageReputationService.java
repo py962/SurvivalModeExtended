@@ -51,13 +51,10 @@ public final class VillageReputationService {
     }
 
     /**
-     * Negative amounts use MINOR_NEGATIVE (weight -1, cap 200), which can express any amount
-     * the economy uses. Positive amounts of 25 or more use MAJOR_POSITIVE, which never decays.
+     * Positive amounts (tier-up rewards, all multiples of 5) use MAJOR_POSITIVE, which never decays.
+     * Negative amounts use MINOR_NEGATIVE (weight -1, cap 200).
      */
     private static GossipType gossipTypeFor(int amount) {
-        if (amount > 0) {
-            return amount >= GossipType.MINOR_POSITIVE.max ? GossipType.MAJOR_POSITIVE : GossipType.MINOR_POSITIVE;
-        }
-        return GossipType.MINOR_NEGATIVE;
+        return amount > 0 ? GossipType.MAJOR_POSITIVE : GossipType.MINOR_NEGATIVE;
     }
 }

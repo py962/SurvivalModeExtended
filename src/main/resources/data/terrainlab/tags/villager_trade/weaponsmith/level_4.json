@@ -6,7 +6,7 @@
     "terrainlab:weaponsmith/level_4/sells_iron_axe_knockback",
     "terrainlab:weaponsmith/level_4/sells_iron_axe_quickstrike",
     "terrainlab:weaponsmith/level_4/sells_iron_axe_sharpness",
-    "terrainlab:weaponsmith/level_4/sells_iron_axe_quickstrike_reach",
+    "terrainlab:weaponsmith/level_4/sells_iron_axe_reach_knockback",
     "terrainlab:weaponsmith/level_4/sells_iron_axe_sharpness_unbreaking",
     "terrainlab:weaponsmith/level_4/buys_iron_spear",
     "terrainlab:weaponsmith/level_4/sells_iron_spear_unbreaking",
@@ -14,7 +14,7 @@
     "terrainlab:weaponsmith/level_4/sells_iron_spear_knockback",
     "terrainlab:weaponsmith/level_4/sells_iron_spear_quickstrike",
     "terrainlab:weaponsmith/level_4/sells_iron_spear_sharpness",
-    "terrainlab:weaponsmith/level_4/sells_iron_spear_quickstrike_reach",
+    "terrainlab:weaponsmith/level_4/sells_iron_spear_reach_knockback",
     "terrainlab:weaponsmith/level_4/sells_iron_spear_sharpness_unbreaking"
   ]
 }

@@ -1,7 +1,7 @@
 {
   "wants": {
     "id": "minecraft:emerald",
-    "count": 4
+    "count": 2
   },
   "gives": {
     "id": "minecraft:leather_horse_armor"

@@ -42,9 +42,9 @@ import java.util.function.Supplier;
  * caribou):
  * <ul>
  *   <li>fewer than {@link VillagerWorkConstants#BREED_BELOW} animals (adults and babies) and at least
- *       {@link VillagerWorkConstants#BREED_MIN_ADULTS}: fetch 2 feed (own inventory first, else walk to
- *       the village chest), walk to two eligible adults and put each in love — once per species per
- *       {@link VillagerWorkConstants#BREED_COOLDOWN_TICKS};</li>
+ *       {@link VillagerWorkConstants#BREED_MIN_ADULTS}: fetch feed (own inventory first, else walk to
+ *       the village chest) and put every adult that can breed in love, nearest first, without waiting
+ *       for pairs — once per species per {@link VillagerWorkConstants#BREED_COOLDOWN_TICKS};</li>
  *   <li>more than {@link VillagerWorkConstants#SLAUGHTER_ABOVE} adults: walk to the oldest eligible adult and
  *       kill it with one blow (villager as the damage source, so normal mob-kill loot drops); the fresh
  *       drops go into the butcher's inventory, raw food smoked instantly. At most once per
@@ -86,17 +86,16 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
 
     private enum Task { BREED, SLAUGHTER }
 
-    private enum Phase { FETCH, FEED_A, FEED_B, KILL }
+    private enum Phase { FETCH, FEED, KILL }
 
     private @Nullable Task task;
-    private Phase phase = Phase.FEED_A;
+    private Phase phase = Phase.FEED;
     private @Nullable Species species;
     private @Nullable Animal animalA;
-    private @Nullable Animal animalB;
+    private final List<Animal> feedQueue = new ArrayList<>();
     private @Nullable BlockPos chestPos;
     private @Nullable BlockPos bellPos;
     private @Nullable BlockPos jobSite;
-    private int fed;
 
     public ButcherHusbandryBehavior() {
         super(VillagerProfession.BUTCHER, Activity.WORK);
@@ -163,7 +162,7 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
             int count = (int) animals.stream().filter(a -> a.getType() == s.type.get()).count();
             if (count < VillagerWorkConstants.BREED_BELOW && adults.size() >= VillagerWorkConstants.BREED_MIN_ADULTS
                     && VillagerWorkState.elapsed(state.lastBreed(s.key), now, VillagerWorkConstants.BREED_COOLDOWN_TICKS)
-                    && planBreed(level, body, s, adults, now)) {
+                    && planBreed(level, body, s, adults, count, now)) {
                 return true;
             }
         }
@@ -189,41 +188,27 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
         return false;
     }
 
-    private boolean planBreed(ServerLevel level, Villager body, Species s, List<Animal> adults, long now) {
-        List<Animal> ready = adults.stream().filter(ButcherHusbandryBehavior::canBreedNow).toList();
-        Animal a = null;
-        Animal b = null;
-        double best = Double.MAX_VALUE;
-        double maxSq = VillagerWorkConstants.BREED_PARTNER_RADIUS * VillagerWorkConstants.BREED_PARTNER_RADIUS;
-        for (int i = 0; i < ready.size(); i++) {
-            for (int j = i + 1; j < ready.size(); j++) {
-                double d = ready.get(i).distanceToSqr(ready.get(j));
-                if (d <= maxSq && d < best) {
-                    best = d;
-                    a = ready.get(i);
-                    b = ready.get(j);
-                }
-            }
-        }
-        if (a == null) {
+    private boolean planBreed(ServerLevel level, Villager body, Species s, List<Animal> adults, int count, long now) {
+        // Each pair makes one baby, so feed at most enough to fill the herd up to the limit.
+        int room = 2 * (VillagerWorkConstants.BREED_BELOW - count);
+        List<Animal> ready = adults.stream()
+                .filter(ButcherHusbandryBehavior::canBreedNow)
+                .sorted(Comparator.comparingDouble(a -> a.distanceToSqr(body)))
+                .limit(Math.max(1, room))
+                .toList();
+        if (ready.isEmpty()) {
             return false;
         }
         int own = VillagerWork.count(body.getInventory(), s.food);
-        if (own < 2 && own + VillageChestService.count(level, bellPos, s.food) < 2) {
+        int available = own + VillageChestService.count(level, bellPos, s.food);
+        if (available < 1) {
             return false;
-        }
-        // Nearer parent first.
-        if (a.distanceToSqr(body) > b.distanceToSqr(body)) {
-            Animal t = a;
-            a = b;
-            b = t;
         }
         task = Task.BREED;
         species = s;
-        animalA = a;
-        animalB = b;
-        fed = 0;
-        phase = own >= 2 ? Phase.FEED_A : Phase.FETCH;
+        feedQueue.clear();
+        feedQueue.addAll(ready.subList(0, Math.min(ready.size(), available)));
+        phase = own >= feedQueue.size() ? Phase.FEED : Phase.FETCH;
         beginLeg(now);
         return true;
     }
@@ -238,8 +223,7 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
         }
         switch (phase) {
             case FETCH -> fetch(level, body, now);
-            case FEED_A -> feed(level, body, now, animalA, Phase.FEED_B);
-            case FEED_B -> feed(level, body, now, animalB, null);
+            case FEED -> feed(level, body, now);
             case KILL -> kill(level, body, now);
         }
     }
@@ -251,22 +235,23 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
         }
         Vec3 centre = Vec3.atCenterOf(chestPos);
         if (VillagerWork.withinReach(body, centre)) {
-            int need = 2 - VillagerWork.count(body.getInventory(), species.food);
             VillagerWork.setChestOpen(level, chestPos, true);
-            while (need > 0) {
-                ItemStack got = VillageChestService.take(level, bellPos, species.food, need);
-                if (got.isEmpty()) {
-                    break;
-                }
-                need -= got.getCount();
-                VillagerWork.giveOrDrop(body, level, got);
-            }
+            makeRoom(level, body);
+            topUp(level, body, species.food, Math.max(feedQueue.size(), VillagerWorkConstants.FEED_RESERVE));
+            // Keep a little of both feeds on hand so later breeding can skip the chest.
+            topUp(level, body, Species.COW.food, VillagerWorkConstants.FEED_RESERVE);
+            topUp(level, body, Species.PIG.food, VillagerWorkConstants.FEED_RESERVE);
             VillagerWork.setChestOpen(level, chestPos, false);
-            if (need > 0) {
+            int carried = VillagerWork.count(body.getInventory(), species.food);
+            if (carried < 1) {
                 fail(body, now);
                 return;
             }
-            phase = Phase.FEED_A;
+            // Less feed than expected: feed the nearest ones only.
+            while (feedQueue.size() > carried) {
+                feedQueue.removeLast();
+            }
+            phase = Phase.FEED;
             beginLeg(now);
         } else if (legTimedOut(now)) {
             fail(body, now);
@@ -275,19 +260,54 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
         }
     }
 
+    private void topUp(ServerLevel level, Villager body, Predicate<ItemStack> feed, int target) {
+        int need = target - VillagerWork.count(body.getInventory(), feed);
+        while (need > 0) {
+            ItemStack got = VillageChestService.take(level, bellPos, feed, need);
+            if (got.isEmpty()) {
+                return;
+            }
+            need -= got.getCount();
+            VillagerWork.giveOrDrop(body, level, got);
+        }
+    }
+
+    /** Puts everything back except the feeds and one stack of the butcher's own food, so the feed fits. */
+    private void makeRoom(ServerLevel level, Villager body) {
+        var inv = body.getInventory();
+        boolean keptFood = false;
+        for (int slot = 0; slot < inv.getContainerSize(); slot++) {
+            ItemStack stack = inv.getItem(slot);
+            if (stack.isEmpty() || species.food.test(stack) || Species.COW.food.test(stack) || Species.PIG.food.test(stack)) {
+                continue;
+            }
+            if (!keptFood && !VillagerProducePlans.isButcherProduce(stack) && !isAnyBreedingFood(stack)) {
+                keptFood = true;
+                continue;
+            }
+            inv.setItem(slot, VillageChestService.deposit(level, bellPos, stack.copy()));
+        }
+    }
+
     private boolean stillValid(@Nullable Animal animal) {
         return animal != null && !animal.isRemoved() && animal.isAlive() && jobSite != null
                 && VillagerWork.inWorkArea(jobSite, animal.position());
     }
 
-    private void feed(ServerLevel level, Villager body, long now, @Nullable Animal target, @Nullable Phase next) {
-        if (!stillValid(target) || !canBreedNow(target)) {
-            fail(body, now);
+    private void feed(ServerLevel level, Villager body, long now) {
+        // Animals that wandered off or were fed meanwhile are skipped, not a reason to give up.
+        while (!feedQueue.isEmpty() && (!stillValid(feedQueue.getFirst()) || !canBreedNow(feedQueue.getFirst()))) {
+            feedQueue.removeFirst();
+            beginLeg(now);
+        }
+        if (feedQueue.isEmpty()) {
+            endBreeding(body, now);
             return;
         }
+        Animal target = feedQueue.getFirst();
         ItemStack food = firstMatching(body, species.food);
         if (food.isEmpty()) {
-            fail(body, now);
+            endBreeding(body, now);
             return;
         }
         holdItem(body, food);
@@ -301,19 +321,20 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
             }
             level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.GENERIC_EAT,
                     SoundSource.NEUTRAL, 0.6F, 1.0F);
-            fed++;
-            if (next == null) {
-                VillagerWork.setState(body, VillagerWork.state(body).withLastBreed(species.key, now));
-                finish();
-            } else {
-                phase = next;
-                beginLeg(now);
-            }
+            feedQueue.removeFirst();
+            beginLeg(now);
         } else if (legTimedOut(now)) {
-            fail(body, now);
+            // This one can't be reached; carry on with the rest.
+            feedQueue.removeFirst();
+            beginLeg(now);
         } else {
             walkTo(body, target, 1);
         }
+    }
+
+    private void endBreeding(Villager body, long now) {
+        VillagerWork.setState(body, VillagerWork.state(body).withLastBreed(species.key, now));
+        finish();
     }
 
     private void kill(ServerLevel level, Villager body, long now) {
@@ -373,6 +394,6 @@ public class ButcherHusbandryBehavior extends AbstractVillagerWorkBehavior {
         task = null;
         species = null;
         animalA = null;
-        animalB = null;
+        feedQueue.clear();
     }
 }

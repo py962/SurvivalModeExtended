@@ -1,7 +1,7 @@
 {
   "values": [
-    "terrainlab:armorer/level_3/buys_iron_horse_armor",
-    "terrainlab:armorer/level_3/sells_iron_horse_armor",
+    "terrainlab:armorer/level_3/buys_copper_horse_armor",
+    "terrainlab:armorer/level_3/sells_copper_horse_armor",
     "terrainlab:armorer/level_3/buys_iron_boots",
     "terrainlab:armorer/level_3/sells_iron_boots_protection_unbreaking",
     "terrainlab:armorer/level_3/sells_iron_boots_unbreaking",

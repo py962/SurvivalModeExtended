@@ -74,7 +74,7 @@ public final class StructureMapIcons {
     // Structure families with one id per variant (abandoned_camp_forest, mineshaft_mesa, ruined_portal_desert, ...).
     private static final List<Map.Entry<String, Icon>> PREFIXES = List.of(
             Map.entry("minecraft:abandoned_camp", vanilla(MapDecorationTypes.ABANDONED_CAMP, Items.ABANDONED_CAMP_MAP)),
-            Map.entry("minecraft:mineshaft", vanilla(MapDecorationTypes.MINESHAFT, Items.BURIED_MINESHAFT_MAP)),
+            Map.entry("minecraft:mineshaft", new Icon(() -> MapDecorationTypes.MINESHAFT, Items.BURIED_MINESHAFT_MAP, false)),
             Map.entry("minecraft:ruined_portal", mod(ModMapDecorations.RUINED_PORTAL::getDelegate)));
 
     private StructureMapIcons() {

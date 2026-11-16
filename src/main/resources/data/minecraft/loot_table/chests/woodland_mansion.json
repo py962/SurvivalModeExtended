@@ -11,12 +11,14 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:golden_apple",
-          "weight": 30
+          "weight": 30,
+          "quality": 2
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:enchanted_golden_apple",
-          "weight": 30
+          "weight": 30,
+          "quality": 3
         },
         {
           "type": "minecraft:item",
@@ -45,7 +47,8 @@
             "options": "#minecraft:on_random_loot"
           },
           "name": "minecraft:book",
-          "weight": 10
+          "weight": 10,
+          "quality": 2
         }
       ],
       "rolls": {
@@ -98,7 +101,8 @@
             }
           },
           "name": "minecraft:wheat",
-          "weight": 20
+          "weight": 20,
+          "quality": -2
         },
         {
           "type": "minecraft:item",
@@ -129,7 +133,8 @@
             }
           },
           "name": "minecraft:melon_seeds",
-          "weight": 10
+          "weight": 10,
+          "quality": -2
         },
         {
           "type": "minecraft:item",
@@ -142,7 +147,8 @@
             }
           },
           "name": "minecraft:pumpkin_seeds",
-          "weight": 10
+          "weight": 10,
+          "quality": -2
         },
         {
           "type": "minecraft:item",
@@ -155,7 +161,8 @@
             }
           },
           "name": "minecraft:beetroot_seeds",
-          "weight": 10
+          "weight": 10,
+          "quality": -2
         },
         {
           "type": "minecraft:item",
@@ -190,7 +197,8 @@
             }
           },
           "name": "minecraft:bone",
-          "weight": 10
+          "weight": 10,
+          "quality": -2
         },
         {
           "type": "minecraft:item",
@@ -203,7 +211,8 @@
             }
           },
           "name": "minecraft:gunpowder",
-          "weight": 10
+          "weight": 10,
+          "quality": -2
         },
         {
           "type": "minecraft:item",
@@ -216,7 +225,8 @@
             }
           },
           "name": "minecraft:rotten_flesh",
-          "weight": 10
+          "weight": 10,
+          "quality": -2
         },
         {
           "type": "minecraft:item",
@@ -229,7 +239,8 @@
             }
           },
           "name": "minecraft:string",
-          "weight": 10
+          "weight": 10,
+          "quality": -2
         }
       ],
       "rolls": 4
@@ -242,6 +253,24 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:vex_armor_trim_smithing_template"
+        }
+      ],
+      "rolls": 1
+    },
+    {
+      "condition": {
+        "type": "minecraft:entity_properties",
+        "entity": "this",
+        "predicate": {
+          "effects": {
+            "minecraft:luck": {}
+          }
+        }
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:totem_of_undying"
         }
       ],
       "rolls": 1

@@ -3,8 +3,7 @@
     "id": "minecraft:leather_horse_armor"
   },
   "gives": {
-    "id": "minecraft:emerald",
-    "count": 2
+    "id": "minecraft:emerald"
   },
   "max_uses": 8,
   "xp": 5,
