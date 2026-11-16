@@ -4,6 +4,8 @@
   "package": "com.terrainlab.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MobEffectAiMixin",
+    "BrainBlindMixin",
     "BaseFireBlockShieldMixin",
     "FireBlockShieldMixin",
     "EndCityPiecesMixin",
@@ -20,6 +22,15 @@
     "LeashableEnchantedLeadMixin",
     "EntityLeadConsumeMixin",
     "AbstractBoatAccessor",
+    "PhantomAccessor",
+    "VillagerCureReputationMixin",
+    "VillagerCushionSeatMixin",
+    "VillagerDataThresholdMixin",
+    "CartographyTableMenuScaleMixin",
+    "MapItemSavedDataScaleMixin",
+    "MapItemSavedDataAccessor",
+    "ItemCraftedByPlayerMixin",
+    "MapItemCentredZoomMixin",
     "DispenserBlockInvoker",
     "LivingEntityAccessor",
     "AbstractBoatGravityMixin",
@@ -51,6 +62,8 @@
     "AbstractBoatFlowingWaterSinkMixin",
     "AbstractBoatStepUpMixin",
     "HouseboatLilyPadMixin",
+    "CamelStepOverFencesMixin",
+    "JungleRuinedPortalVinesMixin",
     "PeacefulMatchesNormalMixin",
     "ServerLevelIsolationDifficultyMixin",
     "ZombieVillagerConversionMixin",
@@ -133,9 +146,12 @@
     "LootPoolLuckBonusMixin",
     "ShowTradesToPlayerFishingMixin",
     "PlayerSpawnFinderSafeGroundMixin",
-    "PlayerListCharacterDataMixin"
+    "PlayerListCharacterDataMixin",
+    "BrainScheduleOverrideMixin",
+    "VillagerBreedFoodOnBirthMixin"
   ],
   "client": [
+    "CartographyTableScreenScaleMixin",
     "WorldCreationUiStateHardcoreMixin",
     "CreateWorldGameTabHardcoreMixin",
     "DebugScreenEntryListGateMixin",
@@ -162,7 +178,10 @@
     "IntegratedServerCharacterMixin",
     "PlayerInfoCharacterSkinMixin",
     "CreateWorldScreenCharacterMixin",
-    "IntegratedPlayerListCharacterMixin"
+    "IntegratedPlayerListCharacterMixin",
+    "VillagerRenderStateSittingMixin",
+    "VillagerRendererSittingMixin",
+    "VillagerModelSittingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

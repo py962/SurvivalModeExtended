@@ -43,7 +43,7 @@ public final class WeaponsmithTrades {
             VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
             VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
             VillagerType.SNOW, List.of(fixed(Enchantments.SHARPNESS, 5)),
-            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(QUICKSTRIKE, 2)),
+            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(Enchantments.KNOCKBACK, 1)),
             VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
     // Plains set.
@@ -57,7 +57,7 @@ public final class WeaponsmithTrades {
             VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
             VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
             VillagerType.SNOW, List.of(fixed(Enchantments.SHARPNESS, 5)),
-            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(QUICKSTRIKE, 2)),
+            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(Enchantments.KNOCKBACK, 1)),
             VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
     // Plains set.
@@ -71,7 +71,7 @@ public final class WeaponsmithTrades {
             VillagerType.TAIGA, List.of(fixed(Enchantments.KNOCKBACK, 2)),
             VillagerType.DESERT, List.of(fixed(QUICKSTRIKE, 4)),
             VillagerType.SNOW, List.of(fixed(Enchantments.SHARPNESS, 5)),
-            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(QUICKSTRIKE, 2)),
+            VillagerType.SWAMP, List.of(fixed(REACH, 2), fixed(Enchantments.KNOCKBACK, 1)),
             VillagerType.JUNGLE, List.of(fixed(Enchantments.SHARPNESS, 2), fixed(Enchantments.UNBREAKING, 2))
     );
     // Plains set.
@@ -155,18 +155,18 @@ public final class WeaponsmithTrades {
         // Expert (level 4): Enchanted Iron Axe (villager type), Enchanted Iron Spear (villager type) - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_AXE, 1, 5, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_AXE, 1, 4, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.IRON_AXE, AXE_ENCHANT_BY_TYPE, AXE_ENCHANT_FALLBACK, 11, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SPEAR, 1, 6, EXPERT_MAX_USES, 10));
+                Items.IRON_AXE, AXE_ENCHANT_BY_TYPE, AXE_ENCHANT_FALLBACK, 8, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SPEAR, 1, 4, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.IRON_SPEAR, SPEAR_ENCHANT_BY_TYPE, SPEAR_ENCHANT_FALLBACK, 12, EXPERT_MAX_USES, 10));
+                Items.IRON_SPEAR, SPEAR_ENCHANT_BY_TYPE, SPEAR_ENCHANT_FALLBACK, 8, EXPERT_MAX_USES, 10));
 
         // Master (level 5): Enchanted Iron Sword (villager type). XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SWORD, 1, 8, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SWORD, 1, 4, MASTER_MAX_USES, 0));
         master.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.IRON_SWORD, SWORD_ENCHANT_BY_TYPE, SWORD_ENCHANT_FALLBACK, 14, MASTER_MAX_USES, 0));
+                Items.IRON_SWORD, SWORD_ENCHANT_BY_TYPE, SWORD_ENCHANT_FALLBACK, 8, MASTER_MAX_USES, 0));
     }
 }

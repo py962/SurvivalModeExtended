@@ -13,6 +13,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -514,6 +515,17 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<Boolean>> NOMAD_WAS_SLEEPING =
             ATTACHMENT_TYPES.register("nomad_was_sleeping", () ->
                     AttachmentType.builder(() -> false).build());
+
+    // Player -> game time of their last cure of this villager (see VillagerCureReputationMixin).
+    public static final Supplier<AttachmentType<HashMap<UUID, Long>>> VILLAGER_CURED_BY =
+            ATTACHMENT_TYPES.register("villager_cured_by", () ->
+                    AttachmentType.<HashMap<UUID, Long>>builder((Supplier<HashMap<UUID, Long>>) HashMap::new)
+                            .serialize(Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.LONG)
+                                    .xmap(
+                                            (Map<UUID, Long> map) -> new HashMap<UUID, Long>(map),
+                                            (HashMap<UUID, Long> map) -> (Map<UUID, Long>) map)
+                                    .fieldOf("cured_by"))
+                            .build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);

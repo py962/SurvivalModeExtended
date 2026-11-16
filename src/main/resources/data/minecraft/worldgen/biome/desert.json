@@ -10,9 +10,7 @@
     "minecraft:gameplay/snow_golem_melts": true,
     "minecraft:visual/sky_color": "#6eb1ff"
   },
-  "carvers": [
-
-  ],
+  "carvers": [],
   "downfall": 0.0,
   "effects": {
     "water_color": "#3f76e4"
@@ -22,8 +20,7 @@
     [
       "minecraft:lake_lava_underground"
     ],
-    [
-    ],
+    [],
     [
       "minecraft:fossil_upper",
       "minecraft:fossil_lower",
@@ -127,12 +124,6 @@
         "maxCount": 4,
         "minCount": 4,
         "weight": 20
-      },
-      {
-        "type": "minecraft:parched",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 10
       }
     ],
     "underground_water_creature": [

@@ -150,15 +150,15 @@ public final class FletcherTrades {
         expert.add(TradeListings.SimpleTradeListing.buying(Items.TIPPED_ARROW, 4, 1, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeTippedArrowSellListing(
                 TIPPED_ARROW_POTION_BY_TYPE, TIPPED_ARROW_POTION_FALLBACK, 2, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.CROSSBOW, 1, 5, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.CROSSBOW, 1, 3, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.CROSSBOW, CROSSBOW_ENCHANT_BY_TYPE, CROSSBOW_ENCHANT_FALLBACK, 11, EXPERT_MAX_USES, 10));
+                Items.CROSSBOW, CROSSBOW_ENCHANT_BY_TYPE, CROSSBOW_ENCHANT_FALLBACK, 7, EXPERT_MAX_USES, 10));
 
         // Master (level 5): Enchanted Bow (villager type). XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.BOW, 1, 9, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.BOW, 1, 3, MASTER_MAX_USES, 0));
         master.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.BOW, BOW_ENCHANT_BY_TYPE, BOW_ENCHANT_FALLBACK, 15, MASTER_MAX_USES, 0));
+                Items.BOW, BOW_ENCHANT_BY_TYPE, BOW_ENCHANT_FALLBACK, 7, MASTER_MAX_USES, 0));
     }
 }

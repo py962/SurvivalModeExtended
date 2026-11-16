@@ -14,7 +14,8 @@ import org.jspecify.annotations.Nullable;
 /**
  * Luck effect bonus roll for container-type loot: while the player opening/brushing/fishing/unlocking
  * has the vanilla Luck mob effect (Luck amulet, Luck conduit), every pool of the OUTERMOST loot table
- * gets one extra roll (like a vanilla bonus_rolls of +1 at luck 1).
+ * gets one extra roll (like a vanilla bonus_rolls of +1 at luck 1); Trial Chamber and woodland
+ * mansion tables get two.
  *
  * <p>Scope: tables whose param set is CHEST, VAULT, ARCHAEOLOGY or FISHING. Nested tables (loot_table
  * entries, e.g. gameplay/fishing -> gameplay/fishing/fish) are not boosted.
@@ -28,6 +29,10 @@ public final class LuckLootBonus {
 
     private static final ThreadLocal<int[]> DEPTH = ThreadLocal.withInitial(() -> new int[1]);
     private static final ThreadLocal<boolean[]> ACTIVE = ThreadLocal.withInitial(() -> new boolean[1]);
+    /** Extra rolls for the outermost table, set with ACTIVE. */
+    private static final ThreadLocal<int[]> BONUS = ThreadLocal.withInitial(() -> new int[1]);
+
+    private static final int SPECIAL_BONUS_ROLLS = 2;
 
     /** Called on entry to LootTable#getRandomItemsRaw(LootContext, Consumer). Returns the previous ACTIVE value. */
     public static boolean enter(LootTable table, LootContext context) {
@@ -36,6 +41,7 @@ public final class LuckLootBonus {
         boolean previous = active[0];
         if (depth == 1) {
             active[0] = qualifies(table, context);
+            BONUS.get()[0] = active[0] ? bonusRolls(table) : 0;
         }
         return previous;
     }
@@ -49,8 +55,19 @@ public final class LuckLootBonus {
 
     /** Extra rolls for the pool currently being rolled (only the outermost table's own pools). */
     public static int extraRolls() {
-        return DEPTH.get()[0] == 1 && ACTIVE.get()[0] ? 1 : 0;
+        return DEPTH.get()[0] == 1 && ACTIVE.get()[0] ? BONUS.get()[0] : 0;
     }
+
+    private static int bonusRolls(LootTable table) {
+        net.minecraft.resources.Identifier id = table.getLootTableId();
+        if (id != null && (id.getPath().startsWith("chests/trial_chambers/") || id.getPath().equals("chests/woodland_mansion"))) {
+            return SPECIAL_BONUS_ROLLS;
+        }
+        return 1;
+    }
+
+    private static final net.minecraft.resources.Identifier VAULT_REWARD =
+            net.minecraft.resources.Identifier.withDefaultNamespace("chests/trial_chambers/reward");
 
     private static final String VILLAGE_PREFIX = "chests/village/";
 
@@ -64,6 +81,15 @@ public final class LuckLootBonus {
         net.minecraft.resources.Identifier id = table.getLootTableId();
         if (id == null) return null;
 
+        // Normal vaults roll a copy of the ominous loot without its guaranteed pools.
+        if (id.equals(VAULT_REWARD)) {
+            if (!qualifies(table, context)) return null;
+            LootTable ominous = context.getLevel().getServer().reloadableRegistries().getLootTable(
+                    net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE,
+                            net.minecraft.resources.Identifier.fromNamespaceAndPath(com.terrainlab.TerrainLab.MODID,
+                                    "chests/trial_chambers/reward_lucky")));
+            return ominous == LootTable.EMPTY ? null : ominous;
+        }
         if (!id.getNamespace().equals("minecraft")
                 || !id.getPath().startsWith(VILLAGE_PREFIX)) {
             return null;

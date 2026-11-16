@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:map",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:exploration_map",
+              "destination": "terrainlab:locate/trial_chamber",
+              "decoration": "minecraft:trial_chambers",
+              "zoom": 2,
+              "search_radius": 100,
+              "skip_existing_chunks": true
+            },
+            {
+              "function": "minecraft:set_custom_data",
+              "tag": {
+                "terrainlab_relic_map": "sunken_chart"
+              }
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "item.terrainlab.sunken_chart"
+              },
+              "target": "item_name"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

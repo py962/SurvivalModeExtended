@@ -2,13 +2,13 @@ package com.terrainlab.temperature;
 
 /**
  * Maps an ambient Celsius temperature onto the 0..1 fraction used by the thermometer's
- * range_dispatch item model. The -40/60 range leaves display room for the deadly bands beyond
- * -30 and 50.
+ * range_dispatch item model. The -40/70 range gives the 11 bands 10 degrees each, the deadly
+ * bands beyond -30 and 60 included.
  */
 public final class ThermometerDial {
 
     public static final double FLOOR_C = -40.0;
-    public static final double CEILING_C = 60.0;
+    public static final double CEILING_C = 70.0;
 
     private ThermometerDial() {
     }

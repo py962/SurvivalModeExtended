@@ -31,7 +31,7 @@ public class FreezingEffectHandler {
 
     /**
      * True when the active Freezing instance is the one PlayerInternalTemperature applies for cold
-     * exposure: a short refresh with no particles. A potion or tipped arrow gives a long, visible instance,
+     * exposure: a refreshed instance with no particles. A potion or tipped arrow gives a long, visible instance,
      * which wins over the short one, so a potion still hurts while the player is also cold.
      */
     private static boolean isColdExposureOnly(LivingEntity living) {

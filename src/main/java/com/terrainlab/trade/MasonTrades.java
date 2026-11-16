@@ -70,13 +70,13 @@ public final class MasonTrades {
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.DIORITE, 18, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.DIORITE, 14, 1, JOURNEYMAN_MAX_USES, 5));
 
-        // Expert (level 4): Granite, Basalt - 10 XP/trade
+        // Expert (level 4): Granite, Obsidian - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
         expert.add(TradeListings.SimpleTradeListing.buying(Items.GRANITE, 9, 1, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.selling(Items.GRANITE, 7, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.BASALT, 9, 1, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.selling(Items.BASALT, 7, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.OBSIDIAN, 2, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.selling(Items.OBSIDIAN, 1, 1, EXPERT_MAX_USES, 10));
 
         // Master (level 5): Diamond. XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);

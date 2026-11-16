@@ -1,6 +1,8 @@
 package com.terrainlab.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,8 +23,12 @@ import java.util.List;
 
 /**
  * Goose: a Parrot-based water bird that never perches on shoulders. Goals, by
- * priority: hiss-chase nearby players, return to water when far from it, rare
+ * priority: hiss-chase whoever provokes it, return to water when far from it, rare
  * flock migration to a distant body of water, and short rests on water.
+ *
+ * <p>A goose is provoked when it is attacked (by anything), when it sees another goose within
+ * 16 blocks attacked, or when a player comes within a block of it (never its owner). The chase
+ * lasts up to 5 seconds and does no damage; any new provocation restarts it.
  *
  * <p>Tamed geese are bed-anchored pets (see {@link AnchoredPets}): they never migrate, only pick
  * water inside their roaming zone, and none of these goals move them while they sit or while
@@ -33,7 +39,13 @@ public class GooseEntity extends Parrot {
     private static final float FLAP_FACTOR = 0.6F;
     private float gooseNextFlap = 1.0F;
 
-    private static final double HISS_RANGE = 6.0;
+    private static final int CHASE_TICKS = 100;
+    private static final double CHASE_GIVE_UP_SQR = 72.0; // about 8.5 blocks
+    private static final double RALLY_RANGE = 16.0;
+    private static final double TOUCH_RANGE = 1.0;
+
+    private LivingEntity hissTarget;
+    private int hissTicks;
 
     public GooseEntity(EntityType<? extends Parrot> entityType, Level level) {
         super(entityType, level);
@@ -51,6 +63,31 @@ public class GooseEntity extends Parrot {
         this.goalSelector.addGoal(2, new GooseWaterAffinityGoal(this));
         this.goalSelector.addGoal(3, new GooseFlockMigrationGoal(this));
         this.goalSelector.addGoal(4, new GooseWaterRestGoal(this));
+    }
+
+    /** Starts, or restarts, a hiss-chase at {@code target}. */
+    void provoke(LivingEntity target) {
+        if (target != this && isValidHissTarget(target)) {
+            this.hissTarget = target;
+            this.hissTicks = CHASE_TICKS;
+        }
+    }
+
+    private static boolean isValidHissTarget(LivingEntity target) {
+        return target.isAlive() && !(target instanceof Player player && (player.isCreative() || player.isSpectator()));
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+        boolean hurt = super.hurtServer(level, source, damage);
+        if (hurt && source.getEntity() instanceof LivingEntity attacker && !(attacker instanceof GooseEntity)) {
+            provoke(attacker);
+            for (GooseEntity other : level.getEntitiesOfClass(GooseEntity.class,
+                    this.getBoundingBox().inflate(RALLY_RANGE), goose -> goose != this && goose.hasLineOfSight(this))) {
+                other.provoke(attacker);
+            }
+        }
+        return hurt;
     }
 
     @Override
@@ -81,7 +118,6 @@ public class GooseEntity extends Parrot {
 
     private static class GooseHissGoal extends Goal {
         private final GooseEntity goose;
-        private Player target;
 
         GooseHissGoal(GooseEntity goose) {
             this.goose = goose;
@@ -91,11 +127,15 @@ public class GooseEntity extends Parrot {
         @Override
         public boolean canUse() {
             if (!AnchoredPets.mayWander(this.goose)) return false;
-            List<Player> nearby = this.goose.level().getEntitiesOfClass(
-                    Player.class, this.goose.getBoundingBox().inflate(HISS_RANGE));
-            for (Player player : nearby) {
-                if (!player.isSpectator() && !player.isCreative()) {
-                    this.target = player;
+            if (this.goose.hissTarget != null && this.goose.hissTicks > 0 && isValidHissTarget(this.goose.hissTarget)) {
+                return true;
+            }
+            this.goose.hissTarget = null;
+            List<Player> touching = this.goose.level().getEntitiesOfClass(
+                    Player.class, this.goose.getBoundingBox().inflate(TOUCH_RANGE));
+            for (Player player : touching) {
+                if (isValidHissTarget(player) && !this.goose.isOwnedBy(player)) {
+                    this.goose.provoke(player);
                     return true;
                 }
             }
@@ -104,22 +144,26 @@ public class GooseEntity extends Parrot {
 
         @Override
         public boolean canContinueToUse() {
-            return this.target != null && this.target.isAlive()
+            LivingEntity target = this.goose.hissTarget;
+            return target != null && this.goose.hissTicks > 0 && isValidHissTarget(target)
                     && AnchoredPets.mayWander(this.goose)
-                    && this.goose.distanceToSqr(this.target) <= HISS_RANGE * HISS_RANGE * 2;
+                    && this.goose.distanceToSqr(target) <= CHASE_GIVE_UP_SQR;
         }
 
         @Override
         public void tick() {
-            if (this.target == null) return;
-            this.goose.getLookControl().setLookAt(this.target, 30.0F, 30.0F);
-            this.goose.getNavigation().moveTo(this.target, 1.2);
-            // Chase and loom only; geese never damage players.
+            LivingEntity target = this.goose.hissTarget;
+            if (target == null) return;
+            this.goose.hissTicks--;
+            this.goose.getLookControl().setLookAt(target, 30.0F, 30.0F);
+            this.goose.getNavigation().moveTo(target, 1.2);
+            // Chase and loom only; geese never do damage.
         }
 
         @Override
         public void stop() {
-            this.target = null;
+            this.goose.hissTarget = null;
+            this.goose.hissTicks = 0;
         }
     }
 

@@ -2,6 +2,8 @@ package com.terrainlab.event;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.data.TerrainLabStructureData;
+import com.terrainlab.entity.OversizedMapFrameEntity;
+import com.terrainlab.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -21,15 +23,14 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * Builds a hidden loot room beneath each Ocean Monument when the monument's chunks are
- * first generated. The room sits just under the seafloor found by scanning down the
- * monument's centre column: the structure bounding box ends at the top of the support
- * pillars, and the ocean-floor heightmap reads the monument itself.
+ * Hidden chest room and map room under each Ocean Monument, placed below the seafloor found by a
+ * column scan (the bounding box stops at the pillar tops and the heightmap reads the monument).
  */
 public class ModOceanMonumentRoomHandler {
 
@@ -41,9 +42,17 @@ public class ModOceanMonumentRoomHandler {
             Registries.LOOT_TABLE,
             Identifier.fromNamespaceAndPath(TerrainLab.MODID, "chests/hidden_monument_room"));
 
-    private static final int WIDTH = 5;
-    private static final int HEIGHT = 4;
-    private static final int DEPTH = 5;
+    /** The Sunken Chart (Trial Chambers explorer map), put in the map room's frame. */
+    public static final ResourceKey<LootTable> MAP_LOOT_TABLE = ResourceKey.create(
+            Registries.LOOT_TABLE,
+            Identifier.fromNamespaceAndPath(TerrainLab.MODID, "chests/hidden_monument_map"));
+
+    /** Relative y of both rooms' roofs (floors at 0, interiors 5 high). */
+    private static final int ROOM_TOP = 6;
+
+    private static final BlockState SHELL = Blocks.TUFF_BRICKS.defaultBlockState();
+    private static final BlockState FLOOR = Blocks.WAXED_COPPER_BLOCK.defaultBlockState();
+    private static final BlockState TRIM = Blocks.DARK_PRISMARINE.defaultBlockState();
 
     // Monument materials skipped by the pillar scan, along with fluids and air.
     private static final Set<Block> MONUMENT_MATERIALS = Set.of(
@@ -97,43 +106,43 @@ public class ModOceanMonumentRoomHandler {
 
     private static void buildHiddenRoom(ServerLevel level, BoundingBox monumentBox, BlockPos originKey) {
         BlockPos origin = findRoomOrigin(level, monumentBox);
+        BlockState shell = SHELL;
 
-        // TerrainLab.LOGGER.info("[HIDDEN_MONUMENT_ROOM] building at origin={} (monument origin={})", origin, originKey);
+        // Shells first so caves or water in the way do not matter.
+        fill(level, origin, shell, 0, 0, 0, 8, ROOM_TOP, 8);
+        fill(level, origin, shell, 9, 0, 3, 11, 3, 5);
+        fill(level, origin, shell, 12, 0, 0, 18, ROOM_TOP, 8);
 
-        // Solid shell, written unconditionally so caves, water or void at the target don't matter.
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                for (int z = 0; z < DEPTH; z++) {
-                    boolean isShell = x == 0 || x == WIDTH - 1
-                            || y == 0 || y == HEIGHT - 1
-                            || z == 0 || z == DEPTH - 1;
-                    if (isShell) {
-                        level.setBlock(origin.offset(x, y, z),
-                                Blocks.WEATHERED_COPPER.defaultBlockState(), 3);
-                    }
-                }
-            }
+        BlockState air = Blocks.AIR.defaultBlockState();
+        fill(level, origin, air, 1, 1, 1, 7, ROOM_TOP - 1, 7);   // chest room 7x7, 5 high
+        fill(level, origin, air, 8, 1, 4, 12, 2, 4);             // corridor 1 wide, 2 high, through both walls
+        fill(level, origin, air, 13, 1, 1, 17, ROOM_TOP - 1, 7); // map room 5 long, 7 wide, 5 high
+
+        fill(level, origin, FLOOR, 1, 0, 1, 7, 0, 7);
+        fill(level, origin, FLOOR, 8, 0, 4, 12, 0, 4);
+        fill(level, origin, FLOOR, 13, 0, 1, 17, 0, 7);
+        for (int wallX : new int[] {8, 12}) {
+            fill(level, origin, TRIM, wallX, 1, 3, wallX, 3, 3);
+            fill(level, origin, TRIM, wallX, 1, 5, wallX, 3, 5);
+            level.setBlock(origin.offset(wallX, 3, 4), TRIM, 3);
         }
 
-        for (int x = 1; x < WIDTH - 1; x++) {
-            for (int y = 1; y < HEIGHT - 1; y++) {
-                for (int z = 1; z < DEPTH - 1; z++) {
-                    level.setBlock(origin.offset(x, y, z),
-                            Blocks.AIR.defaultBlockState(), 3);
-                }
-            }
-        }
+        BlockState torchWest = Blocks.COPPER_WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.WEST);
+        BlockState torchEast = Blocks.COPPER_WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.EAST);
+        level.setBlock(origin.offset(7, 2, 3), torchWest, 3);
+        level.setBlock(origin.offset(7, 2, 5), torchWest, 3);
+        level.setBlock(origin.offset(13, 2, 3), torchEast, 3);
+        level.setBlock(origin.offset(13, 2, 5), torchEast, 3);
 
-        // Sea lanterns embedded in the middle of each side wall.
-        level.setBlock(origin.offset(WIDTH / 2, 1, 0), Blocks.SEA_LANTERN.defaultBlockState(), 3);
-        level.setBlock(origin.offset(WIDTH / 2, 1, DEPTH - 1), Blocks.SEA_LANTERN.defaultBlockState(), 3);
-        level.setBlock(origin.offset(0, 1, DEPTH / 2), Blocks.SEA_LANTERN.defaultBlockState(), 3);
-        level.setBlock(origin.offset(WIDTH - 1, 1, DEPTH / 2), Blocks.SEA_LANTERN.defaultBlockState(), 3);
+        BlockState lantern = Blocks.SEA_LANTERN.defaultBlockState();
+        level.setBlock(origin.offset(4, 2, 0), lantern, 3);
+        level.setBlock(origin.offset(4, 2, 8), lantern, 3);
+        level.setBlock(origin.offset(0, 2, 4), lantern, 3);
+        level.setBlock(origin.offset(15, 2, 0), lantern, 3);
+        level.setBlock(origin.offset(15, 2, 8), lantern, 3);
 
-        // Chest against one interior wall.
-        BlockPos chestPos = origin.offset(WIDTH / 2, 1, 1);
-        level.setBlock(chestPos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH), 3);
-
+        BlockPos chestPos = origin.offset(4, 1, 4);
+        level.setBlock(chestPos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.EAST), 3);
         if (level.getBlockEntity(chestPos) instanceof ChestBlockEntity chestEntity) {
             chestEntity.setLootTable(LOOT_TABLE);
             chestEntity.setLootTableSeed(level.getRandom().nextLong());
@@ -141,7 +150,25 @@ public class ModOceanMonumentRoomHandler {
             TerrainLab.LOGGER.warn("[HIDDEN_MONUMENT_ROOM] chest block entity missing at {}", chestPos);
         }
 
-        // TerrainLab.LOGGER.info("[HIDDEN_MONUMENT_ROOM] build complete at {}", origin);
+        // Filled later by JungleTempleMapHandler; explorer maps can't be made during generation.
+        fill(level, origin, TRIM, 18, 1, 2, 18, 5, 6);
+        BlockPos framePos = origin.offset(17, 3, 4); // centre of the frame; covers z 3..5, y 2..4
+        OversizedMapFrameEntity frame = new OversizedMapFrameEntity(ModEntities.EXTRA_LARGE_MAP_FRAME.get(),
+                level, framePos, Direction.WEST);
+        frame.getPersistentData().putBoolean(JungleTempleMapHandler.MAP_TAG, true);
+        frame.getPersistentData().putString(JungleTempleMapHandler.MAP_LOOT_TAG, MAP_LOOT_TABLE.identifier().toString());
+        level.addFreshEntity(frame);
+    }
+
+    private static void fill(ServerLevel level, BlockPos origin, BlockState state,
+            int x0, int y0, int z0, int x1, int y1, int z1) {
+        for (int x = x0; x <= x1; x++) {
+            for (int y = y0; y <= y1; y++) {
+                for (int z = z0; z <= z1; z++) {
+                    level.setBlock(origin.offset(x, y, z), state, 3);
+                }
+            }
+        }
     }
 
     /**
@@ -174,15 +201,12 @@ public class ModOceanMonumentRoomHandler {
         int centreX = (monumentBox.minX() + monumentBox.maxX()) / 2;
         int centreZ = (monumentBox.minZ() + monumentBox.maxZ()) / 2;
 
-        int floorY = findPillarFloorY(level, centreX, centreZ, monumentBox.minY());
+        // Lower of the two readings, so the map room doesn't break through the seafloor.
+        int floorY = Math.min(
+                findPillarFloorY(level, centreX, centreZ, monumentBox.minY()),
+                findPillarFloorY(level, centreX + 15, centreZ, monumentBox.minY()));
 
-        // TerrainLab.LOGGER.info(
-                // "[HIDDEN_MONUMENT_ROOM] pillar scan at ({},{}) found floor at y={} (pillar top was y={})",
-                // centreX, centreZ, floorY, monumentBox.minY());
-
-        int roomTopY = floorY - 1;
-        int originY = roomTopY - (HEIGHT - 1);
-
-        return new BlockPos(centreX - WIDTH / 2, originY, centreZ - DEPTH / 2);
+        int originY = floorY - 1 - ROOM_TOP;
+        return new BlockPos(centreX - 4, originY, centreZ - 4);
     }
 }

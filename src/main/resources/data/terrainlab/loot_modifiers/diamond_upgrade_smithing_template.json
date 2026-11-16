@@ -16,32 +16,6 @@
               "chance": 0.5
             }
           ]
-        },
-        {
-          "condition": "minecraft:all_of",
-          "terms": [
-            {
-              "condition": "neoforge:loot_table_id",
-              "loot_table_id": "terrainlab:chests/outlaws_hideout_chest"
-            },
-            {
-              "condition": "minecraft:random_chance",
-              "chance": 0.5
-            }
-          ]
-        },
-        {
-          "condition": "minecraft:all_of",
-          "terms": [
-            {
-              "condition": "neoforge:loot_table_id",
-              "loot_table_id": "terrainlab:chests/hidden_monument_room"
-            },
-            {
-              "condition": "minecraft:random_chance",
-              "chance": 0.5
-            }
-          ]
         }
       ]
     }

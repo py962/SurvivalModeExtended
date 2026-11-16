@@ -67,6 +67,8 @@ public class ElephantEntity extends Camel {
     public static final float BABY_SCALE = 0.45F;
     // Blocks of head and back kept above water when swimming (scaled by age); see getFluidJumpThreshold.
     private static final double SWIM_HEAD_ALLOWANCE = 0.4D;
+    // Upward speed while pushing against a low bank from the water.
+    private static final double CLIMB_OUT_RISE = 0.2D;
 
     // Dash charge: mobs the elephant runs into during a dash are knocked away and hurt, once per dash.
     private static final float CHARGE_DAMAGE = 6.0F;
@@ -265,6 +267,14 @@ public class ElephantEntity extends Camel {
 
         super.travel(travelVector);
 
+        // Climbing out: against a bank less than a block above the water, rise until it can step up.
+        if (this.isInWater() && this.horizontalCollision && this.canClimbOutAhead()) {
+            Vec3 delta = this.getDeltaMovement();
+            if (delta.y < CLIMB_OUT_RISE) {
+                this.setDeltaMovement(delta.x, CLIMB_OUT_RISE, delta.z);
+            }
+        }
+
         // Ridden float: rise while the water is deeper than the swim threshold, so the elephant swims
         // with its head and back out instead of walking the riverbed; shallower water is waded.
         if (this.isVehicle() && this.isInWater()
@@ -281,6 +291,29 @@ public class ElephantEntity extends Camel {
         }
     }
 
+    /** True when the ground ahead tops out less than a block above the water surface here. */
+    private boolean canClimbOutAhead() {
+        BlockPos feet = this.blockPosition();
+        BlockPos.MutableBlockPos cursor = feet.mutable();
+        int topWater = Integer.MIN_VALUE;
+        for (int y = feet.getY(); y <= feet.getY() + net.minecraft.util.Mth.ceil(this.getBbHeight()); y++) {
+            cursor.setY(y);
+            if (this.level().getFluidState(cursor).is(FluidTags.WATER)) {
+                topWater = y;
+            }
+        }
+        if (topWater == Integer.MIN_VALUE) {
+            return false;
+        }
+        float yawRad = this.getYRot() * (float) (Math.PI / 180.0);
+        double reach = this.getBbWidth() / 2.0 + 0.6;
+        BlockPos ahead = BlockPos.containing(
+                this.getX() - net.minecraft.util.Mth.sin(yawRad) * reach,
+                topWater + 1,
+                this.getZ() + net.minecraft.util.Mth.cos(yawRad) * reach);
+        return this.level().getBlockState(ahead).getCollisionShape(this.level(), ahead).isEmpty();
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -288,6 +321,8 @@ public class ElephantEntity extends Camel {
         if (level().isClientSide()) {
             return;
         }
+
+        VehicleSleepGuard.tickVehicle(this);
 
         if (this.chargeTicks > 0 || this.isDashing()) {
             this.applyChargeHits((ServerLevel) this.level());
@@ -340,6 +375,11 @@ public class ElephantEntity extends Camel {
             if (!anySleeping) {
                 removeTempBed();
                 isSleepingOnElephant = false;
+                VehicleSleepGuard.startGrace(this);
+                if (sleepingPlayerUUID != null && level() instanceof ServerLevel graceLevel
+                        && graceLevel.getEntity(sleepingPlayerUUID) instanceof Player sleeper) {
+                    VehicleSleepGuard.startGrace(sleeper);
+                }
 
                 if (sleepingPlayerUUID != null
                         && level() instanceof ServerLevel serverLevel) {
@@ -586,6 +626,8 @@ public class ElephantEntity extends Camel {
         } else {
             isSleepingOnElephant = true;
             sleepingPlayerUUID = player.getUUID();
+            VehicleSleepGuard.protect(this);
+            VehicleSleepGuard.protect(player);
 
             // Capture the final elephant transform used throughout sleep.
             sleepingX = this.getX();

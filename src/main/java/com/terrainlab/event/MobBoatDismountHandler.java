@@ -78,6 +78,11 @@ public class MobBoatDismountHandler {
                 BOARD_TICK.remove(id);
                 continue;
             }
+            // A pet stays aboard while its owner is in the same boat or asleep aboard it.
+            if (mob instanceof net.minecraft.world.entity.OwnableEntity pet && pet.getOwner() != null
+                    && (pet.getOwner().getVehicle() == boat || pet.getOwner().isSleeping())) {
+                continue;
+            }
 
             BlockPos safe = SafeSpotFinder.findNearestSafeSpot(
                     level, boat.blockPosition(), GROUND_SEARCH_RADIUS);

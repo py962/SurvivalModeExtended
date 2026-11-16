@@ -7,12 +7,14 @@
         {
           "type": "minecraft:loot_table",
           "value": "minecraft:chests/trial_chambers/reward_ominous_rare",
-          "weight": 8
+          "weight": 8,
+          "quality": 4
         },
         {
           "type": "minecraft:loot_table",
           "value": "minecraft:chests/trial_chambers/reward_ominous_common",
-          "weight": 2
+          "weight": 2,
+          "quality": -1
         }
       ],
       "rolls": 1.0
@@ -22,7 +24,8 @@
       "entries": [
         {
           "type": "minecraft:loot_table",
-          "value": "minecraft:chests/trial_chambers/reward_ominous_common"
+          "value": "minecraft:chests/trial_chambers/reward_ominous_common",
+          "quality": -1
         }
       ],
       "rolls": {
@@ -46,6 +49,46 @@
         }
       ],
       "rolls": 1.0
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:heavy_core"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "effects": {
+              "minecraft:luck": {}
+            }
+          }
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:breeze_rod"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "effects": {
+              "minecraft:luck": {}
+            }
+          }
+        }
+      ]
     }
   ],
   "random_sequence": "minecraft:chests/trial_chambers/reward_ominous"

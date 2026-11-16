@@ -90,7 +90,7 @@ public final class FishermanTrades {
         // XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.FISHING_ROD, 1, 5, MASTER_MAX_USES, 0));
-        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.FISHING_ROD, FISHING_ROD_ENCHANTMENTS_BY_TYPE, FISHING_ROD_ENCHANTMENTS_FALLBACK, 11, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.FISHING_ROD, 1, 3, MASTER_MAX_USES, 0));
+        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.FISHING_ROD, FISHING_ROD_ENCHANTMENTS_BY_TYPE, FISHING_ROD_ENCHANTMENTS_FALLBACK, 7, MASTER_MAX_USES, 0));
     }
 }

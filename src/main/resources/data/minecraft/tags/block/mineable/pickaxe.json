@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "terrainlab:field_stone",
-    "terrainlab:potion_cauldron"
+    "terrainlab:potion_cauldron",
+    "terrainlab:hearth"
   ]
 }

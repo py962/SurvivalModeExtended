@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:feather",
+    "terrainlab:goose_feather",
+    "terrainlab:owl_feather",
+    "terrainlab:parrot_feather",
+    "terrainlab:vulture_feather"
+  ]
+}

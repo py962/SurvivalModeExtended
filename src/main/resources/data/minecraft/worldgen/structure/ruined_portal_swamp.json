@@ -7,7 +7,7 @@
       "can_be_cold": false,
       "mossiness": 0.5,
       "overgrown": false,
-      "placement": "on_ocean_floor",
+      "placement": "partly_buried",
       "replace_with_blackstone": false,
       "vines": true,
       "weight": 1.0

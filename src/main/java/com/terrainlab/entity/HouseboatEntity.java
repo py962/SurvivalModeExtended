@@ -41,6 +41,13 @@ public class HouseboatEntity extends Boat {
     private BlockPos tempBedPos = null;
     private BlockPos tempBedFootPos = null;
     private boolean isSleepingInBoat = false;
+
+    // Owner's pet walking over to board (see callPet), and pets that boarded with their owner aboard.
+    private static final double PET_CALL_RADIUS = 16.0;
+    private static final int PET_CALL_TICKS = 200;
+    private UUID pendingPetUUID = null;
+    private long pendingPetUntil = 0L;
+    private final java.util.Set<UUID> escortedPets = new java.util.HashSet<>();
     private BlockPos lastLightPos = null;
     private UUID sleepingPlayerUUID = null;
 
@@ -94,6 +101,9 @@ public class HouseboatEntity extends Boat {
     // vanilla's instant-destroy branch and use the same scaled accumulation curve.
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        if (VehicleSleepGuard.blocks(this, source)) {
+            return false;
+        }
         boolean isCreativeAttack = source.getEntity() instanceof Player player
                 && player.getAbilities().instabuild;
 
@@ -229,11 +239,93 @@ public class HouseboatEntity extends Boat {
         return super.leashSnapDistance();
     }
 
+    // Hostile mobs never take a seat; pets, villagers and other mobs still can.
+    @Override
+    protected boolean canAddPassenger(Entity passenger) {
+        return !(passenger instanceof net.minecraft.world.entity.monster.Enemy) && super.canAddPassenger(passenger);
+    }
+
+    @Override
+    protected void addPassenger(Entity passenger) {
+        super.addPassenger(passenger);
+        if (level().isClientSide()) return;
+        if (passenger instanceof Player player && getFirstPassenger() == player) {
+            callPet(player);
+        } else if (passenger instanceof net.minecraft.world.entity.TamableAnimal pet
+                && getFirstPassenger() instanceof Player owner && pet.isOwnedBy(owner)) {
+            escortedPets.add(pet.getUUID());
+        }
+    }
+
+    /** The nearest pet following the new helmsman (not sitting, not bed-anchored) walks over to board. */
+    private void callPet(Player owner) {
+        if (getPassengers().size() >= getMaxPassengers()) return;
+        net.minecraft.world.entity.TamableAnimal nearest = null;
+        double best = PET_CALL_RADIUS * PET_CALL_RADIUS;
+        for (net.minecraft.world.entity.TamableAnimal pet : level().getEntitiesOfClass(
+                net.minecraft.world.entity.TamableAnimal.class, getBoundingBox().inflate(PET_CALL_RADIUS))) {
+            if (!pet.isAlive() || !pet.isTame() || !pet.isOwnedBy(owner) || pet.isOrderedToSit()
+                    || pet.isPassenger()
+                    || pet.getData(com.terrainlab.registry.ModAttachments.ANCHOR_BED_POS.get()).isPresent()) {
+                continue;
+            }
+            double distance = pet.distanceToSqr(this);
+            if (distance < best) {
+                best = distance;
+                nearest = pet;
+            }
+        }
+        if (nearest != null) {
+            pendingPetUUID = nearest.getUUID();
+            pendingPetUntil = level().getGameTime() + PET_CALL_TICKS;
+        }
+    }
+
+    private void tickPendingPet() {
+        if (pendingPetUUID == null || !(level() instanceof ServerLevel serverLevel)) return;
+        if (!(serverLevel.getEntity(pendingPetUUID) instanceof net.minecraft.world.entity.TamableAnimal pet)
+                || !(getFirstPassenger() instanceof Player owner) || !pet.isOwnedBy(owner)
+                || pet.isPassenger() || getPassengers().size() >= getMaxPassengers()
+                || level().getGameTime() > pendingPetUntil) {
+            pendingPetUUID = null;
+            return;
+        }
+        if (pet.distanceTo(this) < getBbWidth() / 2.0F + 1.5F) {
+            if (pet.startRiding(this)) {
+                escortedPets.add(pet.getUUID());
+            }
+            pendingPetUUID = null;
+        } else if (tickCount % 10 == 0) {
+            pet.getNavigation().moveTo(this, 1.2);
+        }
+    }
+
+    /** A pet that boarded with its owner stays aboard until the owner leaves (sleeping aboard doesn't count). */
+    private void tickEscortedPets() {
+        if (escortedPets.isEmpty() || isSleepingInBoat) return;
+        for (Entity passenger : java.util.List.copyOf(getPassengers())) {
+            if (passenger instanceof net.minecraft.world.entity.TamableAnimal pet
+                    && escortedPets.contains(pet.getUUID())) {
+                net.minecraft.world.entity.LivingEntity owner = pet.getOwner();
+                if (owner != null && owner.getVehicle() != this && !owner.isSleeping()) {
+                    pet.stopRiding();
+                    escortedPets.remove(pet.getUUID());
+                }
+            }
+        }
+        escortedPets.removeIf(id -> getPassengers().stream().noneMatch(p -> p.getUUID().equals(id)));
+    }
+
     @Override
     public void tick() {
         super.tick();
 
         if (level().isClientSide()) return;
+
+        VehicleSleepGuard.tickVehicle(this);
+        VehicleSleepGuard.clearDeck(this);
+        tickPendingPet();
+        tickEscortedPets();
 
         // Re-seat a rider who left the boat mid-air while suspended (see lastRiderUUID).
         Player currentRider = getFirstPassenger() instanceof Player p ? p : null;
@@ -269,6 +361,11 @@ public class HouseboatEntity extends Boat {
             if (!anySleeping) {
                 removeTempBed();
                 isSleepingInBoat = false;
+                VehicleSleepGuard.startGrace(this);
+                if (sleepingPlayerUUID != null && level() instanceof ServerLevel graceLevel
+                        && graceLevel.getEntity(sleepingPlayerUUID) instanceof Player sleeper) {
+                    VehicleSleepGuard.startGrace(sleeper);
+                }
 
                 if (sleepingPlayerUUID != null && level() instanceof ServerLevel serverLevel) {
                     Entity sleeper = serverLevel.getEntity(sleepingPlayerUUID);
@@ -442,6 +539,8 @@ public class HouseboatEntity extends Boat {
         } else {
             isSleepingInBoat = true;
             sleepingPlayerUUID = player.getUUID();
+            VehicleSleepGuard.protect(this);
+            VehicleSleepGuard.protect(player);
             if (level instanceof ServerLevel serverLevel) {
                 serverLevel.updateSleepingPlayerList();
             }

@@ -65,7 +65,7 @@ public final class LeatherworkerTrades {
             VillagerType.PLAINS, Items.CORNFLOWER,
             VillagerType.SAVANNA, Items.DANDELION,
             VillagerType.DESERT, Items.CACTUS,
-            VillagerType.TAIGA, Items.ROSE_BUSH,
+            VillagerType.TAIGA, Items.POPPY,
             VillagerType.SNOW, Items.AZURE_BLUET,
             VillagerType.SWAMP, Items.LILY_OF_THE_VALLEY,
             VillagerType.JUNGLE, Items.FERN
@@ -105,23 +105,23 @@ public final class LeatherworkerTrades {
         // Journeyman (level 3): Leather Horse Armour, Local Dye Source (villager type) - 5 XP/trade
         List<VillagerTrades.ItemListing> journeyman = trades.get(3);
         journeyman.clear();
-        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.LEATHER_HORSE_ARMOR, 1, 2, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.LEATHER_HORSE_ARMOR, 1, 4, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.LEATHER_HORSE_ARMOR, 1, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.LEATHER_HORSE_ARMOR, 1, 2, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.VillagerTypeVariantTradeListing.buying(LOCAL_DYE_SOURCE, LOCAL_DYE_SOURCE_FALLBACK, 9, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.VillagerTypeVariantTradeListing.selling(LOCAL_DYE_SOURCE, LOCAL_DYE_SOURCE_FALLBACK, 7, 1, JOURNEYMAN_MAX_USES, 5));
 
         // Expert (level 4): Enchanted Bundle (Overstacking), Enchanted Leather Boots (villager type) - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.BUNDLE, 1, 1, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.BUNDLE, 1, 3, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.BUNDLE, BUNDLE_ENCHANTMENTS_BY_TYPE, OVERSTACKING_ONLY, 7, EXPERT_MAX_USES, 10));
         expert.add(TradeListings.SimpleTradeListing.buying(Items.LEATHER_BOOTS, 1, 3, EXPERT_MAX_USES, 10));
-        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.LEATHER_BOOTS, BOOTS_ENCHANTMENTS_BY_TYPE, BOOTS_ENCHANTMENTS_FALLBACK, 9, EXPERT_MAX_USES, 10));
+        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.LEATHER_BOOTS, BOOTS_ENCHANTMENTS_BY_TYPE, BOOTS_ENCHANTMENTS_FALLBACK, 7, EXPERT_MAX_USES, 10));
 
         // Master (level 5): Enchanted Saddle (boots mapping). XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.SADDLE, 1, 5, MASTER_MAX_USES, 0));
-        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.SADDLE, BOOTS_ENCHANTMENTS_BY_TYPE, BOOTS_ENCHANTMENTS_FALLBACK, 11, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.SADDLE, 1, 4, MASTER_MAX_USES, 0));
+        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.SADDLE, BOOTS_ENCHANTMENTS_BY_TYPE, BOOTS_ENCHANTMENTS_FALLBACK, 8, MASTER_MAX_USES, 0));
     }
 }

@@ -149,7 +149,8 @@
             }
           ],
           "name": "minecraft:book",
-          "weight": 2
+          "weight": 2,
+          "quality": 2
         },
         {
           "type": "minecraft:item",
@@ -164,7 +165,8 @@
               "options": "#minecraft:on_random_loot"
             }
           ],
-          "name": "minecraft:diamond_chestplate"
+          "name": "minecraft:diamond_chestplate",
+          "quality": 2
         },
         {
           "type": "minecraft:item",
@@ -179,7 +181,8 @@
               "options": "#minecraft:on_random_loot"
             }
           ],
-          "name": "minecraft:diamond_axe"
+          "name": "minecraft:diamond_axe",
+          "quality": 2
         }
       ],
       "rolls": 1.0

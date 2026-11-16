@@ -19,14 +19,15 @@ import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 /**
  * Marks structures seen through a spyglass on the scoped map, with the icons from
  * {@link StructureMapIcons} (vanilla's where one exists, TerrainLab's own otherwise). Only structures
- * that reach the surface are marked; anything whose top lies below the ground (strongholds, most
- * mineshafts and ancient cities, buried ruins) cannot be seen, and buried treasure is never marked.
+ * with some part above the ground or the water surface are marked: buried and fully submerged ones
+ * (strongholds, sunken ruins and shipwrecks, ocean monuments) cannot be seen, and buried treasure is
+ * never marked.
  * Markers are stored on the map item, like an explorer map's target, without tinting the item.
  */
 public final class SpyglassStructureMarker {
 
-    // How far below the ground (or sea floor) a structure's top may sit and still count as visible.
-    private static final int VISIBLE_DEPTH = 2; // blocks
+    // Footprint columns sampled per axis when looking for a part that breaks the surface.
+    private static final int SAMPLES_PER_AXIS = 5;
 
     private SpyglassStructureMarker() {
     }
@@ -59,9 +60,19 @@ public final class SpyglassStructureMarker {
         }
     }
 
+    // The heightmap counts water and the structure's own blocks but not leaves, so a column whose
+    // surface is no higher than the structure's top has the structure itself showing there.
     private static boolean isVisible(ServerLevel level, BoundingBox box, BlockPos centre) {
-        int ground = level.getHeight(Heightmap.Types.OCEAN_FLOOR, centre.getX(), centre.getZ());
-        return box.maxY() >= ground - VISIBLE_DEPTH;
+        for (int i = 0; i < SAMPLES_PER_AXIS; i++) {
+            int x = box.minX() + (box.getXSpan() - 1) * i / (SAMPLES_PER_AXIS - 1);
+            for (int j = 0; j < SAMPLES_PER_AXIS; j++) {
+                int z = box.minZ() + (box.getZSpan() - 1) * j / (SAMPLES_PER_AXIS - 1);
+                if (!level.hasChunk(x >> 4, z >> 4)) continue;
+                int surface = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+                if (box.maxY() >= surface - 1) return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isOnMap(MapItemSavedData data, BlockPos pos) {

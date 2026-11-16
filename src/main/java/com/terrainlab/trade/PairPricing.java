@@ -21,7 +21,9 @@ import java.util.Objects;
  * <p>
  * Every villager trade is one half of a pair: the villager buys an item for emeralds and sells the
  * same (or a matching) item for emeralds. Reputation moves both halves towards the pair's midpoint,
- * reaching it exactly at +100, so buying and reselling with one villager can never make a profit.
+ * reaching it exactly at +100, so buying and reselling with one villager can never make a profit. A
+ * midpoint between two counts is rounded the villager's way on its buying side (more items, fewer
+ * emeralds), so crafting from bought materials doesn't turn a profit at +100 either.
  * Rounding always favours the villager, nothing improves beyond +100, and negative reputation (down
  * to -100) widens the gap at the same rate. The change is applied to the side of each trade with
  * more items: item counts for cheap goods, emeralds for expensive ones. A pair whose two prices are
@@ -105,7 +107,7 @@ public final class PairPricing {
             if (itemsGiven == itemsReceived) {
                 return;
             }
-            double mid = (itemsGiven + itemsReceived) / 2.0;
+            int mid = (itemsGiven + itemsReceived + 1) / 2;
             setCost(buy, (int) Math.ceil(itemsGiven - t * (itemsGiven - mid) - 1e-9));
             setResult(sell, (int) Math.floor(itemsReceived + t * (mid - itemsReceived) + 1e-9));
         } else {
@@ -115,7 +117,7 @@ public final class PairPricing {
             if (paid == charged) {
                 return; // fixed exchange rate
             }
-            double mid = (paid + charged) / 2.0;
+            int mid = (paid + charged) / 2;
             setResult(buy, (int) Math.floor(paid + t * (mid - paid) + 1e-9));
             setCost(sell, (int) Math.ceil(charged - t * (charged - mid) - 1e-9));
         }

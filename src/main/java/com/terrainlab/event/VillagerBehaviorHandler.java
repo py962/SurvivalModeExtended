@@ -43,6 +43,8 @@ public final class VillagerBehaviorHandler {
 
     private static final int BED_SEARCH_RADIUS = 48; // blocks
     private static final double WALK_SPEED = 0.6D;
+    // Between full reads, the hearth gathering is re-issued this often.
+    private static final int GATHER_REFRESH_TICKS = 20;
 
     private VillagerBehaviorHandler() {
     }
@@ -56,9 +58,18 @@ public final class VillagerBehaviorHandler {
             // Snapshot the due villagers first: the services below can add/remove entities or
             // load chunks, which would rehash the live entity map mid-iteration.
             List<Villager> due = new ArrayList<>();
+            List<Villager> gathering = new ArrayList<>();
             for (Entity entity : level.getAllEntities()) {
-                if (entity instanceof Villager v && isStaggeredThisTick(v, tick)) {
+                if (!(entity instanceof Villager v)) continue;
+                if (isStaggeredThisTick(v, tick)) {
                     due.add(v);
+                } else if (Math.floorMod(v.getId() + tick, GATHER_REFRESH_TICKS) == 0) {
+                    gathering.add(v);
+                }
+            }
+            for (Villager villager : gathering) {
+                if (!villager.isRemoved()) {
+                    VillagerScheduleService.refreshGathering(villager, level);
                 }
             }
             for (Villager villager : due) {
@@ -72,12 +83,15 @@ public final class VillagerBehaviorHandler {
                 checkForNearbyHostiles(villager, level, gameTime);
                 applyFearfulDuskOverride(villager, level, gameTime);
                 checkForSentryTrimSighting(villager, level, gameTime);
+                com.terrainlab.village.SmithGolemRepairService.update(villager, level);
                 // Pending food heals and the daily natural heal, before the mood reads health.
                 VillagerHealthService.update(villager, gameTime);
                 // Last, so it sees this read's thermal/tired/trapped/fear results.
                 VillagerMoodService.update(villager, gameTime);
                 // Morning trip past the bell and its food chest, then eat there if needed.
                 VillagerMorningChestService.update(villager, level, gameTime);
+                // Daily food use (4 points), before the meal check so a villager can eat straight away.
+                com.terrainlab.village.VillagerDailyFoodService.update(villager, level);
                 VillagerChestMealService.update(villager, level, gameTime);
             }
         }

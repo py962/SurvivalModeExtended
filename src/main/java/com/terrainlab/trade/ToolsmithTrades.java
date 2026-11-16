@@ -71,7 +71,7 @@ public final class ToolsmithTrades {
         apprentice.clear();
         apprentice.add(TradeListings.SimpleTradeListing.buying(Items.BUCKET, 3, 1, APPRENTICE_MAX_USES, 2));
         apprentice.add(TradeListings.SimpleTradeListing.selling(Items.BUCKET, 1, 1, APPRENTICE_MAX_USES, 2));
-        apprentice.add(TradeListings.SimpleTradeListing.buying(Items.LAVA_BUCKET, 2, 1, APPRENTICE_MAX_USES, 2));
+        apprentice.add(TradeListings.SimpleTradeListing.buying(Items.LAVA_BUCKET, 1, 1, APPRENTICE_MAX_USES, 2));
         apprentice.add(TradeListings.SimpleTradeListing.selling(Items.LAVA_BUCKET, 1, 2, APPRENTICE_MAX_USES, 2));
 
         // Journeyman (level 3): Bell, Enchanted Iron Hoe (villager type) - 5 XP/trade
@@ -79,25 +79,25 @@ public final class ToolsmithTrades {
         journeyman.clear();
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.BELL, 1, 7, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.BELL, 1, 9, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.IRON_HOE, 1, 2, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.IRON_HOE, 1, 3, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.IRON_HOE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 8, JOURNEYMAN_MAX_USES, 5));
+                Items.IRON_HOE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 7, JOURNEYMAN_MAX_USES, 5));
 
         // Expert (level 4): Enchanted Iron Spade (villager type), Enchanted Iron Axe (villager type) - 10 XP/trade
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SHOVEL, 1, 4, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_SHOVEL, 1, 3, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.IRON_SHOVEL, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 10, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_AXE, 1, 5, EXPERT_MAX_USES, 10));
+                Items.IRON_SHOVEL, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 7, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_AXE, 1, 4, EXPERT_MAX_USES, 10));
         expert.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.IRON_AXE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 11, EXPERT_MAX_USES, 10));
+                Items.IRON_AXE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 8, EXPERT_MAX_USES, 10));
 
         // Master (level 5): Enchanted Iron Pickaxe (villager type). XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.IRON_PICKAXE, 1, 8, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.IRON_PICKAXE, 1, 4, MASTER_MAX_USES, 0));
         master.add(new TradeListings.VillagerTypeEnchantedSellListing(
-                Items.IRON_PICKAXE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 14, MASTER_MAX_USES, 0));
+                Items.IRON_PICKAXE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 8, MASTER_MAX_USES, 0));
     }
 }

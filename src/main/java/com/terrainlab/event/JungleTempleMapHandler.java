@@ -30,11 +30,14 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
  * the temple chest used to give, an explorer map centred on the nearest Ancient City and the item
  * the Archeologist asks for. If no Ancient City is in range, it gets a plain map of the temple's
  * own area instead.
+ * Other frames can name their own table with MAP_LOOT_TAG.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class JungleTempleMapHandler {
 
     public static final String MAP_TAG = "terrainlab_jungle_map";
+    /** Optional: the loot table to fill the frame from, in place of the jungle temple's. */
+    public static final String MAP_LOOT_TAG = "terrainlab_map_loot";
 
     private static final ResourceKey<LootTable> MAP_LOOT = ResourceKey.create(Registries.LOOT_TABLE,
             Identifier.fromNamespaceAndPath(TerrainLab.MODID, "chests/jungle_temple_hidden_map"));
@@ -72,7 +75,14 @@ public final class JungleTempleMapHandler {
 
     private static void fill(ServerLevel level, ItemFrame frame) {
         frame.getPersistentData().remove(MAP_TAG);
-        LootTable table = level.getServer().reloadableRegistries().getLootTable(MAP_LOOT);
+        ResourceKey<LootTable> lootKey = MAP_LOOT;
+        String custom = frame.getPersistentData().getStringOr(MAP_LOOT_TAG, "");
+        frame.getPersistentData().remove(MAP_LOOT_TAG);
+        Identifier customId = custom.isEmpty() ? null : Identifier.tryParse(custom);
+        if (customId != null) {
+            lootKey = ResourceKey.create(Registries.LOOT_TABLE, customId);
+        }
+        LootTable table = level.getServer().reloadableRegistries().getLootTable(lootKey);
         LootParams params = new LootParams.Builder(level)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(frame.blockPosition()))
                 .create(LootContextParamSets.CHEST);

@@ -1,8 +1,14 @@
 package com.terrainlab.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.terrainlab.TerrainLab;
 import com.terrainlab.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -15,6 +21,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.ScatteredFeaturePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.minecraft.world.level.levelgen.structure.structures.DesertPyramidPiece;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -58,8 +65,35 @@ public abstract class DesertPyramidHiddenChamberMixin extends ScatteredFeaturePi
     @Unique
     private static final int TERRAINLAB$CHAMBER_DISTANCE = 7;
 
+    @Unique
+    private static final ResourceKey<LootTable> TERRAINLAB$TREASURE_LOOT = ResourceKey.create(Registries.LOOT_TABLE,
+            Identifier.fromNamespaceAndPath(TerrainLab.MODID, "chests/desert_pyramid_treasure"));
+
     protected DesertPyramidHiddenChamberMixin(StructurePieceType type, CompoundTag tag) {
         super(type, tag);
+    }
+
+    /** Seeded so every chunk pass agrees. */
+    @Unique
+    private int[] terrainlab$hiddenDirection(WorldGenLevel level) {
+        long hash = level.getSeed()
+                ^ this.boundingBox.minX() * 341873128712L
+                ^ this.boundingBox.minZ() * 132897987541L;
+        return TERRAINLAB$DIRECTIONS[Math.floorMod(Long.hashCode(hash), 4)];
+    }
+
+    /**
+     * Vanilla places the four treasure chests 2 blocks out from the centre; the one on the hidden
+     * passage's side gets terrainlab:chests/desert_pyramid_treasure instead of the common table.
+     */
+    @WrapOperation(method = "postProcess", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/level/levelgen/structure/structures/DesertPyramidPiece;createChest(Lnet/minecraft/world/level/WorldGenLevel;Lnet/minecraft/world/level/levelgen/structure/BoundingBox;Lnet/minecraft/util/RandomSource;IIILnet/minecraft/resources/ResourceKey;)Z"),
+            require = 1)
+    private boolean terrainlab$guardianChest(DesertPyramidPiece piece, WorldGenLevel level, BoundingBox chunkBB,
+            RandomSource random, int x, int y, int z, ResourceKey<LootTable> lootTable, Operation<Boolean> original) {
+        int[] dir = terrainlab$hiddenDirection(level);
+        boolean guardian = x == TERRAINLAB$CENTRE + 2 * dir[0] && z == TERRAINLAB$CENTRE + 2 * dir[1];
+        return original.call(piece, level, chunkBB, random, x, y, z, guardian ? TERRAINLAB$TREASURE_LOOT : lootTable);
     }
 
     @Inject(method = "postProcess", at = @At("TAIL"))
@@ -69,10 +103,7 @@ public abstract class DesertPyramidHiddenChamberMixin extends ScatteredFeaturePi
         // Vanilla only builds once it has settled the pyramid's height.
         if (this.heightPosition < 0) return;
 
-        long hash = level.getSeed()
-                ^ this.boundingBox.minX() * 341873128712L
-                ^ this.boundingBox.minZ() * 132897987541L;
-        int[] dir = TERRAINLAB$DIRECTIONS[Math.floorMod(Long.hashCode(hash), 4)];
+        int[] dir = terrainlab$hiddenDirection(level);
         int dx = dir[0];
         int dz = dir[1];
         int px = -dz; // perpendicular

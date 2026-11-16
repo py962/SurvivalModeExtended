@@ -29,12 +29,21 @@ public final class PlayerInternalTemperature {
     /** Wetness when fully exposed to rain; -10C of cooling at COOLING_STRENGTH 20C. */
     private static final float RAIN_WETNESS = 0.5F;
 
+    public static final double FIRE_PROTECTION_HEATING_RATE_PER_LEVEL = 0.05;
+
     private PlayerInternalTemperature() {
     }
 
     public static void tick(ServerPlayer player) {
         // Paused in creative/spectator: the value holds.
         if (player.isCreative() || player.isSpectator()) {
+            return;
+        }
+
+        // Standing in any portal shields from heat and cold: the value holds and effects clear.
+        if (isInPortal(player)) {
+            clearExposureEffect(player, ModMobEffects.FREEZING);
+            clearExposureEffect(player, ModMobEffects.HEATSTROKE);
             return;
         }
 
@@ -89,6 +98,11 @@ public final class PlayerInternalTemperature {
         double delta = localTemp - internalTemp;
 
         double rate = BASE_DRIFT_RATE;
+
+        int fireProtection = fireProtectionLevels(player);
+        if (fireProtection > 0 && delta > 0) {
+            rate *= Math.max(0.0, 1.0 - fireProtection * FIRE_PROTECTION_HEATING_RATE_PER_LEVEL);
+        }
 
         if (furWorn) {
             double baseFurMod = delta < 0
@@ -151,6 +165,18 @@ public final class PlayerInternalTemperature {
      * Instant change from food or drink, applied regardless of active effects. A value starting inside
      * [FOOD_PUSH_MIN_TEMP, FOOD_PUSH_MAX_TEMP] is clamped to that band; one starting outside is not.
      */
+    private static boolean isInPortal(ServerPlayer player) {
+        var box = player.getBoundingBox();
+        for (BlockPos pos : BlockPos.betweenClosed(
+                BlockPos.containing(box.minX, box.minY, box.minZ),
+                BlockPos.containing(box.maxX - 1.0E-7, box.maxY - 1.0E-7, box.maxZ - 1.0E-7))) {
+            if (player.level().getBlockState(pos).getBlock() instanceof net.minecraft.world.level.block.Portal) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void applyInstantPush(ServerPlayer player, double amount) {
         double internalTemp =
                 player.getData(ModAttachments.PLAYER_INTERNAL_TEMP.get());
@@ -256,40 +282,45 @@ public final class PlayerInternalTemperature {
             ServerPlayer player,
             double internalTemp
     ) {
-        if (player.level().getDifficulty() == Difficulty.EASY) {
-            return;
-        }
-
-        if (player.isCreative() || player.isSpectator()) {
-            return;
-        }
+        boolean applies = player.level().getDifficulty() != Difficulty.EASY
+                && !player.isCreative() && !player.isSpectator();
 
         // Warmth suppresses Freezing (see FreezingEffectHandler.isFreezing).
-        if (internalTemp <= FREEZING_EFFECT_THRESHOLD && !hasWarmthEffect(player)) {
-            player.addEffect(
-                    new MobEffectInstance(
-                            ModMobEffects.FREEZING,
-                            EFFECT_REFRESH_TICKS,
-                            0,
-                            false,
-                            false,
-                            true
-                    )
-            );
+        if (applies && internalTemp <= FREEZING_EFFECT_THRESHOLD && !hasWarmthEffect(player)) {
+            player.addEffect(new MobEffectInstance(ModMobEffects.FREEZING, EFFECT_REFRESH_TICKS, 0, false, false, true));
+        } else {
+            clearExposureEffect(player, ModMobEffects.FREEZING);
         }
 
-        if (internalTemp >= HEATSTROKE_EFFECT_THRESHOLD) {
-            player.addEffect(
-                    new MobEffectInstance(
-                            ModMobEffects.HEATSTROKE,
-                            EFFECT_REFRESH_TICKS,
-                            0,
-                            false,
-                            false,
-                            true
-                    )
-            );
+        if (applies && internalTemp >= HEATSTROKE_EFFECT_THRESHOLD) {
+            player.addEffect(new MobEffectInstance(ModMobEffects.HEATSTROKE, EFFECT_REFRESH_TICKS, 0, false, false, true));
+        } else {
+            clearExposureEffect(player, ModMobEffects.HEATSTROKE);
         }
+    }
+
+    /** Removes only the hidden refresh instance applied here, never a potion's. */
+    private static void clearExposureEffect(ServerPlayer player, net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect) {
+        MobEffectInstance instance = player.getEffect(effect);
+        if (instance != null && !instance.isVisible() && !instance.isAmbient()
+                && instance.getDuration() <= EFFECT_REFRESH_TICKS) {
+            player.removeEffect(effect);
+        }
+    }
+
+    /** Summed over the four armour slots. */
+    private static int fireProtectionLevels(ServerPlayer player) {
+        var fireProtection = player.registryAccess()
+                .lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                .getOrThrow(net.minecraft.world.item.enchantment.Enchantments.FIRE_PROTECTION);
+        int total = 0;
+        for (net.minecraft.world.entity.EquipmentSlot slot : net.minecraft.world.entity.EquipmentSlot.values()) {
+            if (slot.getType() == net.minecraft.world.entity.EquipmentSlot.Type.HUMANOID_ARMOR) {
+                total += net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
+                        fireProtection, player.getItemBySlot(slot));
+            }
+        }
+        return total;
     }
 
     private static boolean isFurWorn(ServerPlayer player) {

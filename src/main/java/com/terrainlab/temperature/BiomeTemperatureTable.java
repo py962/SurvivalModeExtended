@@ -108,23 +108,23 @@ public final class BiomeTemperatureTable {
 
         // Oceans.
         put("minecraft:warm_ocean",
-                new SeasonalBiomeData(24, 22, 27, 25, 30, 28, 32, 30, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(29, 27, 32, 30, 35, 33, 37, 35, YEAR_ROUND_RAIN));
         put("minecraft:lukewarm_ocean",
-                new SeasonalBiomeData(16, 14, 19, 17, 22, 20, 24, 22, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(21, 19, 24, 22, 27, 25, 29, 27, YEAR_ROUND_RAIN));
         put("minecraft:deep_lukewarm_ocean",
-                new SeasonalBiomeData(15, 13, 18, 16, 21, 19, 23, 21, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(20, 18, 23, 21, 26, 24, 28, 26, YEAR_ROUND_RAIN));
         put("minecraft:ocean",
-                new SeasonalBiomeData(8, 6, 11, 9, 14, 12, 16, 14, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(15, 13, 18, 16, 21, 19, 23, 21, YEAR_ROUND_RAIN));
         put("minecraft:deep_ocean",
-                new SeasonalBiomeData(7, 5, 10, 8, 13, 11, 15, 13, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(15, 13, 18, 16, 21, 19, 23, 21, YEAR_ROUND_RAIN));
         put("minecraft:cold_ocean",
-                new SeasonalBiomeData(0, -2, 3, 1, 6, 4, 8, 6, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(7, 5, 10, 8, 13, 11, 15, 13, YEAR_ROUND_RAIN));
         put("minecraft:deep_cold_ocean",
-                new SeasonalBiomeData(-1, -3, 2, 0, 5, 3, 7, 5, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(6, 4, 9, 7, 12, 10, 14, 12, YEAR_ROUND_RAIN));
         put("minecraft:frozen_ocean",
-                new SeasonalBiomeData(-10, -12, -7, -9, -4, -6, -2, -4, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(-3, -5, 0, -2, 3, 1, 5, 3, YEAR_ROUND_RAIN));
         put("minecraft:deep_frozen_ocean",
-                new SeasonalBiomeData(-13, -15, -10, -13, -7, -11, -5, -8, YEAR_ROUND_RAIN));
+                new SeasonalBiomeData(-6, -8, -3, -6, 0, -4, 2, -1, YEAR_ROUND_RAIN));
 
         // Caves, Nether and End: non-seasonal.
         put("terrainlab:ice_caves", nonSeasonal(-25));

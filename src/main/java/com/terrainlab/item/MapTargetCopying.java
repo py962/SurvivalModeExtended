@@ -6,8 +6,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,6 +22,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.LodestoneTracker;
 import net.minecraft.world.item.component.MapDecorations;
 import net.minecraft.world.level.Level;
@@ -34,10 +37,11 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Cartography table: copies the structure target(s) of a source map (top slot) onto a recipient
- * (bottom slot) - a plain map gains the source's markers that lie on it, a compass or Rangefinder
- * Compass is pointed at the source's first target. The source map is kept; the recipient is used up
- * into the result. Hooked in by {@code CartographyTableMenuMixin}; results are computed on the server
+ * Cartography table: copies location data from a source (top slot: a map with structure markers, or a
+ * compass or Rangefinder Compass pointing somewhere) onto a recipient (bottom slot) - a plain map gains
+ * the markers that lie on it, a compass or Rangefinder Compass is pointed at the first target. The
+ * source is kept; the recipient is used up into the result. Compasses made here remember the
+ * structure icon, so a later copy back onto a map shows it. Hooked in by {@code CartographyTableMenuMixin}; results are computed on the server
  * only (as vanilla's are) and synced to the client's result slot.
  */
 public final class MapTargetCopying {
@@ -48,6 +52,7 @@ public final class MapTargetCopying {
     private static final int TARGET_Y = 64;
     private static final String GUIDE_CHART_PREFIX = "item.terrainlab.guide_chart.";
     private static final String DESTINATION_PREFIX = "terrainlab.map_destination.";
+    private static final String ICON_KEY = "terrainlab_target_icon";
 
     private MapTargetCopying() {
     }
@@ -56,7 +61,7 @@ public final class MapTargetCopying {
     public static boolean isRecipient(ItemStack stack) {
         return stack.is(Items.COMPASS)
                 || stack.is(ModItems.RANGEFINDER_COMPASS.get())
-                || stack.has(DataComponents.MAP_ID);
+                || stack.has(DataComponents.MAP_ID) && !stack.is(ModItems.ATLAS.get());
     }
 
     /** Whether the bottom-slot item belongs to vanilla's own recipes (cloning, zooming, locking). */
@@ -69,6 +74,9 @@ public final class MapTargetCopying {
      * nothing to copy (no target, wrong dimension, outside the recipient map, already copied ...).
      */
     public static ItemStack craft(Level level, ItemStack source, ItemStack recipient) {
+        if (isCompassSource(source)) {
+            return fromCompass(level, source, recipient);
+        }
         List<Map.Entry<String, MapDecorations.Entry>> targets = targets(source);
         if (targets.isEmpty()) {
             return ItemStack.EMPTY;
@@ -89,13 +97,66 @@ public final class MapTargetCopying {
                                           Map.Entry<String, MapDecorations.Entry> target, ResourceKey<Level> dimension) {
         MapDecorations.Entry entry = target.getValue();
         BlockPos pos = BlockPos.containing(entry.x(), TARGET_Y, entry.z());
+        return pointAt(recipient, GlobalPos.of(dimension, pos), destinationName(source, target), entry.type());
+    }
+
+    private static ItemStack pointAt(ItemStack recipient, GlobalPos target, Component destination,
+                                     Holder<MapDecorationType> icon) {
         ItemStack result = recipient.copyWithCount(1);
         // Untracked: no lodestone needed, and CompassItem#inventoryTick never clears it.
-        result.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(GlobalPos.of(dimension, pos)), false));
+        result.set(DataComponents.LODESTONE_TRACKER, new LodestoneTracker(Optional.of(target), false));
         String nameKey = recipient.is(Items.COMPASS) ? "item.terrainlab.compass_to" : "item.terrainlab.rangefinder_to";
         result.set(DataComponents.CUSTOM_NAME,
-                Component.translatable(nameKey, destinationName(source, target)).withStyle(style -> style.withItalic(false)));
+                Component.translatable(nameKey, destination).withStyle(style -> style.withItalic(false)));
+        icon.unwrapKey().ifPresent(key -> CustomData.update(DataComponents.CUSTOM_DATA, result,
+                tag -> tag.putString(ICON_KEY, key.identifier().toString())));
         return ItemStack.isSameItemSameComponents(result, recipient) ? ItemStack.EMPTY : result;
+    }
+
+    /** A compass or Rangefinder Compass pointing somewhere. */
+    public static boolean isCompassSource(ItemStack stack) {
+        if (!stack.is(Items.COMPASS) && !stack.is(ModItems.RANGEFINDER_COMPASS.get())) {
+            return false;
+        }
+        LodestoneTracker tracker = stack.get(DataComponents.LODESTONE_TRACKER);
+        return tracker != null && tracker.target().isPresent();
+    }
+
+    private static ItemStack fromCompass(Level level, ItemStack source, ItemStack recipient) {
+        GlobalPos target = source.get(DataComponents.LODESTONE_TRACKER).target().orElseThrow();
+        Holder<MapDecorationType> icon = compassIcon(level, source);
+        if (recipient.is(Items.COMPASS) || recipient.is(ModItems.RANGEFINDER_COMPASS.get())) {
+            return pointAt(recipient, target, compassDestination(source), icon);
+        }
+        MapDecorations.Entry entry = new MapDecorations.Entry(icon, target.pos().getX(), target.pos().getZ(), 180.0F);
+        return markMap(level, recipient, List.of(Map.entry("compass", entry)), target.dimension());
+    }
+
+    // The structure icon a compass made here remembers; any other pointed compass shows vanilla's target point.
+    private static Holder<MapDecorationType> compassIcon(Level level, ItemStack compass) {
+        CustomData custom = compass.get(DataComponents.CUSTOM_DATA);
+        Identifier id = custom == null ? null : Identifier.tryParse(custom.copyTag().getStringOr(ICON_KEY, ""));
+        if (id != null) {
+            Optional<? extends Holder<MapDecorationType>> icon = level.registryAccess()
+                    .lookupOrThrow(Registries.MAP_DECORATION_TYPE)
+                    .get(ResourceKey.create(Registries.MAP_DECORATION_TYPE, id));
+            if (icon.isPresent()) {
+                return icon.get();
+            }
+        }
+        return MapDecorationTypes.TARGET_POINT;
+    }
+
+    // A copied compass keeps the destination of its "Compass to ..." name, else its own name.
+    private static Component compassDestination(ItemStack compass) {
+        Component name = compass.get(DataComponents.CUSTOM_NAME);
+        if (name != null && name.getContents() instanceof TranslatableContents translatable
+                && (translatable.getKey().equals("item.terrainlab.compass_to")
+                        || translatable.getKey().equals("item.terrainlab.rangefinder_to"))
+                && translatable.getArgs().length > 0 && translatable.getArgs()[0] instanceof Component destination) {
+            return destination;
+        }
+        return name != null ? name : Component.translatableWithFallback(DESTINATION_PREFIX + "lodestone", "Lodestone");
     }
 
     private static ItemStack markMap(Level level, ItemStack recipient,
@@ -128,9 +189,9 @@ public final class MapTargetCopying {
         return result;
     }
 
-    /** A filled map or Atlas that is not itself an explorer map / chart. */
+    /** A filled map that is not itself an explorer map / chart. */
     private static boolean isPlainMap(ItemStack stack) {
-        if (!stack.is(Items.FILLED_MAP) && !stack.is(ModItems.ATLAS.get())) {
+        if (!stack.is(Items.FILLED_MAP)) {
             return false;
         }
         MapDecorations decorations = stack.get(DataComponents.MAP_DECORATIONS);
@@ -215,6 +276,22 @@ public final class MapTargetCopying {
             name.append(word.substring(0, 1).toUpperCase(Locale.ROOT)).append(word.substring(1));
         }
         return name.toString();
+    }
+
+    /** Top slot: vanilla's maps except the Atlas (a fixed picture), plus pointed compasses. */
+    public static final class SourceSlot extends Slot {
+        private final Slot vanilla;
+
+        public SourceSlot(Slot vanilla, Container container) {
+            super(container, vanilla.getContainerSlot(), vanilla.x, vanilla.y);
+            this.vanilla = vanilla;
+            this.index = vanilla.index;
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return this.vanilla.mayPlace(stack) && !stack.is(ModItems.ATLAS.get()) || isCompassSource(stack);
+        }
     }
 
     /** Bottom slot: vanilla's items plus this feature's recipients. */

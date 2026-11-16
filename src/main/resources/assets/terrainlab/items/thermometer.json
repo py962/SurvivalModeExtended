@@ -4,16 +4,17 @@
     "property": "terrainlab:thermometer_reading",
     "scale": 1.0,
     "entries": [
-      { "threshold": 0.00, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_deadlycold" } },
-      { "threshold": 0.10, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_freezing" } },
-      { "threshold": 0.20, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_verycold" } },
-      { "threshold": 0.30, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_cold" } },
-      { "threshold": 0.40, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_cool" } },
-      { "threshold": 0.50, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_mild" } },
-      { "threshold": 0.60, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_warm" } },
-      { "threshold": 0.70, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_hot" } },
-      { "threshold": 0.80, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_scorching" } },
-      { "threshold": 0.90, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_deadlyhot" } }
+      { "threshold": 0.00000, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_deadlycold" } },
+      { "threshold": 0.09090, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_freezing" } },
+      { "threshold": 0.18181, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_verycold" } },
+      { "threshold": 0.27272, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_cold" } },
+      { "threshold": 0.36363, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_cool" } },
+      { "threshold": 0.45454, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_mild" } },
+      { "threshold": 0.54545, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_warm" } },
+      { "threshold": 0.63636, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_hot" } },
+      { "threshold": 0.72727, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_veryhot" } },
+      { "threshold": 0.81818, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_scorching" } },
+      { "threshold": 0.90909, "model": { "type": "minecraft:model", "model": "terrainlab:item/thermometer_deadlyhot" } }
     ]
   }
 }

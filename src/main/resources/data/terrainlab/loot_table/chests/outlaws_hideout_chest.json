@@ -204,11 +204,22 @@
                 ],
                 "minecraft:tooltip_display": {
                   "hide_tooltip": false,
-                  "hidden_components": ["minecraft:banner_patterns"]
+                  "hidden_components": [
+                    "minecraft:banner_patterns"
+                  ]
                 }
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "terrainlab:diamond_upgrade_smithing_template"
         }
       ]
     }

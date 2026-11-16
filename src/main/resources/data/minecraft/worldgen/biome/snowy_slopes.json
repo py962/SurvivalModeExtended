@@ -72,7 +72,7 @@
     [
       "minecraft:glow_lichen",
       "minecraft:patch_pumpkin",
-   "terrainlab:flower_mountain"
+      "terrainlab:flower_mountain"
     ],
     [
       "minecraft:freeze_top_layer"
@@ -114,12 +114,6 @@
     "monster": [
       {
         "type": "minecraft:stray",
-        "maxCount": 4,
-        "minCount": 1,
-        "weight":10
-      },
-      {
-        "type": "terrainlab:frostbitten",
         "maxCount": 4,
         "minCount": 1,
         "weight": 20

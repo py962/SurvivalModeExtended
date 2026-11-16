@@ -142,26 +142,26 @@ public final class ArmorerTrades {
                 )
         );
 
-        // Journeyman (level 3): Iron Horse Armour, enchanted iron boots
+        // Journeyman (level 3): Copper Horse Armour, enchanted iron boots
         List<VillagerTrades.ItemListing> journeyman = trades.get(3);
         journeyman.clear();
-        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.IRON_HORSE_ARMOR, 1, 2, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.IRON_HORSE_ARMOR, 1, 8, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.IRON_BOOTS, 1, 3, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.COPPER_HORSE_ARMOR, 1, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.COPPER_HORSE_ARMOR, 1, 4, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.IRON_BOOTS, 1, 5, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.IRON_BOOTS, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 9, JOURNEYMAN_MAX_USES, 5));
 
         // Expert (level 4): enchanted iron helmet + leggings
         List<VillagerTrades.ItemListing> expert = trades.get(4);
         expert.clear();
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_HELMET, 1, 4, EXPERT_MAX_USES, 10));
-        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.IRON_HELMET, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 10, EXPERT_MAX_USES, 10));
-        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_LEGGINGS, 1, 5, EXPERT_MAX_USES, 10));
-        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.IRON_LEGGINGS, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 11, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_HELMET, 1, 5, EXPERT_MAX_USES, 10));
+        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.IRON_HELMET, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 9, EXPERT_MAX_USES, 10));
+        expert.add(TradeListings.SimpleTradeListing.buying(Items.IRON_LEGGINGS, 1, 6, EXPERT_MAX_USES, 10));
+        expert.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.IRON_LEGGINGS, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 10, EXPERT_MAX_USES, 10));
 
         // Master (level 5): enchanted iron chestplate. XP 0: no level above Master.
         List<VillagerTrades.ItemListing> master = trades.get(5);
         master.clear();
-        master.add(TradeListings.SimpleTradeListing.buying(Items.IRON_CHESTPLATE, 1, 6, MASTER_MAX_USES, 0));
-        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.IRON_CHESTPLATE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 12, MASTER_MAX_USES, 0));
+        master.add(TradeListings.SimpleTradeListing.buying(Items.IRON_CHESTPLATE, 1, 7, MASTER_MAX_USES, 0));
+        master.add(new TradeListings.VillagerTypeEnchantedSellListing(Items.IRON_CHESTPLATE, ENCHANT_PAIR_BY_TYPE, ENCHANT_PAIR_FALLBACK, 11, MASTER_MAX_USES, 0));
     }
 }

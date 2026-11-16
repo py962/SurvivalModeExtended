@@ -23,7 +23,7 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:blackstone",
-          "weight": 1,
+          "weight": 2,
           "functions": [
             { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 9, "max": 13 } }
           ]
@@ -47,14 +47,6 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:quartz",
-          "weight": 1,
-          "functions": [
-            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 8, "max": 10 } }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:gilded_blackstone",
           "weight": 1,
           "functions": [
             { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 8, "max": 10 } }

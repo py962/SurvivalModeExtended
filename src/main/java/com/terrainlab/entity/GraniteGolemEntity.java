@@ -64,7 +64,7 @@ public class GraniteGolemEntity extends AbstractGolem {
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0)
                 .add(Attributes.ATTACK_DAMAGE, 15.0)
-                .add(Attributes.STEP_HEIGHT, 2.0);
+                .add(Attributes.STEP_HEIGHT, 1.0);
     }
 
     public int getGolemState() {

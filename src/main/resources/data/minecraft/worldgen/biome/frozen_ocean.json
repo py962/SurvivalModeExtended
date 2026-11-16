@@ -105,7 +105,7 @@
     "misc": [],
     "monster": [
       {
-        "type": "terrainlab:frostbitten",
+        "type": "minecraft:stray",
         "maxCount": 4,
         "minCount": 1,
         "weight": 20
