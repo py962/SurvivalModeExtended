@@ -80,7 +80,7 @@ public class TerrainLab {
         NeoForge.EVENT_BUS.register(ModLeashHandler.class);
         NeoForge.EVENT_BUS.register(com.terrainlab.event.MountHitchHandler.class);
         NeoForge.EVENT_BUS.register(ModSpawnRuleHandler.class);
-        // Wood shield combat: auto-block, magic ward, fire/blast immunity, knockback scaling.
+        // Wood shield combat: auto-block, magic ward, fire immunity, cover, knockback.
         NeoForge.EVENT_BUS.register(com.terrainlab.event.ShieldCombatEvents.class);
         // Tier-4 villages sing at the dusk gathering.
         NeoForge.EVENT_BUS.register(com.terrainlab.village.VillageSongService.class);

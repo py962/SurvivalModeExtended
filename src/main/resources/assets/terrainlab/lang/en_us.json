@@ -425,6 +425,7 @@
   "enchantment.terrainlab.quickstrike.desc": "Increases attack speed. Cannot be combined with Reach.",
   "enchantment.terrainlab.reach.desc": "Extends block and attack reach, and how far a lead leashes mobs. Cannot be combined with Quickstrike.",
   "enchantment.terrainlab.recall.desc": "On death this item stays out of your drops and returns when you respawn. Cannot be combined with Overstacking.",
+  "enchantment.minecraft.impaling.desc": "Extra damage against aquatic mobs with a trident, or airborne mobs with a spear.",
 
   "subtitles.terrainlab.villager.song": "Villagers sing",
   "message.terrainlab.celestial.pair.wrong_variant": "This amulet can only pair with a %s conduit.",
