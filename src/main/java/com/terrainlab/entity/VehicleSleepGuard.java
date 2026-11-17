@@ -118,7 +118,7 @@ public final class VehicleSleepGuard {
             }
             Vec3 motion = mob.getDeltaMovement();
             mob.setDeltaMovement(dx / length * PUSH_SPEED, Math.max(motion.y, 0.1), dz / length * PUSH_SPEED);
-            mob.hurtMarked = true;
+            mob.needsSync = true;
         }
     }
 }

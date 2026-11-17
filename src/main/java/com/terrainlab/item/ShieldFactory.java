@@ -55,7 +55,7 @@ public final class ShieldFactory {
      */
     private static BlocksAttacks buildBlocksAttacks(ShieldStats stats, HolderSet<DamageType> bypassesShield) {
         BlocksAttacks.DamageReduction fullBlock = new BlocksAttacks.DamageReduction(
-                stats.blockingAngleDegrees(), // horizontalBlockingAngle
+                stats.coverHalfAngleDegrees(), // horizontalBlockingAngle
                 Optional.empty(),      // type: all non-bypassed damage types
                 0.0f,                  // base
                 1.0f                   // factor: negate 100% within the angle

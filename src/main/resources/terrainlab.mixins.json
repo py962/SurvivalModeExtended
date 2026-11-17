@@ -46,6 +46,7 @@
     "PhasingNoPhysicsMixin",
     "PhasingBlockJumpMixin",
     "EnderDragonPhaseBlockingMixin",
+    "EnderDragonWingShieldMixin",
     "CopperGolemAiMixin",
     "VillagerGoalPackagesWorkMixin",
     "AbstractHorseVillageLoveMixin",

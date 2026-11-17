@@ -10,10 +10,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 /**
  * Crouch bypass: a melee hit from a crouching attacker goes straight past a shield, raised or
  * autoblocking, unless the defender is crouching too.
@@ -21,17 +17,13 @@ import java.util.WeakHashMap;
  * <p>The raised-shield case is cancelled at the very start of {@link LivingShieldBlockEvent}, so
  * vanilla sees "not blocked" (full damage, no durability loss, no block sound, no shield
  * disable, no attacker knockback) and every later block listener (bash/thorns, Cleave) sees
- * {@code getBlocked() == false}. Autoblock and the raised-shield knockback-taken multiplier
- * live outside that event and check {@link #isCrouchBypass} themselves.
+ * {@code getBlocked() == false}. Autoblock lives outside that event and checks
+ * {@link #isCrouchBypass} itself.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class ShieldBypass {
 
     private ShieldBypass() {}
-
-    /** Defender -> game time of its last crouch-bypassed hit; weak so entities are not retained. */
-    private static final Map<LivingEntity, Long> lastBypassTick =
-            Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * Whether this hit ignores the defender's shields: a melee hit (the attacker dealt it
@@ -54,17 +46,6 @@ public final class ShieldBypass {
         }
 
         return attacker.isCrouching() && !defender.isCrouching();
-    }
-
-    /** Records a crouch-bypassed hit so knockback in the same tick skips shield modifiers. */
-    static void markBypassed(LivingEntity defender) {
-        lastBypassTick.put(defender, defender.level().getGameTime());
-    }
-
-    /** Whether the defender took a crouch-bypassed hit this tick. */
-    static boolean wasBypassedThisTick(LivingEntity defender) {
-        Long tick = lastBypassTick.get(defender);
-        return tick != null && tick == defender.level().getGameTime();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

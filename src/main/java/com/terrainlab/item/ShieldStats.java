@@ -13,18 +13,16 @@ import java.util.function.Supplier;
  * @param id          registry path, e.g. {@code "oak_shield"}
  * @param displayName English display name
  * @param plankItem   thematic wood item (informational; repair uses {@code #minecraft:planks})
- * @param knockback   knockback taken while blocking, shove dealt to blocked melee attackers, and
- *                    blocking angle
+ * @param knockback   push taken from attacks a raised shield blocks, and shove dealt to blocked
+ *                    melee attackers
  * @param thorns      damage dealt to a melee attacker whose hit a raised shield blocks (not on autoblock)
  * @param durability  maximum damage and axe-disable recovery
  * @param lightness   raise speed and extra energy drain while raised
  * @param autoblock   chance to auto-block melee/projectile hits while held but not raised
- * @param magic       ward against effects and magic damage from other entities: 2 = each effect is
- *                    blocked for 1s while raised, 3 = full ward while raised, 4 = full ward while held
+ * @param magic       ward against potions, clouds, dragon's breath, auras and guardian lasers: 2 = half,
+ *                    3 = three-quarters, 4 = all (lasers only while raised, the rest while held)
  * @param fire        fire/lava/fireball damage reduction while raised
- * @param blast       directional explosion coverage while raised: 0 never, 1 within 45 degrees of
- *                    facing, 2 within 90 (vanilla, damage only), 3 within 135 and also knockback,
- *                    4 any direction, damage and knockback
+ * @param cover       arc a raised shield blocks, for every attack: 90/135/180/270/360 degrees
  */
 public record ShieldStats(
         String id,
@@ -37,13 +35,14 @@ public record ShieldStats(
         int autoblock,
         int magic,
         int fire,
-        int blast
+        int cover
 ) {
 
-    private static final float[] KNOCKBACK_TAKEN = {1.40f, 1.20f, 1.00f, 0.50f, 0.25f};
-    private static final float[] BASH_STRENGTH = {0.0f, 0.2f, 0.4f, 0.8f, 1.6f};
+    private static final float[] KNOCKBACK_TAKEN = {1.50f, 1.25f, 1.00f, 0.50f, 0.0f};
+    private static final float[] BASH_STRENGTH = {0.0f, 0.0f, 0.0f, 1.2f, 2.4f};
     private static final float[] BLOCK_DELAY_SECONDS = {0.60f, 0.40f, 0.25f, 0.15f, 0.05f};
-    private static final float[] BLAST_HALF_ANGLE_DEGREES = {0.0f, 45.0f, 90.0f, 135.0f, 180.0f};
+    private static final float[] COVER_HALF_ANGLE_DEGREES = {45.0f, 67.5f, 90.0f, 135.0f, 180.0f};
+    private static final float[] MAGIC_WARD = {0.0f, 0.0f, 0.5f, 0.75f, 1.0f};
 
     private static int tier(int rating) {
         return Math.max(0, Math.min(4, rating));
@@ -76,27 +75,27 @@ public record ShieldStats(
         return 1.3f - 0.15f * durability;
     }
 
-    /** Knockback multiplier while blocking: 140/120/100/50/25% for knockback 0-4. */
+    /** Scale on the push from a blocked attack: 150/125/100/50/0% for knockback 0-4. */
     public float knockbackMultiplier() {
         return KNOCKBACK_TAKEN[tier(knockback)];
     }
 
-    /** Knockback dealt to a melee attacker whose hit a raised shield blocks: 0/0.2/0.4/0.8/1.6. */
+    /** Knockback dealt to a melee attacker whose hit a raised shield blocks: none up to 2, then 1.2/2.4. */
     public float bashStrength() {
         return BASH_STRENGTH[tier(knockback)];
     }
 
     /**
      * {@code horizontal_blocking_angle} in degrees: the maximum angle between the facing direction and
-     * the attack within which damage is fully negated. Knockback 2 gives vanilla's 90 (front hemisphere).
+     * the attack within which it is blocked. Cover 2 gives vanilla's 90 (front half), 4 all round.
      */
-    public float blockingAngleDegrees() {
-        return 90.0f * (0.5f + 0.25f * knockback);
+    public float coverHalfAngleDegrees() {
+        return COVER_HALF_ANGLE_DEGREES[tier(cover)];
     }
 
-    /** Damage dealt to a melee attacker whose hit a raised shield blocks; 0 = none. */
+    /** Damage dealt to a melee attacker whose hit a raised shield blocks: 2 per thorns level. */
     public float thornsDamage() {
-        return Math.max(0, thorns);
+        return 2 * Math.max(0, thorns);
     }
 
     /** Chance (0..1) to auto-block a melee or projectile hit while held but not raised. */
@@ -104,60 +103,19 @@ public record ShieldStats(
         return 0.25f * autoblock;
     }
 
-    /** Magic 2: ticks each effect is blocked after it first lands. */
-    public static final int MAGIC_2_WARD_TICKS = 20;
-
-    /**
-     * Magic 2: ticks without an application attempt before an effect gets a fresh ward window. A
-     * lingering cloud re-applies every 5 ticks, so standing in one does not renew the window.
-     */
-    public static final int MAGIC_2_SOURCE_RESET_TICKS = 20;
-
-    /** Magic 3+: full ward while raised. */
-    public boolean magicFullWardWhileRaised() {
-        return magic >= 3;
+    /** Share of a potion, cloud, breath, aura or laser warded: half at magic 2, three-quarters at 3, all at 4. */
+    public float magicWardFraction() {
+        return MAGIC_WARD[tier(magic)];
     }
 
-    /** Magic 2: per-effect timed ward while raised. */
-    public boolean magicWindowWardWhileRaised() {
-        return magic == 2;
-    }
-
-    /**
-     * @deprecated Magic is not a percentage roll; use {@link #magicFullWardWhileRaised()},
-     * {@link #magicWindowWardWhileRaised()} or {@link #magicWardWhileHeld()}.
-     */
-    @Deprecated
-    public float magicAutoBlockChance() {
-        return 0.25f * magic;
-    }
-
-    /** Magic 4: ward is up whenever the shield is held in either hand. */
-    public boolean magicWardWhileHeld() {
+    /** Magic 4: potions, clouds, breath and auras are warded whenever the shield is held. */
+    public boolean magicWardWhileLowered() {
         return magic >= 4;
     }
 
     /** Fraction (0..1) of fire/lava/fireball damage negated while blocking: 0 at fire 1, 1 at fire 4. */
     public float fireImmunityFraction() {
         return Math.max(0f, Math.min(1f, (fire - 1) / 3.0f));
-    }
-
-    /**
-     * Maximum angle in degrees between the player's facing and the direction to an explosion's centre
-     * for a raised shield to block it: 0 (never), 45, 90 (vanilla), 135, 180 (any direction).
-     */
-    public float blastCoverageDegrees() {
-        return BLAST_HALF_ANGLE_DEGREES[tier(blast)];
-    }
-
-    /** Blast 3+: a covered explosion's knockback is blocked as well as its damage. */
-    public boolean blastBlocksKnockback() {
-        return blast >= 3;
-    }
-
-    /** Blast 4: every explosion is blocked, from any direction. */
-    public boolean blastBlocksAllDirections() {
-        return blast >= 4;
     }
 
     /** Enchantment value, same as the vanilla shield. */

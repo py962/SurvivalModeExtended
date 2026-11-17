@@ -1,4 +1,3 @@
-
 package com.terrainlab.event;
 
 import com.terrainlab.TerrainLab;
@@ -12,14 +11,21 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Guardian;
 import net.minecraft.world.entity.projectile.EvokerFangs;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.AbstractThrownPotion;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
@@ -28,15 +34,17 @@ import net.neoforged.neoforge.event.level.ExplosionKnockbackEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Wood-shield behaviour the blocks_attacks component cannot express: knockback taken and
- * dealt, thorns, autoblock, magic ward, fire immunity, directional blast coverage, and the
- * lightness energy drain hook used by PlayerEnergySystem.
+ * Wood-shield behaviour the blocks_attacks component cannot express: knockback from blocked
+ * attacks, thorns, autoblock, magic ward, fire immunity, evoker fangs, and the lightness
+ * energy drain hook used by PlayerEnergySystem.
  */
 public final class ShieldCombatEvents {
 
@@ -44,11 +52,29 @@ public final class ShieldCombatEvents {
 
     private static final long AUTO_BLOCK_COOLDOWN_TICKS = 20;
 
+    /** Net push from a fully blocked melee hit in vanilla 1.21.11 (block pull, then hit knockback). */
+    private static final double BLOCKED_MELEE_PUSH = 0.15;
+
+    /** Push from a blocked projectile in vanilla 1.21.11. */
+    private static final double BLOCKED_PROJECTILE_PUSH = 0.4;
+
+    /** Vertical hop from a blocked hit on the ground in vanilla. */
+    private static final double BLOCKED_HOP = 0.4;
+
     private static final Map<UUID, Long> lastAutoBlockTick =
             new ConcurrentHashMap<>();
 
-    private static final Map<UUID, Map<String, long[]>> magicWindows =
-            new ConcurrentHashMap<>();
+    /** Defender -> game time of its last blocked hit; vanilla's knockback that tick is replaced. */
+    private static final Map<LivingEntity, Long> lastBlockTick =
+            Collections.synchronizedMap(new WeakHashMap<>());
+
+    /** Victim -> last non-magic hit that dealt damage; effects that hit carries are not warded. */
+    private static final Map<LivingEntity, LandedHit> lastLandedHit =
+            Collections.synchronizedMap(new WeakHashMap<>());
+
+    private record LandedHit(long tick, Entity cause, Entity direct) {}
+
+    private static boolean reapplyingEffect;
 
     private static volatile Map<Item, ShieldStats> statsByItem;
 
@@ -93,6 +119,10 @@ public final class ShieldCombatEvents {
         return entity.isUsingItem() && statsFor(entity.getUseItem()) != null;
     }
 
+    private static ShieldStats raisedStats(LivingEntity entity) {
+        return entity.isUsingItem() ? statsFor(entity.getUseItem()) : null;
+    }
+
     /**
      * Client rendering helper. Suppresses visible fire while a shield with
      * a positive fire-immunity rating is actively raised.
@@ -108,27 +138,14 @@ public final class ShieldCombatEvents {
         return stats != null && stats.fireImmunityFraction() > 0.0f;
     }
 
+    /** Vanilla's knockback from a blocked hit is replaced by the push applied in onShieldBlock. */
     @SubscribeEvent
     public static void onKnockback(LivingKnockBackEvent event) {
         LivingEntity entity = event.getEntity();
+        Long tick = lastBlockTick.get(entity);
 
-        if (!entity.isUsingItem()) {
-            return;
-        }
-
-        ShieldStats stats = statsFor(entity.getUseItem());
-        if (stats == null) {
-            return;
-        }
-
-        // A crouch-bypassed melee hit went past the shield, so it takes knockback as if unshielded.
-        if (ShieldBypass.wasBypassedThisTick(entity)) {
-            return;
-        }
-
-        float multiplier = stats.knockbackMultiplier();
-        if (multiplier != 1.0f) {
-            event.setStrength(event.getStrength() * multiplier);
+        if (tick != null && tick == entity.level().getGameTime()) {
+            event.setCanceled(true);
         }
     }
 
@@ -137,39 +154,56 @@ public final class ShieldCombatEvents {
         LivingEntity entity = event.getEntity();
         DamageSource source = event.getSource();
 
-        if (isForeignMagicDamage(source, entity)
-                && isMagicWardActive(
-                entity,
-                "damage:" + source.typeHolder().getRegisteredName())) {
-            event.setAmount(0.0f);
-            return;
+        if (source.getDirectEntity() instanceof EvokerFangs fangs) {
+            if (tryBlockFangs(entity, fangs)) {
+                event.setCanceled(true);
+                return;
+            }
+        } else {
+            float warded = magicDamageWard(entity, source);
+            if (warded > 0.0f) {
+                event.setAmount(event.getAmount() * (1.0f - warded));
+                if (warded >= 1.0f) {
+                    return;
+                }
+            }
         }
 
-        boolean crouchBypass = ShieldBypass.isCrouchBypass(source, entity);
-
         if (isBlockingWithShield(entity)) {
-            if (crouchBypass) {
-                ShieldBypass.markBypassed(entity);
-            }
             applyFireImmunity(event, entity, source);
             return;
         }
 
         // A crouching melee attacker slips past autoblock as well as a raised shield.
-        if (crouchBypass) {
+        if (ShieldBypass.isCrouchBypass(source, entity)) {
             return;
         }
 
         tryAutoBlock(event, entity, source);
     }
 
+    @SubscribeEvent
+    public static void onDamagePost(LivingDamageEvent.Post event) {
+        DamageSource source = event.getSource();
+        if (event.getHealthDamage() <= 0.0f || isMagicDamageType(source)) {
+            return;
+        }
+
+        LivingEntity entity = event.getEntity();
+        lastLandedHit.put(entity, new LandedHit(
+                entity.level().getGameTime(),
+                source.getEntity(),
+                source.getDirectEntity()
+        ));
+    }
+
     /**
-     * A raised shield that blocks a melee hit shoves the attacker and deals thorns
-     * damage. Autoblocks never reach this event, so they trigger neither. Crouch-bypassed hits
-     * are already unblocked by {@link ShieldBypass} at HIGHEST priority, so they trigger neither.
+     * A raised shield's block replaces vanilla's knockback with a push scaled by the knockback rating,
+     * and a blocked melee hit deals thorns damage and shoves the attacker. Autoblocks never reach this
+     * event; crouch-bypassed hits are already unblocked by {@link ShieldBypass} at HIGHEST priority.
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onShieldBash(LivingShieldBlockEvent event) {
+    public static void onShieldBlock(LivingShieldBlockEvent event) {
         if (!event.getBlocked() || event.getBlockedDamage() <= 0.0f) {
             return;
         }
@@ -181,20 +215,23 @@ public final class ShieldCombatEvents {
 
         DamageSource source = event.getDamageSource();
 
-        // Explosions and thorns are not melee hits.
+        // Explosion push is handled in onExplosionKnockback.
         if (source.is(DamageTypeTags.IS_EXPLOSION) || source.is(DamageTypes.THORNS)) {
-            return;
-        }
-
-        if (!(source.getEntity() instanceof LivingEntity attacker)
-                || source.getDirectEntity() != attacker
-                || attacker == blocker
-                || attacker.distanceToSqr(blocker) > 36.0) {
             return;
         }
 
         ShieldStats stats = statsFor(blocker.getUseItem());
         if (stats == null) {
+            return;
+        }
+
+        pushBlocker(blocker, source, stats);
+        lastBlockTick.put(blocker, blocker.level().getGameTime());
+
+        if (!(source.getEntity() instanceof LivingEntity attacker)
+                || source.getDirectEntity() != attacker
+                || attacker == blocker
+                || attacker.distanceToSqr(blocker) > 36.0) {
             return;
         }
 
@@ -216,6 +253,72 @@ public final class ShieldCombatEvents {
                 event.getBlockedDamage()
         );
         attacker.needsSync = true;
+    }
+
+    /** Vanilla 1.21.11's blocked-hit push, scaled by the knockback rating. */
+    private static void pushBlocker(LivingEntity blocker, DamageSource source, ShieldStats stats) {
+        float scale = stats.knockbackMultiplier();
+        if (scale <= 0.0f || source.is(DamageTypeTags.NO_KNOCKBACK)) {
+            return;
+        }
+
+        double xd;
+        double zd;
+        double push;
+
+        if (source.getDirectEntity() instanceof Projectile projectile) {
+            Vec3 motion = projectile.getDeltaMovement();
+            xd = -motion.x;
+            zd = -motion.z;
+            push = BLOCKED_PROJECTILE_PUSH;
+        } else if (source.getSourcePosition() != null) {
+            xd = source.getSourcePosition().x - blocker.getX();
+            zd = source.getSourcePosition().z - blocker.getZ();
+            push = BLOCKED_MELEE_PUSH;
+        } else {
+            return;
+        }
+
+        blocker.knockback(push * scale, xd, zd, source, 0.0f);
+
+        if (blocker.onGround()) {
+            double resistance = blocker.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+            double hop = Math.min(BLOCKED_HOP, BLOCKED_HOP * scale) * (1.0 - resistance);
+            if (hop > 0.0) {
+                Vec3 movement = blocker.getDeltaMovement();
+                blocker.setDeltaMovement(movement.x, hop, movement.z);
+            }
+        }
+        blocker.needsSync = true;
+    }
+
+    /** Evoker fangs are a physical attack: a raised shield blocks them within its cover. */
+    private static boolean tryBlockFangs(LivingEntity entity, EvokerFangs fangs) {
+        if (!entity.isBlocking()) {
+            return false;
+        }
+
+        ShieldStats stats = statsFor(entity.getUseItem());
+        if (stats == null || !covers(entity, stats, fangs.position())) {
+            return false;
+        }
+
+        entity.getUseItem().hurtAndBreak(
+                ShieldStats.ITEM_DAMAGE_PER_BLOCK,
+                entity,
+                entity.getUsedItemHand()
+        );
+        entity.level().playSound(
+                null,
+                entity.getX(),
+                entity.getY(),
+                entity.getZ(),
+                SoundEvents.SHIELD_BLOCK,
+                entity.getSoundSource(),
+                1.0F,
+                0.8F + entity.getRandom().nextFloat() * 0.4F
+        );
+        return true;
     }
 
     /**
@@ -304,15 +407,16 @@ public final class ShieldCombatEvents {
             LivingEntity entity,
             DamageSource source) {
 
-        if (source.is(DamageTypeTags.BYPASSES_SHIELD)) {
+        if (source.is(DamageTypeTags.BYPASSES_SHIELD)
+                && !(source.getDirectEntity() instanceof EvokerFangs)) {
             return;
         }
 
-        boolean physicalDamage = !isMagicDamageType(source)
+        boolean physicalDamage = source.getDirectEntity() instanceof EvokerFangs
+                || (!isMagicDamageType(source)
                 && (source.is(DamageTypeTags.IS_PROJECTILE)
                 || source.is(DamageTypeTags.IS_PLAYER_ATTACK)
-                || source.getEntity() instanceof LivingEntity
-                || source.getDirectEntity() instanceof EvokerFangs);
+                || source.getEntity() instanceof LivingEntity));
 
         if (!physicalDamage || isOnAutoBlockCooldown(entity)) {
             return;
@@ -361,112 +465,94 @@ public final class ShieldCombatEvents {
         }
     }
 
+    /**
+     * Effects from potions, clouds, dragon's breath and auras are warded by the Magic rating. An
+     * effect carried by a hit that landed (a bite, a blade, an arrow) is not.
+     */
     @SubscribeEvent
     public static void onMobEffectApplicable(MobEffectEvent.Applicable event) {
-        if (!(event.getEntity() instanceof LivingEntity entity)) {
+        if (reapplyingEffect || !(event.getEntity() instanceof LivingEntity entity)) {
             return;
         }
 
         Entity source = event.getEffectSource();
-        if (source == null || source == entity) {
+        if (source == null || source == entity || landedHitFrom(entity, source)) {
             return;
         }
 
-        if (isMagicWardActive(
-                entity,
-                "effect:" + event.getEffectInstance()
-                        .getEffect().getRegisteredName())) {
-            event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+        MobEffectInstance effect = event.getEffectInstance();
+        float warded = potionWard(entity);
+        if (warded <= 0.0f || (warded < 1.0f && effect.isInfiniteDuration())) {
+            return;
+        }
+
+        event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+
+        int duration = Math.round(effect.getDuration() * (1.0f - warded));
+        if (duration <= 0) {
+            return;
+        }
+
+        reapplyingEffect = true;
+        try {
+            entity.addEffect(new MobEffectInstance(
+                    effect.getEffect(),
+                    duration,
+                    effect.getAmplifier(),
+                    effect.isAmbient(),
+                    effect.isVisible(),
+                    effect.showIcon()
+            ), source);
+        } finally {
+            reapplyingEffect = false;
         }
     }
 
-    private static boolean isMagicWardActive(
-            LivingEntity entity,
-            String windowKey) {
+    private static boolean landedHitFrom(LivingEntity entity, Entity source) {
+        LandedHit hit = lastLandedHit.get(entity);
+        return hit != null
+                && hit.tick() == entity.level().getGameTime()
+                && (hit.cause() == source || hit.direct() == source);
+    }
 
+    /**
+     * Share of magic damage warded: guardian lasers within cover while raised, and potions, clouds
+     * and dragon's breath as {@link #potionWard}.
+     */
+    private static float magicDamageWard(LivingEntity entity, DamageSource source) {
+        Entity direct = source.getDirectEntity();
+
+        if (direct instanceof Guardian guardian && isMagicDamageType(source)) {
+            ShieldStats raised = raisedStats(entity);
+            return raised != null && covers(entity, raised, guardian.position())
+                    ? raised.magicWardFraction()
+                    : 0.0f;
+        }
+
+        boolean potion = source.is(DamageTypes.DRAGON_BREATH)
+                || (isMagicDamageType(source)
+                && (direct instanceof AbstractThrownPotion || direct instanceof AreaEffectCloud));
+
+        return potion && source.getEntity() != entity ? potionWard(entity) : 0.0f;
+    }
+
+    /** Magic 2-4 ward part or all of it while raised; Magic 4 wards all of it while held. */
+    private static float potionWard(LivingEntity entity) {
         for (ItemStack held : new ItemStack[]{
                 entity.getMainHandItem(),
                 entity.getOffhandItem()
         }) {
             ShieldStats stats = statsFor(held);
-            if (stats != null && stats.magicWardWhileHeld()) {
-                return true;
+            if (stats != null && stats.magicWardWhileLowered()) {
+                return 1.0f;
             }
         }
 
-        if (!entity.isUsingItem()) {
-            return false;
-        }
-
-        ShieldStats raised = statsFor(entity.getUseItem());
-        if (raised == null) {
-            return false;
-        }
-
-        if (raised.magicFullWardWhileRaised()) {
-            return true;
-        }
-
-        return raised.magicWindowWardWhileRaised()
-                && inMagicWindow(entity, windowKey);
+        ShieldStats raised = raisedStats(entity);
+        return raised == null ? 0.0f : raised.magicWardFraction();
     }
 
-    private static boolean inMagicWindow(LivingEntity entity, String key) {
-        long now = entity.level().getGameTime();
-
-        Map<String, long[]> windows = magicWindows.computeIfAbsent(
-                entity.getUUID(),
-                k -> new ConcurrentHashMap<>()
-        );
-
-        windows.values().removeIf(
-                window -> now - window[1] > ShieldStats.MAGIC_2_SOURCE_RESET_TICKS
-        );
-
-        long[] window = windows.get(key);
-
-        if (window == null) {
-            window = new long[]{now, now};
-            windows.put(key, window);
-        } else {
-            window[1] = now;
-        }
-
-        return now - window[0] < ShieldStats.MAGIC_2_WARD_TICKS;
-    }
-
-    /**
-     * Explosion damage against a raised wood shield is blocked by blast coverage
-     * instead of the blocks_attacks angle.
-     */
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onShieldBlockExplosion(LivingShieldBlockEvent event) {
-        DamageSource source = event.getDamageSource();
-        if (!source.is(DamageTypeTags.IS_EXPLOSION)
-                || source.is(DamageTypeTags.BYPASSES_SHIELD)) {
-            return;
-        }
-
-        LivingEntity blocker = event.getEntity();
-        if (blocker.level().isClientSide() || !isBlockingWithShield(blocker)) {
-            return;
-        }
-
-        ShieldStats stats = statsFor(blocker.getUseItem());
-        if (stats == null) {
-            return;
-        }
-
-        if (blastCovers(blocker, stats, source.getSourcePosition())) {
-            event.setBlocked(true);
-            event.setBlockedDamage(event.getDamageContainer().getNewDamage());
-        } else {
-            event.setBlocked(false);
-            event.setBlockedDamage(0.0f);
-        }
-    }
-
-    /** Blast 3+: a raised shield covering the explosion also cancels its knockback. */
+    /** Knockback rating scales the push of an explosion the raised shield covers. */
     @SubscribeEvent
     public static void onExplosionKnockback(ExplosionKnockbackEvent event) {
         if (!(event.getAffectedEntity() instanceof LivingEntity living)
@@ -476,67 +562,58 @@ public final class ShieldCombatEvents {
         }
 
         ShieldStats stats = statsFor(living.getUseItem());
-        if (stats == null || !stats.blastBlocksKnockback()) {
+        if (stats == null || !covers(living, stats, event.getExplosion().center())) {
             return;
         }
 
-        if (blastCovers(living, stats, event.getExplosion().center())) {
-            event.setKnockbackVelocity(Vec3.ZERO);
-        }
+        event.setKnockbackVelocity(event.getKnockbackVelocity().scale(stats.knockbackMultiplier()));
     }
 
     /**
-     * Whether a raised shield covers an explosion at center, measuring the horizontal angle
-     * from the head's facing as vanilla's shield blocking does.
+     * Scale on a direct push from pos (the dragon's wing swipe): the knockback rating while raised and
+     * within cover, otherwise 1.
      */
-    private static boolean blastCovers(LivingEntity entity, ShieldStats stats, Vec3 center) {
-        if (stats.blastBlocksAllDirections()) {
-            return true;
+    public static double pushScale(LivingEntity entity, Vec3 pos) {
+        if (!entity.isBlocking()) {
+            return 1.0;
         }
 
-        float coverage = stats.blastCoverageDegrees();
-        if (coverage <= 0.0f || center == null) {
+        ShieldStats stats = statsFor(entity.getUseItem());
+        return stats != null && covers(entity, stats, pos) ? stats.knockbackMultiplier() : 1.0;
+    }
+
+    /**
+     * Whether a raised shield's cover includes pos, measuring the horizontal angle from the head's
+     * facing as vanilla's shield blocking does.
+     */
+    private static boolean covers(LivingEntity entity, ShieldStats stats, Vec3 pos) {
+        float halfAngle = stats.coverHalfAngleDegrees();
+        if (halfAngle >= 180.0f) {
+            return true;
+        }
+        if (pos == null) {
             return false;
         }
 
-        double dx = center.x - entity.getX();
-        double dz = center.z - entity.getZ();
+        double dx = pos.x - entity.getX();
+        double dz = pos.z - entity.getZ();
         double length = Math.sqrt(dx * dx + dz * dz);
-
-        double angleDegrees;
         if (length < 1.0E-4) {
-            angleDegrees = 90.0;
-        } else {
-            double yaw = Math.toRadians(entity.getYHeadRot());
-            double facingX = -Math.sin(yaw);
-            double facingZ = Math.cos(yaw);
-            double dot = (dx * facingX + dz * facingZ) / length;
-            angleDegrees = Math.toDegrees(
-                    Math.acos(Math.max(-1.0, Math.min(1.0, dot)))
-            );
+            return true;
         }
 
-        return angleDegrees <= coverage;
+        double yaw = Math.toRadians(entity.getYHeadRot());
+        double facingX = -Math.sin(yaw);
+        double facingZ = Math.cos(yaw);
+        double dot = (dx * facingX + dz * facingZ) / length;
+        double angleDegrees = Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, dot))));
+
+        return angleDegrees <= halfAngle;
     }
 
     private static boolean isMagicDamageType(DamageSource source) {
         return source.is(DamageTypes.MAGIC)
                 || source.is(DamageTypes.INDIRECT_MAGIC);
-    }
-
-    private static boolean isForeignMagicDamage(
-            DamageSource source,
-            LivingEntity victim) {
-
-        Entity direct = source.getDirectEntity();
-
-        if (!isMagicDamageType(source)
-                || direct == null
-                || direct instanceof EvokerFangs) {
-            return false;
-        }
-
-        return source.getEntity() != victim;
     }
 
     private static boolean isFireDamage(DamageSource source) {
