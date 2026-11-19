@@ -64,13 +64,13 @@ public final class ShieldDefinitions {
             "dark_oak_shield",
             "Dark Oak Shield",
             () -> net.minecraft.world.item.Items.DARK_OAK_PLANKS,
-            3, 2, 3, 1, 2, 0, 0, 4
+            2, 2, 4, 1, 2, 0, 0, 4
         ),
         new ShieldStats(
             "pale_oak_shield",
             "Pale Oak Shield",
             () -> net.minecraft.world.item.Items.PALE_OAK_PLANKS,
-            4, 4, 3, 1, 0, 0, 0, 3
+            4, 3, 3, 2, 0, 0, 0, 3
         ),
             new ShieldStats(
                     "azalea_shield",
@@ -82,7 +82,7 @@ public final class ShieldDefinitions {
             "jungle_shield",
             "Jungle Shield",
             () -> net.minecraft.world.item.Items.JUNGLE_PLANKS,
-            3, 4, 2, 2, 2, 0, 0, 2
+            2, 4, 2, 2, 2, 0, 0, 3
         ),
         new ShieldStats(
             "mangrove_shield",
@@ -94,13 +94,13 @@ public final class ShieldDefinitions {
             "warped_shield",
             "Warped Shield",
             () -> net.minecraft.world.item.Items.WARPED_PLANKS,
-            3, 3, 4, 1, 0, 0, 4, 3
+            3, 3, 3, 2, 0, 0, 4, 3
         ),
         new ShieldStats(
             "crimson_shield",
             "Crimson Shield",
             () -> net.minecraft.world.item.Items.CRIMSON_PLANKS,
-            2, 0, 2, 2, 3, 3, 4, 2
+            2, 0, 2, 3, 3, 2, 4, 2
         ),
         new ShieldStats(
             "enderwood_shield",

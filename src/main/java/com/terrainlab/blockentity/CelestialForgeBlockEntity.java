@@ -69,6 +69,8 @@ public class CelestialForgeBlockEntity extends BlockEntity implements Container,
     private ItemStack slot = ItemStack.EMPTY;
     private ItemStack gem = ItemStack.EMPTY;
     private final List<ItemStack> absorbed = new ArrayList<>();
+    // The component the ritual wants, synced so the client can show it as a clue.
+    private ItemStack wanted = ItemStack.EMPTY;
     private final List<ItemStack> legacyDrops = new ArrayList<>();
     private Phase phase = Phase.IDLE;
     private @Nullable CelestialVariant variant;
@@ -108,6 +110,10 @@ public class CelestialForgeBlockEntity extends BlockEntity implements Container,
 
     public List<ItemStack> absorbed() {
         return absorbed;
+    }
+
+    public ItemStack wanted() {
+        return wanted;
     }
 
     /** Ticks into the current phase. */
@@ -174,6 +180,12 @@ public class CelestialForgeBlockEntity extends BlockEntity implements Container,
             return;
         }
         CelestialForgeRecipe forge = recipe.get().value();
+        if (wanted.isEmpty()) {
+            forge.thrown().items().findFirst().ifPresent(item -> {
+                wanted = new ItemStack(item);
+                sync();
+            });
+        }
         if (phaseTicks % 2 == 0 && catchThrownItems(level, pos, forge)) {
             sync();
         }
@@ -285,6 +297,7 @@ public class CelestialForgeBlockEntity extends BlockEntity implements Container,
         phase = Phase.IDLE;
         phaseTicks = 0;
         variant = null;
+        wanted = ItemStack.EMPTY;
         sync();
     }
 
@@ -417,6 +430,7 @@ public class CelestialForgeBlockEntity extends BlockEntity implements Container,
         phase = input.read("Phase", com.mojang.serialization.Codec.STRING).map(CelestialForgeBlockEntity::parsePhase).orElse(Phase.IDLE);
         variant = input.read("Variant", CelestialVariant.CODEC).orElse(null);
         phaseTicks = input.getIntOr("PhaseTicks", 0);
+        wanted = input.read("Wanted", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         holdGem = input.getBooleanOr("HoldGem", false);
         // Forges from before the ritual rework kept a ring of 8 ingredients and an output slot.
         for (int i = 1; i <= 9; i++) {
@@ -449,6 +463,9 @@ public class CelestialForgeBlockEntity extends BlockEntity implements Container,
             output.store("Variant", CelestialVariant.CODEC, variant);
         }
         output.putInt("PhaseTicks", phaseTicks);
+        if (!wanted.isEmpty()) {
+            output.store("Wanted", ItemStack.OPTIONAL_CODEC, wanted);
+        }
         if (holdGem) {
             output.putBoolean("HoldGem", true);
         }

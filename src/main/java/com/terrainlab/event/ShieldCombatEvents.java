@@ -50,8 +50,6 @@ public final class ShieldCombatEvents {
 
     private ShieldCombatEvents() {}
 
-    private static final long AUTO_BLOCK_COOLDOWN_TICKS = 20;
-
     /** Net push from a fully blocked melee hit in vanilla 1.21.11 (block pull, then hit knockback). */
     private static final double BLOCKED_MELEE_PUSH = 0.15;
 
@@ -61,7 +59,8 @@ public final class ShieldCombatEvents {
     /** Vertical hop from a blocked hit on the ground in vanilla. */
     private static final double BLOCKED_HOP = 0.4;
 
-    private static final Map<UUID, Long> lastAutoBlockTick =
+    /** Entity -> game time its autoblock is ready again. */
+    private static final Map<UUID, Long> autoBlockReadyTick =
             new ConcurrentHashMap<>();
 
     /** Defender -> game time of its last blocked hit; vanilla's knockback that tick is replaced. */
@@ -422,24 +421,34 @@ public final class ShieldCombatEvents {
             return;
         }
 
+        // With a shield in each hand, the one with the shorter cooldown blocks.
+        InteractionHand blockingHand = null;
+        int cooldown = Integer.MAX_VALUE;
+
         for (InteractionHand hand : InteractionHand.values()) {
             ShieldStats stats = statsFor(entity.getItemInHand(hand));
             if (stats == null) {
                 continue;
             }
 
-            float chance = stats.autoBlockChance();
-            if (chance <= 0.0f) {
-                continue;
-            }
-
-            if (entity.getRandom().nextFloat() < chance) {
-                event.setAmount(0.0f);
-                markAutoBlockUsed(entity);
-                showAutoBlock(entity, hand);
-                return;
+            int ticks = stats.autoBlockCooldownTicks();
+            if (ticks > 0 && ticks < cooldown) {
+                cooldown = ticks;
+                blockingHand = hand;
             }
         }
+
+        if (blockingHand == null) {
+            return;
+        }
+
+        event.setAmount(0.0f);
+        int cleave = CleaveShieldHandler.extraShieldDamage(entity, source);
+        if (cleave > 0) {
+            entity.getItemInHand(blockingHand).hurtAndBreak(cleave, entity, blockingHand);
+        }
+        autoBlockReadyTick.put(entity.getUUID(), entity.level().getGameTime() + cooldown);
+        showAutoBlock(entity, blockingHand);
     }
 
     private static void showAutoBlock(LivingEntity entity, InteractionHand hand) {
@@ -623,16 +632,8 @@ public final class ShieldCombatEvents {
     }
 
     private static boolean isOnAutoBlockCooldown(LivingEntity entity) {
-        Long last = lastAutoBlockTick.get(entity.getUUID());
+        Long ready = autoBlockReadyTick.get(entity.getUUID());
 
-        return last != null
-                && entity.level().getGameTime() - last < AUTO_BLOCK_COOLDOWN_TICKS;
-    }
-
-    private static void markAutoBlockUsed(LivingEntity entity) {
-        lastAutoBlockTick.put(
-                entity.getUUID(),
-                entity.level().getGameTime()
-        );
+        return ready != null && entity.level().getGameTime() < ready;
     }
 }

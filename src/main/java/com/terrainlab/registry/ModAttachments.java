@@ -527,6 +527,17 @@ public class ModAttachments {
                                     .fieldOf("cured_by"))
                             .build());
 
+    // Player -> reputation change that never decays (see VillagerPermanentReputationMixin). Serialized.
+    public static final Supplier<AttachmentType<HashMap<UUID, Integer>>> VILLAGER_PERMANENT_REPUTATION =
+            ATTACHMENT_TYPES.register("villager_permanent_reputation", () ->
+                    AttachmentType.<HashMap<UUID, Integer>>builder((Supplier<HashMap<UUID, Integer>>) HashMap::new)
+                            .serialize(Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT)
+                                    .xmap(
+                                            (Map<UUID, Integer> map) -> new HashMap<UUID, Integer>(map),
+                                            (HashMap<UUID, Integer> map) -> (Map<UUID, Integer>) map)
+                                    .fieldOf("permanent"), map -> !map.isEmpty())
+                            .build());
+
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
     }

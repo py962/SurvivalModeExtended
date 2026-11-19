@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * @param thorns      damage dealt to a melee attacker whose hit a raised shield blocks (not on autoblock)
  * @param durability  maximum damage and axe-disable recovery
  * @param lightness   raise speed and extra energy drain while raised
- * @param autoblock   chance to auto-block melee/projectile hits while held but not raised
+ * @param autoblock   auto-blocks a melee/projectile hit while held but not raised, then waits 10/5/3/1s
  * @param magic       ward against potions, clouds, dragon's breath, auras and guardian lasers: 2 = half,
  *                    3 = three-quarters, 4 = all (lasers only while raised, the rest while held)
  * @param fire        fire/lava/fireball damage reduction while raised
@@ -43,14 +43,18 @@ public record ShieldStats(
     private static final float[] BLOCK_DELAY_SECONDS = {0.60f, 0.40f, 0.25f, 0.15f, 0.05f};
     private static final float[] COVER_HALF_ANGLE_DEGREES = {45.0f, 67.5f, 90.0f, 135.0f, 180.0f};
     private static final float[] MAGIC_WARD = {0.0f, 0.0f, 0.5f, 0.75f, 1.0f};
+    private static final int[] MAX_DAMAGE = {36, 186, 336, 486, 700};
+    private static final float[] DISABLE_COOLDOWN_SCALE = {1.3f, 1.15f, 1.0f, 0.6f, 0.0f};
+    private static final float[] THORNS_DAMAGE = {0.0f, 1.0f, 2.0f, 4.0f, 8.0f};
+    private static final int[] AUTO_BLOCK_COOLDOWN_TICKS = {0, 200, 100, 60, 20};
 
     private static int tier(int rating) {
         return Math.max(0, Math.min(4, rating));
     }
 
-    /** Durability 2 gives vanilla's 336. */
+    /** 186/336/486/700 for durability 1-4; durability 2 gives vanilla's 336. */
     public int maxDamage() {
-        return 36 + 150 * durability;
+        return MAX_DAMAGE[tier(durability)];
     }
 
     /** Raise delay: 0.60/0.40/0.25/0.15/0.05s for lightness 0-4; lightness 2 gives vanilla's 0.25s. */
@@ -70,9 +74,9 @@ public record ShieldStats(
         };
     }
 
-    /** Axe-disable cooldown scale; durability 2 gives vanilla's 1.0, stronger shields recover sooner. */
+    /** Axe-disable cooldown scale; durability 2 gives vanilla's 1.0, 4 can't be disabled. */
     public float disableCooldownScale() {
-        return 1.3f - 0.15f * durability;
+        return DISABLE_COOLDOWN_SCALE[tier(durability)];
     }
 
     /** Scale on the push from a blocked attack: 150/125/100/50/0% for knockback 0-4. */
@@ -93,14 +97,14 @@ public record ShieldStats(
         return COVER_HALF_ANGLE_DEGREES[tier(cover)];
     }
 
-    /** Damage dealt to a melee attacker whose hit a raised shield blocks: 2 per thorns level. */
+    /** Damage dealt to a melee attacker whose hit a raised shield blocks: 1/2/4/8 for thorns 1-4. */
     public float thornsDamage() {
-        return 2 * Math.max(0, thorns);
+        return THORNS_DAMAGE[tier(thorns)];
     }
 
-    /** Chance (0..1) to auto-block a melee or projectile hit while held but not raised. */
-    public float autoBlockChance() {
-        return 0.25f * autoblock;
+    /** Ticks before autoblock can block again: 10/5/3/1s for autoblock 1-4, 0 = no autoblock. */
+    public int autoBlockCooldownTicks() {
+        return AUTO_BLOCK_COOLDOWN_TICKS[tier(autoblock)];
     }
 
     /** Share of a potion, cloud, breath, aura or laser warded: half at magic 2, three-quarters at 3, all at 4. */

@@ -16,5 +16,9 @@ public class CelestialForgeRenderState extends BlockEntityRenderState {
     public float transformProgress;
     public int colour = 0xFFFFFF;
     public final ItemStackRenderState gem = new ItemStackRenderState();
+    /** Ghost of the wanted component, shown now and then during the ritual as a clue. */
+    public final ItemStackRenderState clue = new ItemStackRenderState();
+    /** 0..1 size of the clue; 0 while hidden. */
+    public float clueScale;
     public final List<ItemStackRenderState> components = new ArrayList<>();
 }

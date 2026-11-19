@@ -1887,7 +1887,37 @@
             "offset": 0,
             "temperature": [
               -0.421,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              -0.2,
+              -0.11
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              -1,
+              0
+            ],
+            "humidity": [
+              -1,
+              1
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -1947,7 +1977,37 @@
             "offset": 0,
             "temperature": [
               -0.421,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              -0.11,
+              0.03
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              -1,
+              0.4
+            ],
+            "humidity": [
+              -1,
+              -0.0185
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -1977,7 +2037,37 @@
             "offset": 0,
             "temperature": [
               -0.421,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              -0.11,
+              0.03
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              -1,
+              0
+            ],
+            "humidity": [
+              0.221,
+              1
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -2007,7 +2097,37 @@
             "offset": 0,
             "temperature": [
               -0.1457,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              -0.11,
+              0.03
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              -1,
+              0
+            ],
+            "humidity": [
+              -0.102,
+              1
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -2037,7 +2157,37 @@
             "offset": 0,
             "temperature": [
               -0.421,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              -0.11,
+              0.03
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              -0.78,
+              0
+            ],
+            "humidity": [
+              -0.102,
+              1
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -2097,7 +2247,37 @@
             "offset": 0,
             "temperature": [
               -0.421,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              0.03,
+              0.3
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              -0.375,
+              1
+            ],
+            "humidity": [
+              -1,
+              -0.0185
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -2157,7 +2337,37 @@
             "offset": 0,
             "temperature": [
               -0.1457,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              0.03,
+              0.3
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              -0.375,
+              0.1
+            ],
+            "humidity": [
+              -1,
+              -0.0185
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -2196,7 +2406,7 @@
           }
         },
         {
-          "biome": "minecraft:river",
+          "biome": "terrainlab:warm_river",
           "parameters": {
             "continentalness": [
               0.03,
@@ -2217,7 +2427,7 @@
             "offset": 0,
             "temperature": [
               0.188,
-              0.4253
+              1.0
             ],
             "weirdness": [
               -0.04,
@@ -2247,7 +2457,37 @@
             "offset": 0,
             "temperature": [
               -0.1457,
-              0.4253
+              0.188
+            ],
+            "weirdness": [
+              -0.04,
+              0.04
+            ]
+          }
+        },
+        {
+          "biome": "terrainlab:warm_river",
+          "parameters": {
+            "continentalness": [
+              0.03,
+              0.3
+            ],
+            "depth": [
+              -0.005,
+              0
+            ],
+            "erosion": [
+              0.4565,
+              1
+            ],
+            "humidity": [
+              -0.102,
+              0.065
+            ],
+            "offset": 0,
+            "temperature": [
+              0.188,
+              1.0
             ],
             "weirdness": [
               -0.04,

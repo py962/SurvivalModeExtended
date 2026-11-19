@@ -1,5 +1,6 @@
 package com.terrainlab.village;
 
+import com.terrainlab.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,6 +48,19 @@ public final class VillageReputationService {
                 .getOrDefault(bellPos, List.of());
         for (Villager villager : members) {
             villager.getGossips().add(playerId, type, value);
+        }
+    }
+
+    /** Adds {@code amount} reputation that never decays for one player on every villager of the village. */
+    public static void applyPermanentToPlayer(ServerLevel level, BlockPos bellPos, UUID playerId, int amount) {
+        if (amount == 0) {
+            return;
+        }
+        List<Villager> members = VillageMembershipService
+                .assignVillagersToNearestVillage(level, List.of(bellPos))
+                .getOrDefault(bellPos, List.of());
+        for (Villager villager : members) {
+            villager.getData(ModAttachments.VILLAGER_PERMANENT_REPUTATION.get()).merge(playerId, amount, Integer::sum);
         }
     }
 

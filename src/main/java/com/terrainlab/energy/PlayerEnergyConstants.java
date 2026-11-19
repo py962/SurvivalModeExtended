@@ -17,8 +17,9 @@ public final class PlayerEnergyConstants {
     public static final float ATTACK_SWING_DRAIN = 0.0011F;
     public static final int MINING_DRAIN_INTERVAL_TICKS = 13;
 
-    public static final double BOOST_JUMP_HEIGHT_BLOCKS = 1.5;
-    public static final double BOOST_SPRINT_SPEED_MODIFIER = 0.25;
+    public static final double BOOST_JUMP_HEIGHT_BLOCKS = 1.75;
+    public static final double BOOST_SPRINT_SPEED_MODIFIER = 0.5;
+    public static final double BOOST_SWIM_SPEED_MODIFIER = 0.5;
 
     // Extra drain per tick while a heavy wood shield is raised (by ShieldStats lightness); lightness 2+
     // has none.

@@ -1,6 +1,7 @@
 {
   "wants": {
-    "id": "minecraft:emerald"
+    "id": "minecraft:emerald",
+    "count": 3
   },
   "gives": {
     "id": "minecraft:amethyst_shard"

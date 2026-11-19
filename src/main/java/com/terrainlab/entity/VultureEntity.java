@@ -7,6 +7,13 @@ import net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal;
 import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.registry.ModSounds;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.tags.ItemTags;
+import com.terrainlab.pet.BirdTaming;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -20,8 +27,9 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * Parrot-based scavenger that soars without flapping. Goals, highest priority first: scavenge dropped
- * rotten flesh, circle at altitude by day, and occasionally perch on a local hilltop.
+ * Parrot-based scavenger that soars without flapping. Goals, highest priority first: chase whoever
+ * attacks its owner (tamed only, no damage), scavenge dropped rotten flesh, circle at altitude by day,
+ * and occasionally perch on a local hilltop. Tamed with rotten flesh.
  *
  * <p>Tamed vultures are bed-anchored pets (see {@link AnchoredPets}): they circle above the centre
  * of their roaming zone (bed, or owner when unanchored), only scavenge and perch inside the zone,
@@ -33,6 +41,12 @@ public class VultureEntity extends Parrot {
     private static final boolean DEBUG_LOGGING = false;
 
     private static final double SCAVENGE_RANGE = 12.0; // blocks
+
+    private static final int CHASE_TICKS = 100;
+    private static final double CHASE_GIVE_UP_SQR = 256.0; // 16 blocks
+
+    private LivingEntity chaseTarget;
+    private int chaseTicks;
 
     private static boolean isDayTime(Level level) {
         long dayTime = level.getOverworldClockTime() % 24000L;
@@ -51,9 +65,38 @@ public class VultureEntity extends Parrot {
         this.goalSelector.removeAllGoals(goal -> goal instanceof net.minecraft.world.entity.ai.goal.LandOnOwnersShoulderGoal);
         this.goalSelector.getAvailableGoals()
                 .removeIf(wrapped -> wrapped.getGoal() instanceof LandOnOwnersShoulderGoal);
+        this.goalSelector.addGoal(0, new VultureDefendOwnerGoal(this));
         this.goalSelector.addGoal(1, new VultureScavengeGoal(this));
         this.goalSelector.addGoal(2, new VultureCircleGoal(this));
         this.goalSelector.addGoal(3, new VultureHilltopPerchGoal(this));
+    }
+
+    /** Owner attacked: chase the attacker for a few seconds. */
+    public void defendOwner(LivingEntity attacker) {
+        if (AnchoredPets.mayWander(this) && isValidChaseTarget(attacker)) {
+            this.chaseTarget = attacker;
+            this.chaseTicks = CHASE_TICKS;
+        }
+    }
+
+    private static boolean isValidChaseTarget(LivingEntity target) {
+        return target.isAlive() && !(target instanceof Player player && (player.isCreative() || player.isSpectator()));
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!this.isTame()) {
+            if (stack.is(Items.ROTTEN_FLESH)) {
+                this.usePlayerItem(player, hand, stack);
+                BirdTaming.fed(this, player);
+                return InteractionResult.SUCCESS;
+            }
+            if (stack.is(ItemTags.PARROT_FOOD)) {
+                return InteractionResult.PASS;
+            }
+        }
+        return super.mobInteract(player, hand);
     }
 
     @Override
@@ -80,6 +123,43 @@ public class VultureEntity extends Parrot {
     @Override
     protected SoundEvent getDeathSound() {
         return ModSounds.VULTURE_DEATH.get();
+    }
+
+    private static class VultureDefendOwnerGoal extends Goal {
+        private final VultureEntity vulture;
+
+        VultureDefendOwnerGoal(VultureEntity vulture) {
+            this.vulture = vulture;
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+        }
+
+        @Override
+        public boolean canUse() {
+            return canContinueToUse();
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            LivingEntity target = this.vulture.chaseTarget;
+            return target != null && this.vulture.chaseTicks > 0 && isValidChaseTarget(target)
+                    && AnchoredPets.mayWander(this.vulture)
+                    && this.vulture.distanceToSqr(target) <= CHASE_GIVE_UP_SQR;
+        }
+
+        @Override
+        public void tick() {
+            LivingEntity target = this.vulture.chaseTarget;
+            if (target == null) return;
+            this.vulture.chaseTicks--;
+            this.vulture.getLookControl().setLookAt(target, 30.0F, 30.0F);
+            this.vulture.getNavigation().moveTo(target, 1.2);
+        }
+
+        @Override
+        public void stop() {
+            this.vulture.chaseTarget = null;
+            this.vulture.chaseTicks = 0;
+        }
     }
 
     private static class VultureScavengeGoal extends Goal {

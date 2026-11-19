@@ -92,9 +92,10 @@ public final class BiomePalette {
                     "minecraft:stony_peaks" ->
                     AtlasColors.STONY;
 
-            // Water (normally caught first by AtlasMapGenerator's sea-level check)
+            // Water
             case "minecraft:river",
                  "terrainlab:inland_river",
+                 "terrainlab:warm_river",
                  "minecraft:ocean",
                  "minecraft:deep_ocean",
                  "minecraft:cold_ocean",

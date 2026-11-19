@@ -42,6 +42,13 @@ public class CelestialForgeRenderer implements BlockEntityRenderer<CelestialForg
     private static final float RAY_LENGTH = 160.0F; // blocks: high enough to reach the sky
     private static final int FULL_BRIGHT = 0xF000F0;
 
+    // Clue timing (ticks into the ritual): first shown at CLUE_START, then every CLUE_PERIOD; it grows
+    // in over CLUE_FADE, holds for CLUE_HOLD and shrinks away over CLUE_FADE.
+    private static final float CLUE_START = 40.0F;
+    private static final float CLUE_PERIOD = 200.0F;
+    private static final float CLUE_FADE = 8.0F;
+    private static final float CLUE_HOLD = 20.0F;
+
     // The dragon-ray pipeline with ordinary alpha blending, so dark rays shade what is behind them.
     // (26.x: like vanilla's dragon rays, this pipeline writes depth itself; there is no separate depth pass.)
     private static final RenderPipeline DARK_RAYS_PIPELINE = RenderPipeline.builder(RenderPipelines.DRAGON_RAYS_SNIPPET)
@@ -85,6 +92,31 @@ public class CelestialForgeRenderer implements BlockEntityRenderer<CelestialForg
                 state.components.add(component);
             }
         }
+
+        state.clueScale = forge.phase() == CelestialForgeBlockEntity.Phase.RITUAL ? clueScale(state.time) : 0.0F;
+        if (state.clueScale > 0.0F) {
+            itemModelResolver.updateForTopItem(state.clue, forge.wanted(), ItemDisplayContext.FIXED, forge.getLevel(), null, seed - 1);
+        } else {
+            state.clue.clear();
+        }
+    }
+
+    private static float clueScale(float time) {
+        if (time < CLUE_START) {
+            return 0.0F;
+        }
+        float t = (time - CLUE_START) % CLUE_PERIOD;
+        float s;
+        if (t < CLUE_FADE) {
+            s = t / CLUE_FADE;
+        } else if (t < CLUE_FADE + CLUE_HOLD) {
+            s = 1.0F;
+        } else if (t < CLUE_FADE * 2.0F + CLUE_HOLD) {
+            s = 1.0F - (t - CLUE_FADE - CLUE_HOLD) / CLUE_FADE;
+        } else {
+            return 0.0F;
+        }
+        return s * s * (3.0F - 2.0F * s);
     }
 
     @Override
@@ -115,6 +147,17 @@ public class CelestialForgeRenderer implements BlockEntityRenderer<CelestialForg
             float scale = 0.6F + state.transformProgress * 0.3F;
             poseStack.scale(scale, scale, scale);
             state.gem.submit(poseStack, collector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+            poseStack.popPose();
+        }
+
+        // The clue swells into view above the gem and shrinks away again.
+        if (state.clueScale > 0.0F && !state.clue.isEmpty()) {
+            poseStack.pushPose();
+            poseStack.translate(0.5F, GEM_HEIGHT + 0.75F + bob, 0.5F);
+            poseStack.rotateDegrees(Axis.YP, time * 6.0F);
+            float scale = 0.4F * state.clueScale;
+            poseStack.scale(scale, scale, scale);
+            state.clue.submit(poseStack, collector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }
 

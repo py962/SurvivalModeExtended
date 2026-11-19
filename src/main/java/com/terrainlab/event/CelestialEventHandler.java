@@ -749,8 +749,11 @@ public class CelestialEventHandler {
                 .registryAccess()
                 .lookupOrThrow(Registries.ENCHANTMENT);
 
-        grantIfApplicable(event, enchantmentRegistry.getOrThrow(Enchantments.LOOTING));
-        grantIfApplicable(event, enchantmentRegistry.getOrThrow(Enchantments.FORTUNE));
+        // Looting and Fortune come only from the conduit; Luck of the Sea from either.
+        if (player.getData(ModAttachments.LUCK_CONDUIT_NEARBY.get())) {
+            grantIfApplicable(event, enchantmentRegistry.getOrThrow(Enchantments.LOOTING));
+            grantIfApplicable(event, enchantmentRegistry.getOrThrow(Enchantments.FORTUNE));
+        }
         grantIfApplicable(event, enchantmentRegistry.getOrThrow(Enchantments.LUCK_OF_THE_SEA));
     }
 

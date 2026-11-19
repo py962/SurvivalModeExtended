@@ -155,6 +155,7 @@ public final class BiomeTemperatureTable {
         inheritsSurroundings("minecraft:stony_peaks");
         inheritsSurroundings("minecraft:mushroom_fields");
         inheritsSurroundings("terrainlab:inland_river");
+        inheritsSurroundings("terrainlab:warm_river");
 
         bootstrapped = true;
     }
