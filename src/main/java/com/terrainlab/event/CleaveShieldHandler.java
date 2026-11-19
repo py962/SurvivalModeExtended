@@ -4,6 +4,7 @@ import com.terrainlab.TerrainLab;
 import com.terrainlab.registry.ModEnchantments;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +16,7 @@ import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 
 /**
  * Cleave enchantment: adds extra shield durability damage when a melee hit from a Cleave
- * weapon is blocked.
+ * weapon is blocked, by a raised shield or by autoblock.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID)
 public final class CleaveShieldHandler {
@@ -27,29 +28,34 @@ public final class CleaveShieldHandler {
     public static void onShieldBlock(LivingShieldBlockEvent event) {
         LivingEntity blocker = event.getEntity();
 
-        if (blocker.level().isClientSide()) {
+        if (blocker.level().isClientSide() || !event.getBlocked()) {
             return;
         }
 
-        if (!event.getBlocked()) {
-            return;
-        }
+        int additionalShieldDamage = extraShieldDamage(blocker, event.getDamageSource());
 
-        Entity attacker = event.getDamageSource().getEntity();
+        if (additionalShieldDamage > 0) {
+            event.setShieldDamage(Math.round(event.shieldDamage()) + additionalShieldDamage);
+        }
+    }
+
+    /** Extra shield damage from a blocked melee hit: 15 x (level + 1) with a Cleave weapon, else 0. */
+    public static int extraShieldDamage(LivingEntity blocker, DamageSource source) {
+        Entity attacker = source.getEntity();
 
         if (!(attacker instanceof LivingEntity livingAttacker)) {
-            return;
+            return 0;
         }
 
         // Melee only: for projectiles getEntity() is the shooter, not the hand that dealt the hit.
-        if (event.getDamageSource().getDirectEntity() != attacker) {
-            return;
+        if (source.getDirectEntity() != attacker) {
+            return 0;
         }
 
         ItemStack weapon = livingAttacker.getMainHandItem();
 
         if (weapon.isEmpty()) {
-            return;
+            return 0;
         }
 
         Holder<Enchantment> cleave = blocker.level()
@@ -59,14 +65,6 @@ public final class CleaveShieldHandler {
 
         int level = EnchantmentHelper.getItemEnchantmentLevel(cleave, weapon);
 
-        if (level <= 0) {
-            return;
-        }
-
-        int additionalShieldDamage = 15 * (level + 1);
-
-        int currentShieldDamage = Math.round(event.shieldDamage());
-
-        event.setShieldDamage(currentShieldDamage + additionalShieldDamage);
+        return level > 0 ? 15 * (level + 1) : 0;
     }
 }

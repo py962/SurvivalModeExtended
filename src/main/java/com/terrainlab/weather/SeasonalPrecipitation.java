@@ -116,6 +116,11 @@ public final class SeasonalPrecipitation {
                 Identifier.fromNamespaceAndPath(
                         "terrainlab",
                         "inland_river"
+                ))
+                || biomeId.equals(
+                Identifier.fromNamespaceAndPath(
+                        "terrainlab",
+                        "warm_river"
                 ));
     }
 

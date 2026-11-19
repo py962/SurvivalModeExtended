@@ -4,7 +4,6 @@ import com.terrainlab.TerrainLab;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -33,9 +32,6 @@ public final class AtlasMapGenerator {
 
     /** World blocks per sample cell along each axis. */
     public static final int BLOCKS_PER_SAMPLE = COVERAGE_BLOCKS / SAMPLE_RESOLUTION;
-
-    /** Surface Y at or above which a sample renders as snowy mountain regardless of biome. */
-    private static final int MOUNTAIN_Y_THRESHOLD = 150;
 
     private AtlasMapGenerator() {}
 
@@ -100,7 +96,7 @@ public final class AtlasMapGenerator {
         return data;
     }
 
-    /** Colour for one sample, read from the generator's height and biome source rather than loaded chunks. */
+    /** Colour for one sample: the surface biome, read from the generator rather than loaded chunks. */
     private static MapColor samplePixel(
             ServerLevel level,
             int wx,
@@ -119,14 +115,6 @@ public final class AtlasMapGenerator {
                 randomState
         );
 
-        // No blocks to inspect, so a surface at or below sea level counts as ocean.
-        boolean isOcean = surfaceY <= level.getSeaLevel();
-
-        if (isOcean) {
-
-            return AtlasColors.OCEAN;
-        }
-
         Holder<Biome> biome = generator.getBiomeSource().getNoiseBiome(
                 QuartPos.fromBlock(wx),
                 QuartPos.fromBlock(surfaceY),
@@ -134,18 +122,7 @@ public final class AtlasMapGenerator {
                 randomState.sampler()
         );
 
-        Identifier biomeId = biome.unwrapKey()
-                .map(key -> key.identifier())
-                .orElse(null);
-
-        if (surfaceY >= MOUNTAIN_Y_THRESHOLD) {
-
-            return AtlasColors.SNOWY;
-        }
-
-        MapColor color = BiomePalette.classify(biome);
-
-        return color;
+        return BiomePalette.classify(biome);
     }
 
     /** Category name for diagnostic output. */

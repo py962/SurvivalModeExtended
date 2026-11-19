@@ -2,6 +2,9 @@ package com.terrainlab.event;
 
 import com.terrainlab.TerrainLab;
 import com.terrainlab.data.HazardOwnerData;
+import com.terrainlab.village.VillageConstants;
+import com.terrainlab.village.VillageMembershipService;
+import com.terrainlab.village.VillageReputationService;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -12,6 +15,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -118,6 +122,13 @@ public final class MobExperienceHandler {
         }
         if (responsible == null) {
             return;
+        }
+
+        if (victim instanceof IronGolem golem && !golem.isPlayerCreated()) {
+            UUID killer = responsible;
+            VillageMembershipService.findMemberBell(level, golem.blockPosition()).ifPresent(bell ->
+                    VillageReputationService.applyPermanentToPlayer(level, bell, killer,
+                            VillageConstants.KILL_IRON_GOLEM_REPUTATION));
         }
 
         ServerPlayer player = level.getServer().getPlayerList().getPlayer(responsible);

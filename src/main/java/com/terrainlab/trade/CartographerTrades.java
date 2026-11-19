@@ -51,8 +51,8 @@ public final class CartographerTrades {
         // Journeyman (level 3): Amethyst, Spyglass - 5 XP/trade
         List<VillagerTrades.ItemListing> journeyman = trades.get(3);
         journeyman.clear();
-        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.AMETHYST_SHARD, 3, 1, JOURNEYMAN_MAX_USES, 5));
-        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.AMETHYST_SHARD, 1, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.buying(Items.AMETHYST_SHARD, 1, 1, JOURNEYMAN_MAX_USES, 5));
+        journeyman.add(TradeListings.SimpleTradeListing.selling(Items.AMETHYST_SHARD, 1, 3, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.buying(Items.SPYGLASS, 1, 1, JOURNEYMAN_MAX_USES, 5));
         journeyman.add(TradeListings.SimpleTradeListing.selling(Items.SPYGLASS, 1, 3, JOURNEYMAN_MAX_USES, 5));
 

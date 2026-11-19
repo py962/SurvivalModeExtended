@@ -91,6 +91,9 @@ public final class VillageConstants {
     // Applied to the player who breaks a bell.
     public static final int DESTROY_BELL_REPUTATION = -150;
 
+    // Applied permanently to the player who kills a village's iron golem.
+    public static final int KILL_IRON_GOLEM_REPUTATION = -25;
+
     // Radius (blocks) at which villagers notice a Sentry-trimmed player in line of sight.
     public static final double SENTRY_TRIM_SIGHT_RADIUS = 16.0;
 

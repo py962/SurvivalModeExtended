@@ -38,6 +38,9 @@ public final class CelestialEffects {
     // Conduit checks happen every 40 ticks.
     private static final int EFFECT_DURATION_TICKS = 260;
 
+    // Life amulet: heals half a heart a minute.
+    private static final int LIFE_AMULET_HEAL_INTERVAL_TICKS = 1200;
+
     /*
      * Shield environmental scan.
      *
@@ -238,7 +241,12 @@ public final class CelestialEffects {
     public static void tickAmulet(ServerPlayer player, CelestialVariant variant) {
         switch (variant) {
             case BREATH -> give(player, MobEffects.WATER_BREATHING);
-            case LIFE -> boostEnergy(player, 0.5F);
+            case LIFE -> {
+                boostEnergy(player, 0.5F);
+                if (player.tickCount % LIFE_AMULET_HEAL_INTERVAL_TICKS == 0) {
+                    player.heal(1.0F);
+                }
+            }
             case DEATH -> {
                 // Event-driven: respawn-choice flow.
             }
