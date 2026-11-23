@@ -150,12 +150,6 @@
                   "Properties": { "facing": "west", "waterlogged": "false" }
                 },
                 "weight": 6
-              },
-              {
-                "data": {
-                  "Name": "minecraft:budding_amethyst"
-                },
-                "weight": 10
               }
             ]
           }

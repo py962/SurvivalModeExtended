@@ -81,7 +81,7 @@ public class OwlEntity extends Parrot {
 
         this.goalSelector.addGoal(1, new OwlNocturnalGoal(this));
         this.goalSelector.addGoal(2, new OwlCircleGoal(this));
-        this.goalSelector.addGoal(3, new OwlMorningGiftGoal(this));
+        this.goalSelector.addGoal(1, new OwlMorningGiftGoal(this));
         this.goalSelector.addGoal(4, new OwlPerchGoal(this));
     }
 
@@ -413,65 +413,80 @@ public class OwlEntity extends Parrot {
     }
 
     /**
-     * Drops at most one gift per in-game day during dawn,
-     * when the tamed owl's owner is nearby.
+     * Once per in-game day at dawn, a tamed owl whose owner is within OWNER_RANGE (and inside its
+     * roaming zone) flies to the owner and drops a gift beside them.
      */
     private static class OwlMorningGiftGoal extends Goal {
         private static final double GIFT_CHANCE_PER_CHECK = 0.02;
-        private static final double OWNER_RANGE = 10.0;
+        private static final double OWNER_RANGE = 64.0;
+        private static final double DROP_RANGE = 3.0;
+        private static final int GIVE_UP_TICKS = 600;
         private static final long DAWN_START = 23000L;
 
         private final OwlEntity owl;
         private long lastGiftDay = Long.MIN_VALUE;
+        private Player owner;
+        private int ticks;
 
         OwlMorningGiftGoal(OwlEntity owl) {
             this.owl = owl;
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }
 
         @Override
         public boolean canUse() {
-            if (!this.owl.isTame()) {
+            if (!this.owl.isTame() || this.owl.isOrderedToSit()) {
                 return false;
             }
 
             long dayTime = this.owl.level().getDayTime();
 
-            if (dayTime % 24000L < DAWN_START) {
+            if (dayTime % 24000L < DAWN_START || dayTime / 24000L == this.lastGiftDay) {
                 return false;
             }
 
-            if (dayTime / 24000L == this.lastGiftDay) {
+            if (!(this.owl.getOwner() instanceof Player player) || !player.isAlive()
+                    || this.owl.distanceToSqr(player) > OWNER_RANGE * OWNER_RANGE
+                    || (this.owl.hasHome() && !this.owl.isWithinHome(player.blockPosition()))) {
                 return false;
             }
 
-            LivingEntity ownerEntity = this.owl.getOwner();
-
-            if (!(ownerEntity instanceof Player player)) {
+            if (this.owl.getRandom().nextDouble() >= GIFT_CHANCE_PER_CHECK) {
                 return false;
             }
-
-            if (this.owl.distanceToSqr(player)
-                    > OWNER_RANGE * OWNER_RANGE) {
-                return false;
-            }
-
-            return this.owl.getRandom().nextDouble()
-                    < GIFT_CHANCE_PER_CHECK;
+            this.owner = player;
+            return true;
         }
 
         @Override
         public boolean canContinueToUse() {
-            return false;
+            return this.owner != null && this.owner.isAlive() && !this.owl.isOrderedToSit()
+                    && this.ticks < GIVE_UP_TICKS;
         }
 
         @Override
         public void start() {
-            if (this.owl.getOwner() instanceof Player player) {
-                this.lastGiftDay =
-                        this.owl.level().getDayTime() / 24000L;
+            this.ticks = 0;
+            this.lastGiftDay = this.owl.level().getDayTime() / 24000L;
+        }
 
-                giveGift(player);
+        @Override
+        public void tick() {
+            if (this.owner == null) return;
+            this.ticks++;
+            this.owl.getLookControl().setLookAt(this.owner, 30.0F, 30.0F);
+            if (this.owl.distanceToSqr(this.owner) <= DROP_RANGE * DROP_RANGE) {
+                giveGift(this.owner);
+                this.owner = null;
+            } else if (this.ticks % 10 == 1) {
+                this.owl.getNavigation().moveTo(this.owner, 1.2);
             }
+        }
+
+        @Override
+        public void stop() {
+            this.owner = null;
+            this.owl.getNavigation().stop();
         }
 
         private void giveGift(Player owner) {
