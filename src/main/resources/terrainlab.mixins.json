@@ -25,6 +25,8 @@
     "PhantomAccessor",
     "VillagerCureReputationMixin",
     "VillagerPermanentReputationMixin",
+    "CatRelaxOnOwnerGoalMixin",
+    "LivingEntityColdFrostMixin",
     "VillagerCushionSeatMixin",
     "VillagerDataThresholdMixin",
     "CartographyTableMenuScaleMixin",
@@ -153,6 +155,7 @@
     "VillagerBreedFoodOnBirthMixin"
   ],
   "client": [
+    "PhasingViewOverlayMixin",
     "CartographyTableScreenScaleMixin",
     "WorldCreationUiStateHardcoreMixin",
     "CreateWorldGameTabHardcoreMixin",

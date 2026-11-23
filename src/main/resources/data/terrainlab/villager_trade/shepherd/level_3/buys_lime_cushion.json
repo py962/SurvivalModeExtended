@@ -1,20 +1,20 @@
 {
   "wants": {
-    "id": "minecraft:emerald"
+    "id": "minecraft:lime_cushion",
+    "count": 5
   },
   "gives": {
-    "id": "minecraft:purple_cushion",
-    "count": 3
+    "id": "minecraft:emerald"
   },
-  "max_uses": 4,
-  "xp": 10,
+  "max_uses": 8,
+  "xp": 5,
   "reputation_discount": 0.05,
   "merchant_predicate": {
     "type": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
       "minecraft:predicates": {
-        "minecraft:villager/variant": "minecraft:taiga"
+        "minecraft:villager/variant": "minecraft:savanna"
       }
     }
   }

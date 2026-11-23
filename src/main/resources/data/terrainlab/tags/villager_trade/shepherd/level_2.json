@@ -13,6 +13,12 @@
     "terrainlab:shepherd/level_2/sells_cactus_flower",
     "terrainlab:shepherd/level_2/sells_allium",
     "terrainlab:shepherd/level_2/sells_blue_orchid",
-    "terrainlab:shepherd/level_2/sells_cocoa_beans"
+    "terrainlab:shepherd/level_2/sells_cocoa_beans",
+    "terrainlab:shepherd/level_2/buys_brown_wool",
+    "terrainlab:shepherd/level_2/buys_black_wool",
+    "terrainlab:shepherd/level_2/buys_gray_wool",
+    "terrainlab:shepherd/level_2/sells_brown_wool",
+    "terrainlab:shepherd/level_2/sells_black_wool",
+    "terrainlab:shepherd/level_2/sells_gray_wool"
   ]
 }

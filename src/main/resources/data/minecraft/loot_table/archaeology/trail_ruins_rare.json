@@ -54,16 +54,11 @@
         {
           "type": "minecraft:item",
           "name": "terrainlab:diamond_upgrade_smithing_template"
-        }
-      ],
-      "rolls": 1
-    },
-    {
-      "entries": [
+        },
         {
           "type": "minecraft:item",
           "name": "terrainlab:ancient_artefact",
-          "weight": 1
+          "weight": 13
         }
       ],
       "rolls": 1

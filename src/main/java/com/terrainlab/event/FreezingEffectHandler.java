@@ -34,7 +34,7 @@ public class FreezingEffectHandler {
      * exposure: a refreshed instance with no particles. A potion or tipped arrow gives a long, visible instance,
      * which wins over the short one, so a potion still hurts while the player is also cold.
      */
-    private static boolean isColdExposureOnly(LivingEntity living) {
+    public static boolean isColdExposureOnly(LivingEntity living) {
         MobEffectInstance instance = living.getEffect(ModMobEffects.FREEZING);
         return instance != null
                 && !instance.isVisible()

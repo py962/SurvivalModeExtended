@@ -1,10 +1,9 @@
 {
   "wants": {
-    "id": "minecraft:lime_cushion",
-    "count": 5
+    "id": "minecraft:emerald"
   },
   "gives": {
-    "id": "minecraft:emerald"
+    "id": "terrainlab:caribou_fur"
   },
   "max_uses": 4,
   "xp": 10,
@@ -14,7 +13,10 @@
     "entity": "this",
     "predicate": {
       "minecraft:predicates": {
-        "minecraft:villager/variant": "minecraft:savanna"
+        "minecraft:villager/variant": [
+          "minecraft:snow",
+          "minecraft:taiga"
+        ]
       }
     }
   }

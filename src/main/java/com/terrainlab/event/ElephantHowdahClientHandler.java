@@ -13,8 +13,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 /**
  * Client-side howdah sleep trigger. Vanilla picking never hits the player's own mount, so an
- * empty-hand right-click on a block while riding an elephant and looking steeply down is
- * treated as a click on the elephant and sent as a {@link HowdahSleepRequestPacket}.
+ * empty-hand right-click while riding an elephant and looking steeply down is treated as a click
+ * on the elephant and sent as a {@link HowdahSleepRequestPacket}. From the elephant's back the
+ * ground is often out of reach, so clicks on empty air count too.
  */
 @EventBusSubscriber(modid = TerrainLab.MODID, value = Dist.CLIENT)
 public class ElephantHowdahClientHandler {
@@ -31,6 +32,17 @@ public class ElephantHowdahClientHandler {
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
 
+        sendSleepRequest();
+    }
+
+    @SubscribeEvent
+    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        if (event.getHand() != InteractionHand.MAIN_HAND) return;
+        if (!ElephantHowdahServerHandler.isHowdahClick(event.getEntity())) return;
+        sendSleepRequest();
+    }
+
+    private static void sendSleepRequest() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.getConnection() == null) return;
 

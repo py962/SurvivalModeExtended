@@ -3,20 +3,18 @@
     "id": "minecraft:emerald"
   },
   "gives": {
-    "id": "terrainlab:caribou_fur"
+    "id": "minecraft:purple_cushion",
+    "count": 3
   },
-  "max_uses": 2,
-  "xp": 0,
+  "max_uses": 8,
+  "xp": 5,
   "reputation_discount": 0.05,
   "merchant_predicate": {
     "type": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
       "minecraft:predicates": {
-        "minecraft:villager/variant": [
-          "minecraft:snow",
-          "minecraft:taiga"
-        ]
+        "minecraft:villager/variant": "minecraft:taiga"
       }
     }
   }

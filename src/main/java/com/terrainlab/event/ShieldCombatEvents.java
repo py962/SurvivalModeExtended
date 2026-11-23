@@ -442,7 +442,8 @@ public final class ShieldCombatEvents {
             return;
         }
 
-        event.setAmount(0.0f);
+        // Cancelled rather than zeroed, so the hit's poison, fire or knockback never applies and arrows bounce off.
+        event.setCanceled(true);
         int cleave = CleaveShieldHandler.extraShieldDamage(entity, source);
         if (cleave > 0) {
             entity.getItemInHand(blockingHand).hurtAndBreak(cleave, entity, blockingHand);

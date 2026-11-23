@@ -3,12 +3,19 @@ package com.terrainlab.event;
 import com.terrainlab.TerrainLab;
 import com.terrainlab.pet.AnchoredPets;
 import com.terrainlab.pet.FlyTowardsHomeGoal;
+import com.terrainlab.pet.WolfCarpetSleep;
+import com.terrainlab.season.SolarTime;
 import com.terrainlab.registry.ModAttachments;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -19,7 +26,10 @@ import java.util.Optional;
 /**
  * Keeps tamed anchored pets (wolves, cats, geese, owls, vultures - see {@link AnchoredPets}) within {@link #ROAM_RADIUS} of a roaming centre: their bed
  * anchor if set, otherwise the owner's position. Uses the vanilla Mob home, refreshed about
- * once a second (leashing overwrites it, so leashed pets are skipped).
+ * once a second (leashing overwrites it, so leashed pets are skipped). An anchor whose bed (or
+ * respawn anchor) is gone is cleared, so the pet follows its owner's zone until the next spawn set.
+ * At night (an hour either side of the bed window) a bed-anchored wolf or cat's zone shrinks to
+ * {@link #NIGHT_RADIUS} so it gathers near the bed.
  *
  * <p>Vanilla home only biases where strolls go; {@link MoveTowardsRestrictionGoal} is added
  * on join so pets far outside the zone walk back (goals are not saved, so this runs on every
@@ -32,6 +42,13 @@ import java.util.Optional;
 public class PetRoamingHandler {
 
     public static final int ROAM_RADIUS = 64;
+
+    /** Night zone around a bed anchor; matches the wolf carpet search radius. */
+    public static final int NIGHT_RADIUS = 16;
+
+    // 18:30 to 05:30 on the unwarped clock: the bed window plus an hour each side.
+    private static final long NIGHT_START = SolarTime.BED_START - 1000L;
+    private static final long NIGHT_END = SolarTime.BED_END + 1000L;
 
     private static final int REFRESH_INTERVAL_TICKS = 20; // staggered per entity id
 
@@ -84,6 +101,15 @@ public class PetRoamingHandler {
         refreshHome(pet);
     }
 
+    private static boolean isGatheringTime(TamableAnimal pet) {
+        long t = Math.floorMod(pet.level().getOverworldClockTime(), 24000L);
+        return t >= NIGHT_START && t < NIGHT_END;
+    }
+
+    private static boolean isAnchorBlock(BlockState state) {
+        return state.is(BlockTags.BEDS) || state.is(Blocks.RESPAWN_ANCHOR);
+    }
+
     private static void refreshHome(TamableAnimal pet) {
         if (!pet.isTame()) {
             // if (DEBUG_LOGGING) TerrainLab.LOGGER.info("[PET_ROAM] {} not tame - vanilla behaviour", pet);
@@ -101,8 +127,16 @@ public class PetRoamingHandler {
             // if (DEBUG_LOGGING) TerrainLab.LOGGER.info("[PET_ROAM] {} leashed - leash owns the home, skip", pet);
             return;
         }
+        if (pet instanceof Wolf wolf && WolfCarpetSleep.hasCarpet(wolf)) {
+            return; // never pulled off its carpet
+        }
 
         Optional<BlockPos> anchor = pet.getData(ModAttachments.ANCHOR_BED_POS.get());
+        if (anchor.isPresent() && pet.level().isLoaded(anchor.get())
+                && !isAnchorBlock(pet.level().getBlockState(anchor.get()))) {
+            pet.setData(ModAttachments.ANCHOR_BED_POS.get(), Optional.empty());
+            anchor = Optional.empty();
+        }
         boolean anchored = anchor.isPresent();
 
         BlockPos centre;
@@ -117,9 +151,11 @@ public class PetRoamingHandler {
             centre = owner.blockPosition();
         }
 
+        int radius = anchored && (pet instanceof Wolf || pet instanceof Cat) && isGatheringTime(pet)
+                ? NIGHT_RADIUS : ROAM_RADIUS;
         double tolerance = anchored ? 0.0 : OWNER_RECENTRE_DIST_SQ;
         boolean needsUpdate = !pet.hasHome()
-                || pet.getHomeRadius() != ROAM_RADIUS
+                || pet.getHomeRadius() != radius
                 || pet.getHomePosition().distSqr(centre) > tolerance;
 
         if (!needsUpdate) {
@@ -128,8 +164,8 @@ public class PetRoamingHandler {
             return;
         }
 
-        pet.setHomeTo(centre, ROAM_RADIUS);
+        pet.setHomeTo(centre, radius);
         // if (DEBUG_LOGGING) TerrainLab.LOGGER.info("[PET_ROAM] {} home -> {} radius {} ({})",
-                // pet, centre, ROAM_RADIUS, anchored ? "bed" : "owner");
+                // pet, centre, radius, anchored ? "bed" : "owner");
     }
 }

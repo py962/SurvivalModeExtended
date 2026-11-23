@@ -1,7 +1,7 @@
 {
   "wants": {
-    "id": "minecraft:pink_cushion",
-    "count": 5
+    "id": "terrainlab:caribou_fur",
+    "count": 3
   },
   "gives": {
     "id": "minecraft:emerald"
@@ -14,7 +14,10 @@
     "entity": "this",
     "predicate": {
       "minecraft:predicates": {
-        "minecraft:villager/variant": "minecraft:desert"
+        "minecraft:villager/variant": [
+          "minecraft:snow",
+          "minecraft:taiga"
+        ]
       }
     }
   }
