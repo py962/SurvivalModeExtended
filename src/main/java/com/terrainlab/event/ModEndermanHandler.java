@@ -16,7 +16,10 @@ import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -491,6 +494,10 @@ public class ModEndermanHandler {
                 continue;
             }
 
+            if (!canSeeBlock(level, enderman, lastPos)) {
+                continue;
+            }
+
             double distance =
                     enderman.distanceToSqr(
                             target.getX() + 0.5D,
@@ -546,6 +553,13 @@ public class ModEndermanHandler {
                 target.getZ() + 0.5D,
                 ENDERMAN_WALK_SPEED
         );
+    }
+
+    /** Nothing solid between the enderman's eyes and the block. */
+    private static boolean canSeeBlock(ServerLevel level, Enderman enderman, BlockPos pos) {
+        BlockHitResult hit = level.clip(new ClipContext(enderman.getEyePosition(), Vec3.atCenterOf(pos),
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, enderman));
+        return hit.getType() == HitResult.Type.MISS || hit.getBlockPos().equals(pos);
     }
 
     private static BlockState pickBlockForEnderman(
