@@ -1,0 +1,25 @@
+{
+  "values": [
+    "#minecraft:undead",
+    "#minecraft:arthropod",
+    "#minecraft:aquatic",
+    "minecraft:armor_stand",
+    "minecraft:iron_golem",
+    "minecraft:snow_golem",
+    "minecraft:copper_golem",
+    "minecraft:blaze",
+    "minecraft:breeze",
+    "minecraft:vex",
+    "minecraft:allay",
+    "minecraft:slime",
+    "minecraft:magma_cube",
+    "minecraft:shulker",
+    "minecraft:creaking",
+    "minecraft:ghast",
+    "minecraft:happy_ghast",
+    "minecraft:ender_dragon",
+    { "id": "terrainlab:frostbitten", "required": false },
+    { "id": "terrainlab:granite_golem", "required": false },
+    { "id": "terrainlab:ghost_fish", "required": false }
+  ]
+}
