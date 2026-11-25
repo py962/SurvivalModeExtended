@@ -10,7 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
  * Particle types: villager comfort indicators (client/VillagerMoodClient; "trapped"
- * uses vanilla's ANGRY_VILLAGER) and sandstorm particles.
+ * uses vanilla's ANGRY_VILLAGER), sandstorm particles, and breath and heat haze (client/ClimateVisualsClient).
  */
 public final class ModParticles {
 
@@ -45,6 +45,11 @@ public final class ModParticles {
             PARTICLE_TYPES.register("orange_poplar_leaves", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> YELLOW_POPLAR_LEAVES =
             PARTICLE_TYPES.register("yellow_poplar_leaves", () -> new SimpleParticleType(false));
+
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> BREATH =
+            PARTICLE_TYPES.register("breath", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HEAT_HAZE =
+            PARTICLE_TYPES.register("heat_haze", () -> new SimpleParticleType(false));
 
     private ModParticles() {
     }

@@ -2,15 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "pattern": [
-    "CGG",
-    "WKP",
-    "CGG"
+    " C ",
+    "GWG",
+    " C "
   ],
   "key": {
     "C": "minecraft:copper_ingot",
-    "G": "minecraft:glass_pane",
-    "K": "minecraft:ink_sac",
-    "P": "minecraft:paper",
+    "G": "minecraft:glass",
     "W": {
       "neoforge:ingredient_type": "neoforge:components",
       "items": "minecraft:potion",
