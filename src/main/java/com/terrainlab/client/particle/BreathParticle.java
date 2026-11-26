@@ -25,7 +25,7 @@ public class BreathParticle extends SingleQuadParticle {
         this.gravity = -0.004F;
         this.friction = 0.9F;
         this.lifetime = 20 + this.random.nextInt(8);
-        this.quadSize = 0.07F;
+        this.quadSize = 0.11F;
         this.roll = this.random.nextFloat() * Mth.TWO_PI;
         this.oRoll = this.roll;
         this.setAlpha(0.0F);
@@ -46,7 +46,7 @@ public class BreathParticle extends SingleQuadParticle {
     @Override
     public float getQuadSize(float partialTick) {
         float life = Mth.clamp((this.age + partialTick) / this.lifetime, 0.0F, 1.0F);
-        return this.quadSize * (1.0F + life * 1.4F);
+        return this.quadSize * (1.0F + life * 1.8F);
     }
 
     @Override

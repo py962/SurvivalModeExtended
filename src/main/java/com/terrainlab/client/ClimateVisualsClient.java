@@ -56,8 +56,12 @@ public final class ClimateVisualsClient {
     private static final double BREATH_FULL = -10.0D;
     private static final double BREATH_RANGE = 32.0D;
     private static final int BREATH_CHECK_INTERVAL = 10;
+    // Ticks between puffs.
     private static final float BREATH_SLOW_INTERVAL = 80.0F;
     private static final float BREATH_FAST_INTERVAL = 30.0F;
+    // Mob puffs outlast the gap between breaths, so each one is still fading as the next appears.
+    private static final float MOB_PUFF_OVERLAP = 1.4F;
+    private static final float PLAYER_BREATH_SCALE = 1.7F;
 
     // Haze and glare: start at 32 °C, full from 40 °C.
     private static final double HEAT_START = 32.0D;
@@ -165,13 +169,13 @@ public final class ClimateVisualsClient {
             }
             float interval = Mth.lerp(cold, BREATH_SLOW_INTERVAL, BREATH_FAST_INTERVAL);
             if (random.nextFloat() < BREATH_CHECK_INTERVAL / interval) {
-                spawnBreath(minecraft, level, entity, cold, entity == player);
+                spawnBreath(minecraft, level, entity, cold, entity == player, interval);
             }
         }
     }
 
     private static void spawnBreath(Minecraft minecraft, ClientLevel level, LivingEntity entity,
-                                    float cold, boolean self) {
+                                    float cold, boolean self, float interval) {
         Vec3 look = Vec3.directionFromRotation(entity.getXRot(), entity.getYHeadRot());
         boolean firstPerson = self && minecraft.options.getCameraType().isFirstPerson();
         double forward = firstPerson ? 0.6D : entity.getBbWidth() * 0.5D + 0.1D;
@@ -183,7 +187,11 @@ public final class ClimateVisualsClient {
                 mouth.x, mouth.y, mouth.z, drift.x, drift.y + 0.004D, drift.z);
         if (particle != null) {
             float size = Mth.clamp(entity.getBbHeight() / 1.8F, 0.5F, 1.6F);
-            particle.scale(size * (0.8F + 0.5F * cold));
+            float playerScale = entity instanceof Player ? PLAYER_BREATH_SCALE : 1.0F;
+            if (!(entity instanceof Player)) {
+                particle.setLifetime(Math.round(interval * MOB_PUFF_OVERLAP));
+            }
+            particle.scale(size * playerScale * (0.9F + 0.6F * cold));
         }
     }
 

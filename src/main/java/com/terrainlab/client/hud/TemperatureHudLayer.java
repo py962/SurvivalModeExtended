@@ -15,7 +15,7 @@ import net.neoforged.neoforge.client.gui.GuiLayer;
 
 /**
  * Temperature HUD gauge drawn bottom-center above the hotbar. The silhouette outline is
- * tinted by the client-computed ambient temperature; the arrow marks the server-synced
+ * tinted by the client-computed ambient temperature and the fill by the server-synced
  * internal body temperature ({@link ClientInternalTempState}). Drawn at {@link #SCALE}
  * around a scaled anchor, with layout in unscaled local coordinates.
  */
@@ -25,29 +25,24 @@ public class TemperatureHudLayer implements GuiLayer {
             Identifier.fromNamespaceAndPath("terrainlab", "textures/gui/temperature_fill.png");
     private static final Identifier OUTLINE_TEXTURE =
             Identifier.fromNamespaceAndPath("terrainlab", "textures/gui/temperature_outline.png");
-    private static final Identifier ARROW_TEXTURE =
-            Identifier.fromNamespaceAndPath("terrainlab", "textures/gui/temperature_arrow.png");
 
     private static final int FILL_W = 16, FILL_H = 32;
-    private static final int OUTLINE_W = 18, OUTLINE_H = 34;
-    private static final int ARROW_W = 14, ARROW_H = 12;
+    // The outline art is the fill grown by 2px on every side.
+    private static final int OUTLINE_W = 20, OUTLINE_H = 36;
+    private static final int FILL_OFFSET = 2;
 
     private static final float SCALE = 0.7F;
-
-    // Must match the mapping baked into the gauge art (degrees C).
-    private static final float DISPLAY_MIN = -20.0F;
-    private static final float DISPLAY_MAX = 60.0F;
-    private static final float DAMAGE_LOW = 0.0F;
-    private static final float DAMAGE_HIGH = 40.0F;
 
     private static final int HOTBAR_HEIGHT = 22; // matches Gui.HOTBAR_SPRITE height
     private static final int BOTTOM_MARGIN = 4;
     // Additional lift above the hotbar, on top of BOTTOM_MARGIN.
     private static final int EXTRA_LIFT = 12;
 
-    private static final int COLOR_WHITE = 0xFFFFFFFF;
-    private static final int COLOR_RED = 0xFFE1503C;
-    private static final int COLOR_BLUE = 0xFF417DEB;
+    // Colour stops (degrees C, RGB), cold to hot: dark blue at 0 and below, blue at 5, green through
+    // 15-20, yellow through 20-25, red at 35, dark red at 40 and above.
+    private static final float[] STOP_TEMPS = {0.0F, 5.0F, 10.0F, 15.0F, 19.0F, 21.0F, 25.0F, 30.0F, 35.0F, 40.0F};
+    private static final int[] STOP_COLOURS =
+            {0x223F9E, 0x417DEB, 0x46C4C2, 0x54CC6F, 0x54CC6F, 0xE6CD40, 0xE6CD40, 0xEE8A28, 0xE13C2D, 0x9A1A16};
 
     @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
@@ -73,14 +68,7 @@ public class TemperatureHudLayer implements GuiLayer {
         double nightFraction = com.terrainlab.season.SolarTime.nightFraction(mc.level); // matches the server
         double ambient = LocalTemperatureService.getAmbientTemperature(mc.level, pos, season, nightFraction);
 
-        int outlineTint;
-        if (ambient < DAMAGE_LOW) {
-            outlineTint = COLOR_BLUE;
-        } else if (ambient > DAMAGE_HIGH) {
-            outlineTint = COLOR_RED;
-        } else {
-            outlineTint = COLOR_WHITE;
-        }
+        int outlineTint = scaleColour((float) ambient);
 
         graphics.pose().pushMatrix();
         graphics.pose().translate((float) x, (float) y);
@@ -89,22 +77,32 @@ public class TemperatureHudLayer implements GuiLayer {
         graphics.blit(RenderPipelines.GUI_TEXTURED, OUTLINE_TEXTURE,
                 0, 0, 0f, 0f, OUTLINE_W, OUTLINE_H, OUTLINE_W, OUTLINE_H, outlineTint);
 
-        // Inner fill: centered with a 1px margin inside the 18x34 outline.
-        int fillX = 1;
-        int fillY = 1;
+        // Inner fill, tinted by internal body temperature.
+        int fillTint = scaleColour(ClientInternalTempState.getInternalTemp());
         graphics.blit(RenderPipelines.GUI_TEXTURED, FILL_TEXTURE,
-                fillX, fillY, 0f, 0f, FILL_W, FILL_H, FILL_W, FILL_H, COLOR_WHITE);
-
-        // Arrow: internal temperature on the same DISPLAY_MIN..DISPLAY_MAX scale.
-        float internalTemp = ClientInternalTempState.getInternalTemp();
-        float clamped = Math.max(DISPLAY_MIN, Math.min(DISPLAY_MAX, internalTemp));
-        float frac = (DISPLAY_MAX - clamped) / (DISPLAY_MAX - DISPLAY_MIN); // 0 = top (hot), 1 = bottom (cold)
-        int arrowY = fillY + Math.round(frac * (FILL_H - 1)) - ARROW_H / 2;
-        int arrowX = fillX - ARROW_W + 2; // tip overlaps the silhouette's left edge
-
-        graphics.blit(RenderPipelines.GUI_TEXTURED, ARROW_TEXTURE,
-                arrowX, arrowY, 0f, 0f, ARROW_W, ARROW_H, ARROW_W, ARROW_H, COLOR_WHITE);
+                FILL_OFFSET, FILL_OFFSET, 0f, 0f, FILL_W, FILL_H, FILL_W, FILL_H, fillTint);
 
         graphics.pose().popMatrix();
+    }
+
+    /** Colour of the gauge scale at this temperature, blended smoothly between stops. */
+    static int scaleColour(float celsius) {
+        if (celsius <= STOP_TEMPS[0]) {
+            return 0xFF000000 | STOP_COLOURS[0];
+        }
+        for (int i = 1; i < STOP_TEMPS.length; i++) {
+            if (celsius <= STOP_TEMPS[i]) {
+                float t = (celsius - STOP_TEMPS[i - 1]) / (STOP_TEMPS[i] - STOP_TEMPS[i - 1]);
+                return 0xFF000000 | lerpRgb(STOP_COLOURS[i - 1], STOP_COLOURS[i], t);
+            }
+        }
+        return 0xFF000000 | STOP_COLOURS[STOP_COLOURS.length - 1];
+    }
+
+    private static int lerpRgb(int a, int b, float t) {
+        int r = Math.round(((a >> 16) & 0xFF) + (((b >> 16) & 0xFF) - ((a >> 16) & 0xFF)) * t);
+        int g = Math.round(((a >> 8) & 0xFF) + (((b >> 8) & 0xFF) - ((a >> 8) & 0xFF)) * t);
+        int bl = Math.round((a & 0xFF) + ((b & 0xFF) - (a & 0xFF)) * t);
+        return (r << 16) | (g << 8) | bl;
     }
 }

@@ -34,6 +34,8 @@
     "MapItemSavedDataAccessor",
     "ItemCraftedByPlayerMixin",
     "MapItemCentredZoomMixin",
+    "MapItemZoomDetailMixin",
+    "MapItemSavedDataBannersAccessor",
     "DispenserBlockInvoker",
     "LivingEntityAccessor",
     "AbstractBoatGravityMixin",
@@ -156,6 +158,8 @@
     "VillagerBreedFoodOnBirthMixin"
   ],
   "client": [
+    "OptionsSpyglassViewMixin",
+    "IntegratedServerSpyglassViewMixin",
     "PhasingViewOverlayMixin",
     "CartographyTableScreenScaleMixin",
     "WorldCreationUiStateHardcoreMixin",

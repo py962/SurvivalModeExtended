@@ -22,10 +22,13 @@ import net.neoforged.neoforge.client.event.ViewportEvent;
 @EventBusSubscriber(modid = TerrainLab.MODID, value = Dist.CLIENT)
 public final class MarshMistClient {
 
-    // Pale grey-green, scaled by vanilla's light level.
+    // Pale grey-green, scaled by vanilla's light level down to MIN_MIST_LIGHT.
     private static final float[] MIST_COLOUR = {
             0.76F, 0.80F, 0.78F
     };
+
+    // The mist keeps its daytime brightness after dark instead of fading to black with the fog.
+    private static final float MIN_MIST_LIGHT = 1.0F;
 
     // Fog distances at full mist.
     private static final float MIST_START = 40.0F;
@@ -290,10 +293,10 @@ public final class MarshMistClient {
         float g = event.getGreen();
         float b = event.getBlue();
 
-        // Preserve vanilla daylight, night-time and storm darkening.
+        // Brightens on the brightest days but never dims below its daytime colour.
         float light = Mth.clamp(
                 (0.299F * r + 0.587F * g + 0.114F * b) / 0.55F,
-                0.08F,
+                MIN_MIST_LIGHT,
                 1.1F
         );
 
