@@ -7,6 +7,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -20,7 +25,8 @@ import java.util.Map;
 
 /**
  * While a player scopes with a spyglass holding a map (see {@link #isScopeableMap}) in the off hand, computes the
- * loaded chunks inside a narrow view cone (up to {@link #MAX_DIST} blocks) for
+ * loaded chunks inside a narrow view cone (up to {@link #MAX_DIST} blocks) whose ground the player
+ * can actually see, for
  * MapItemMixin to paint onto that map. The cone is recomputed every {@link #SCAN_INTERVAL_TICKS}
  * ticks, and each chunk is handed to the mixin once per scoping session.
  */
@@ -31,6 +37,11 @@ public class SpyglassMapFillHandler {
     private static final double COS_HALF_FOV = Math.cos(Math.toRadians(HALF_FOV_DEG));
 
     private static final int SCAN_INTERVAL_TICKS = 10;
+
+    // Ground points tested per chunk (centre and four quarter points); any one in sight counts.
+    private static final int[][] SIGHT_POINTS = {{8, 8}, {4, 4}, {12, 4}, {4, 12}, {12, 12}};
+    // A ray stopping this close to the ground point is taken as reaching it.
+    private static final double SIGHT_TOLERANCE_SQ = 2.25;
 
     /** Chunks flagged but not yet painted in the current session. */
     private static final Map<Player, Set<ChunkPos>> FLAGGED_CACHE = new ConcurrentHashMap<>();
@@ -140,10 +151,27 @@ public class SpyglassMapFillHandler {
 
                 Vec3 dir = toChunk.normalize();
                 if (dir.dot(flatLook) < COS_HALF_FOV) continue;
+                if (!canSeeGround(player, eye, cx, cz)) continue;
 
                 result.add(new ChunkPos(cx, cz));
             }
         }
         return result;
+    }
+
+    private static boolean canSeeGround(Player player, Vec3 eye, int cx, int cz) {
+        Level level = player.level();
+        for (int[] point : SIGHT_POINTS) {
+            int x = cx * 16 + point[0];
+            int z = cz * 16 + point[1];
+            int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+            Vec3 ground = new Vec3(x + 0.5, top, z + 0.5);
+            BlockHitResult hit = level.clip(new ClipContext(eye, ground,
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+            if (hit.getType() == HitResult.Type.MISS || hit.getLocation().distanceToSqr(ground) <= SIGHT_TOLERANCE_SQ) {
+                return true;
+            }
+        }
+        return false;
     }
 }
