@@ -2,7 +2,7 @@
 
 A survival overhaul for **Minecraft 1.21.11** and  **26.3** on **NeoForge**. It makes the world something to prepare for and live in, while keeping the look and feel of vanilla.
 
-> **Beta.** Expect bugs and balance changes, and keep backups of any world you use it in. Please report problems on the [issue tracker](https://github.com/py962/SurvivalModeExtended/issues).
+> **Release** The mod has been extensively tested across 100 hours of gameplay, and contains no major bugs to the best of our knowledge, but is still being tested for playthrough balance. Expect monthly updates with small improvements. Please report problems on the issue tracker.
 
 ## Features
 
